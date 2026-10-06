@@ -1543,7 +1543,7 @@
   },
   "clinic": {
     "title": "Clinic dashboard",
-    "intro": "Vaccinations due for pets registered with this clinic.",
+    "intro": "Verify owner uploads first, then follow up on pets that are overdue or due soon.",
     "upToDate": "{up} of {total} registered pets up to date",
     "coverageNote": "Based on pets registered in this app — not population coverage.",
     "noVerified": "{count, plural, one {# pet has} other {# pets have}} no verified record",
@@ -1575,7 +1575,14 @@
       "dateFuture": "The date cannot be in the future.",
       "dueAfter": "The next due date must be after the vaccination date.",
       "templateOption": "{name} (demo template: {days} days)"
-    }
+    },
+    "todayAt": "Today at {clinic}",
+    "demoClinic": "Demo clinic",
+    "filterLabel": "Filter the lists",
+    "filteredBy": "Showing only: {name}.",
+    "showAll": "Show everything",
+    "demoTools": "Demo tools",
+    "demoToolsIntro": "Only in demo organisations. Use these to show how reminders progress; real clinics never see this."
   },
   "footer": {
     "demoVersion": "Demo version — not for real medical use.",

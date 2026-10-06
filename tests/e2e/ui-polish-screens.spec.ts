@@ -101,3 +101,20 @@ for (const [label, viewport] of WIDTHS) {
     await expect(page).toHaveURL(/\/en\/app\/pets$/);
   });
 }
+
+for (const [label, viewport] of WIDTHS) {
+  test(`clinic dashboard (${label})`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize(viewport);
+    await signIn(page, DEMO.clinicVet.email);
+    await page.goto("/en/app/clinic");
+    await expect(page.getByRole("heading", { level: 1, name: /Today at Lotus Pet Clinic/ })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Demo tools" })).toBeVisible();
+    await check(page, `clinic-${label}`);
+    await page.getByRole("button", { name: /Overdue/ }).click();
+    await expect(page.getByText("Showing only: Overdue.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /^Awaiting verification/ })).toHaveCount(0);
+    await page.getByRole("button", { name: "Show everything" }).click();
+    await expect(page.getByRole("heading", { name: /^Awaiting verification/ })).toBeVisible();
+  });
+}
