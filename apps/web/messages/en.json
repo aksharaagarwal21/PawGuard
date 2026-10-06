@@ -1841,6 +1841,25 @@
       "notifications": "Notifications",
       "how_to": "How to use PawGuard",
       "bite_help": "Bite help — now"
+    },
+    "voice": {
+      "title": "Talk instead of typing",
+      "talk": "Talk to assistant",
+      "stopListening": "Stop listening",
+      "stopSpeaking": "Stop speaking",
+      "listening": "Listening… speak now.",
+      "heard": "Heard: “{text}”",
+      "noRecognition": "Voice input isn't available in this browser. On Android use Chrome; on iPhone use Safari. You can type instead.",
+      "noVoice": "This device has no {language} voice, so answers will be shown as text only.",
+      "denied": "Microphone permission was denied. Allow the microphone for this site, or type instead.",
+      "noSpeech": "I didn't catch that — tap Talk and try again.",
+      "error": "Voice input stopped. Try again or type instead.",
+      "privacy": "In Chrome and Safari, speech recognition is done by the browser maker's online service (your recording is sent to it). Answers are read aloud by your device. Don't say personal details.",
+      "languages": {
+        "en": "English",
+        "hi": "Hindi",
+        "ta": "Tamil"
+      }
     }
   }
 }
