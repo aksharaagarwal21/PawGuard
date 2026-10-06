@@ -2079,6 +2079,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/webhooks/twilio/gather": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Phone-call keypad answer (Twilio)
+         * @description Permission: public, but the request must carry Twilio's signature (checked with Twilio's own validator
+         *     against the public address Twilio called). 1 = "I'll book a visit"; 2 = remind again in 3 days.
+         */
+        post: operations["webhooks_twilio_gather"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/webhooks/whatsapp": {
         parameters: {
             query?: never;
@@ -2696,6 +2717,8 @@ export interface components {
         };
         /** ChannelsAvailableOut */
         ChannelsAvailableOut: {
+            /** Call */
+            call: boolean;
             /** Email */
             email: boolean;
             /** Push */
@@ -2805,7 +2828,7 @@ export interface components {
              * Channel
              * @enum {string}
              */
-            channel: "email" | "push" | "whatsapp";
+            channel: "email" | "push" | "whatsapp" | "call";
             /**
              * Created At
              * Format: date-time
@@ -2825,6 +2848,8 @@ export interface components {
             last_error: string | null;
             /** Pet Name */
             pet_name: string | null;
+            /** Reply */
+            reply: ("1" | "2") | null;
             /** Sent At */
             sent_at: string | null;
             /**
@@ -3602,6 +3627,13 @@ export interface components {
         };
         /** NotificationSettingsIn */
         NotificationSettingsIn: {
+            /**
+             * Call Enabled
+             * @default false
+             */
+            call_enabled?: boolean;
+            /** Call Number */
+            call_number?: string | null;
             /** Email Address */
             email_address?: string | null;
             /**
@@ -3625,6 +3657,10 @@ export interface components {
         /** NotificationSettingsOut */
         NotificationSettingsOut: {
             available: components["schemas"]["ChannelsAvailableOut"];
+            /** Call Enabled */
+            call_enabled: boolean;
+            /** Call Number */
+            call_number: string | null;
             /** Demo Email Set */
             demo_email_set: boolean;
             /** Demo Recipients */
@@ -4182,7 +4218,7 @@ export interface components {
              * Provider
              * @enum {string}
              */
-            provider: "email" | "push" | "whatsapp";
+            provider: "email" | "push" | "whatsapp" | "call";
             /**
              * State
              * @enum {string}
@@ -4723,7 +4759,7 @@ export interface components {
              * Channel
              * @enum {string}
              */
-            channel: "email" | "push" | "whatsapp";
+            channel: "email" | "push" | "whatsapp" | "call";
         };
         /** TimelineEntryOut */
         TimelineEntryOut: {
@@ -11113,6 +11149,55 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ProductOut"];
                 };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    webhooks_twilio_gather: {
+        parameters: {
+            query: {
+                d: string;
+            };
+            header?: {
+                "X-Twilio-Signature"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Unauthorized */
             401: {

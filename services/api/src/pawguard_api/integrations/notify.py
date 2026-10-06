@@ -261,3 +261,60 @@ def whatsapp_signature_valid(s: Settings, raw_body: bytes, header: str | None) -
         return False
     expected = hmac.new(s.whatsapp_app_secret.encode(), raw_body, hashlib.sha256).hexdigest()
     return hmac.compare_digest(expected, header.removeprefix("sha256="))
+
+
+# ---- phone call (Twilio trial) -----------------------------------------------------------------------------------
+
+def call_configured(s: Settings) -> bool:
+    return bool(s.twilio_account_sid and s.twilio_auth_token and s.twilio_from_number)
+
+
+def call_twiml(msg: Message, gather_url: str | None) -> str:
+    """Spoken reminder. Every value is XML-escaped (pet names are typed by people), so nothing can inject TwiML."""
+    from xml.sax.saxutils import escape, quoteattr
+
+    say = escape(msg.short.replace("PawGuard:", "Hello. This is a reminder from PawGuard.", 1))
+    parts = [f"<Response><Say>{say}</Say>"]
+    if gather_url:  # the keypad needs a public HTTPS address for Twilio to post the answer to
+        parts.append(f'<Gather numDigits="1" timeout="6" method="POST" action={quoteattr(gather_url)}>'
+                     "<Say>Press 1 if you will book a visit. Press 2 to be reminded again in 3 days.</Say></Gather>")
+    parts.append("<Say>Goodbye.</Say></Response>")
+    return "".join(parts)
+
+
+def send_call(s: Settings, to: str, msg: Message, delivery_id: str) -> str:
+    import httpx
+
+    if not call_configured(s):
+        raise ProviderError("not_configured", status="not_configured", detail="Twilio account, token or number not set")
+    gather = (f"{s.public_app_url}/api/v1/webhooks/twilio/gather?d={delivery_id}"
+              if s.public_app_url.startswith("https://") else None)
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{s.twilio_account_sid}/Calls.json"
+    try:
+        r = httpx.post(url, data={"To": to, "From": s.twilio_from_number, "Twiml": call_twiml(msg, gather)},
+                       auth=(s.twilio_account_sid or "", s.twilio_auth_token or ""), timeout=20)
+    except httpx.HTTPError as exc:
+        raise ProviderError("unreachable", retry_in=300, detail="Twilio not reachable") from exc
+    if r.status_code < 300:
+        try:
+            return str(r.json()["sid"])
+        except (ValueError, KeyError) as exc:
+            raise ProviderError("bad_response", detail="Unexpected Twilio response") from exc
+    try:
+        code = int(r.json().get("code") or -1)
+    except (ValueError, TypeError):
+        code = -1
+    # Codes from Twilio's error dictionary.
+    if code == 21219:
+        raise ProviderError("not_verified_number",
+                            detail="Twilio trial: this number isn't verified in your Twilio console")
+    if code == 20005:
+        raise ProviderError("trial_ended", status="cap_reached",
+                            detail="Twilio account not active (trial minutes or trial period used up) — calls are off")
+    if code == 20003 or r.status_code == 401:
+        raise ProviderError("auth_failed", status="error", detail="Twilio rejected the account SID or auth token")
+    if r.status_code == 429:
+        raise ProviderError("rate_limited", retry_in=600, status="rate_limited", detail="Twilio rate limit")
+    if r.status_code >= 500:
+        raise ProviderError("temporary", retry_in=300, detail=f"Twilio temporary error ({r.status_code})")
+    raise ProviderError("rejected", detail=f"Twilio error {code}")

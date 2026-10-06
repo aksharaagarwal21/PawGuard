@@ -27,7 +27,7 @@ def channel_available() -> dict[str, bool]:
     s = get_settings()
     return {"email": notify.email_configured(s),
             "push": notify.push_configured(s),
-            "whatsapp": notify.whatsapp_configured(s)}
+            "whatsapp": notify.whatsapp_configured(s), "call": notify.call_configured(s)}
 
 
 def get_prefs(p: Principal) -> dict[str, Any]:
@@ -46,6 +46,7 @@ def get_prefs(p: Principal) -> dict[str, Any]:
         "email_pending": bool(row and row.email_address and not row.email_verified_at and row.email_verify_sent_at),
         "push_enabled": bool(row and row.push_enabled), "push_devices": push_devices,
         "whatsapp_enabled": bool(row and row.whatsapp_enabled), "whatsapp_number": row.whatsapp_number if row else None,
+        "call_enabled": bool(row and row.call_enabled), "call_number": row.call_number if row else None,
         "demo_recipients": demo and bool(s.demo_notify_email or s.demo_notify_whatsapp),
         "available": channel_available(),
         "demo_email_set": bool(s.demo_notify_email), "demo_whatsapp_set": bool(s.demo_notify_whatsapp),
@@ -86,14 +87,15 @@ def update_prefs(p: Principal, data: dict[str, Any]) -> dict[str, Any]:
         changed = (old.email_address if old else None) != new_email
         db.execute(text("""
             insert into app.notification_preferences (user_id, email_enabled, email_address, push_enabled,
-              whatsapp_enabled, whatsapp_number, updated_at)
-            values (:u, :ee, :ea, :pe, :we, :wn, now())
+              whatsapp_enabled, whatsapp_number, call_enabled, call_number, updated_at)
+            values (:u, :ee, :ea, :pe, :we, :wn, :ce, :cn, now())
             on conflict (user_id) do update set email_enabled = excluded.email_enabled,
               email_address = excluded.email_address, push_enabled = excluded.push_enabled,
               whatsapp_enabled = excluded.whatsapp_enabled, whatsapp_number = excluded.whatsapp_number,
-              updated_at = now()"""),
+              call_enabled = excluded.call_enabled, call_number = excluded.call_number, updated_at = now()"""),
             {"u": p.user_id, "ee": data["email_enabled"], "ea": new_email,
-             "pe": data["push_enabled"], "we": data["whatsapp_enabled"], "wn": data.get("whatsapp_number") or None})
+             "pe": data["push_enabled"], "we": data["whatsapp_enabled"], "wn": data.get("whatsapp_number") or None,
+             "ce": data.get("call_enabled", False), "cn": data.get("call_number") or None})
         if changed:  # a new address must be confirmed again
             db.execute(text("""update app.notification_preferences set email_verified_at = null,
                                email_verify_hash = null, email_verify_sent_at = null where user_id = :u"""),
@@ -158,13 +160,13 @@ def overview(db: Any, ctx: OrgContext) -> dict[str, Any]:
     status = {r.provider: r for r in db.execute(text("select * from app.provider_status"))}
     available = channel_available()
     providers = []
-    for name in ("email", "push", "whatsapp"):
+    for name in ("email", "push", "whatsapp", "call"):
         r = status.get(name)
         providers.append({"provider": name, "configured": available[name],
                           "state": (r.state if r else ("ok" if available[name] else "not_configured")),
                           "detail": r.detail if r else None, "updated_at": r.updated_at if r else None})
     rows = db.execute(text("""
-        select d.id, d.channel, d.kind, d.state, d.created_at, d.sent_at, d.last_error,
+        select d.id, d.channel, d.kind, d.state, d.created_at, d.sent_at, d.last_error, d.reply,
                coalesce(a.nickname, a.reference_code) as pet_name
         from app.notification_deliveries d
         left join app.vaccination_reminders r on r.id = d.reminder_id

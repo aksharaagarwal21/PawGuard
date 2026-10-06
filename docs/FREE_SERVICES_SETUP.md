@@ -113,6 +113,24 @@ Reading is a **draft**: the person checks every field and a vet still verifies t
 full certificate text is never stored. (Optional: `PAWGUARD_OCR_ENGINE=gemini` uses Gemini vision, but only for demo
 organisations, because real certificates carry people's names and the free tier must not receive personal data.)
 
+## 6. Phone calls — Twilio trial (optional, testing only)
+
+Twilio's trial (checked 7 October 2026): you "can call or message only verified recipients"; it includes **75 voice
+minutes**; trial accounts **expire 30 days after sign-up**. The call starts with Twilio's trial notice.
+
+1. Sign up at <https://www.twilio.com/try-twilio> and verify your own phone number.
+2. Console → **Phone Numbers → Verified Caller IDs** → add each team phone that should receive calls (+91…).
+3. Get a trial phone number (Console → Phone Numbers → Buy a number; trial numbers use trial credit).
+4. Copy into `.env`:
+   ```
+   PAWGUARD_TWILIO_ACCOUNT_SID=AC…        (Console → Account Info)
+   PAWGUARD_TWILIO_AUTH_TOKEN=…           (Console → Account Info)
+   PAWGUARD_TWILIO_FROM_NUMBER=+1…        (your Twilio number)
+   ```
+5. Restart; then **Notifications → Phone call (test only)** → number → turn on → **Send me a test**. Pressing 1 or 2
+   on the call needs the public HTTPS link running (the keypad answer is posted back to the app). When the trial
+   minutes or period run out, the clinic's Messages panel shows calls as off.
+
 ## After you've added the values: test each channel (5 minutes)
 
 1. Restart the services so they read the new `.env` (API, worker and dispatcher).

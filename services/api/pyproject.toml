@@ -24,6 +24,7 @@ dependencies = [
   "fpdf2==2.8.5",
   "pywebpush==2.0.3",
   "pytesseract==0.3.13",
+  "twilio==9.8.3",
 ]
 
 [project.scripts]

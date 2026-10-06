@@ -73,6 +73,7 @@ export function MessagesPanel({ data, tz, demo }: { data: Overview; tz: string; 
                       {d.state === "sent" ? <CheckCircle2 aria-hidden className="size-3.5 text-primary" /> : d.state === "failed" ? <AlertTriangle aria-hidden className="size-3.5 text-urgent" /> : <Clock aria-hidden className="size-3.5 text-ink-2" />}
                       {t(`delivery.${d.state}`)}
                     </span>
+                    {d.reply ? <span className="block text-xs text-ink-2">{t(`reply.${d.reply}`)}</span> : null}
                     {d.last_error && d.state !== "sent" ? <span className="block text-xs text-ink-2">{d.last_error}</span> : null}
                   </td>
                 </tr>

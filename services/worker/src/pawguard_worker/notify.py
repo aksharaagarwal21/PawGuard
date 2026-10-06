@@ -19,7 +19,8 @@ from pawguard_api.settings import Settings, get_settings
 log = get_logger(__name__)
 MAX_ATTEMPTS = 5
 # Errors about one recipient (not the provider as a whole).
-RECIPIENT_CODES = {"no_recipient", "not_confirmed", "outside_window", "recipient_refused", "push_failed"}
+RECIPIENT_CODES = {"no_recipient", "not_confirmed", "outside_window", "recipient_refused", "push_failed",
+                   "not_verified_number"}
 
 
 def _sql(sql: str, **params: Any) -> Any:
@@ -100,8 +101,15 @@ def _send_whatsapp(info: dict[str, Any], msg: notify.Message, s: Settings) -> st
     return notify.send_whatsapp(s, to, msg, info)
 
 
+def _send_call(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
+    to = info.get("call_number")
+    if not to:
+        raise notify.ProviderError("no_recipient", detail="No phone number for calls")
+    return notify.send_call(s, to, msg, str(info["id"]))
+
+
 SENDERS: dict[str, Callable[[dict[str, Any], notify.Message, Settings], str]] = {
-    "email": _send_email, "push": _send_push, "whatsapp": _send_whatsapp}
+    "email": _send_email, "push": _send_push, "whatsapp": _send_whatsapp, "call": _send_call}
 
 
 def deliver(info: dict[str, Any], s: Settings) -> str:

@@ -1727,6 +1727,10 @@
       },
       "ChannelsAvailableOut": {
         "properties": {
+          "call": {
+            "title": "Call",
+            "type": "boolean"
+          },
           "email": {
             "title": "Email",
             "type": "boolean"
@@ -1743,7 +1747,8 @@
         "required": [
           "email",
           "push",
-          "whatsapp"
+          "whatsapp",
+          "call"
         ],
         "title": "ChannelsAvailableOut",
         "type": "object"
@@ -1989,7 +1994,8 @@
             "enum": [
               "email",
               "push",
-              "whatsapp"
+              "whatsapp",
+              "call"
             ],
             "title": "Channel",
             "type": "string"
@@ -2036,6 +2042,21 @@
             ],
             "title": "Pet Name"
           },
+          "reply": {
+            "anyOf": [
+              {
+                "enum": [
+                  "1",
+                  "2"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reply"
+          },
           "sent_at": {
             "anyOf": [
               {
@@ -2069,7 +2090,8 @@
           "pet_name",
           "created_at",
           "sent_at",
-          "last_error"
+          "last_error",
+          "reply"
         ],
         "title": "DeliveryOut",
         "type": "object"
@@ -4126,6 +4148,23 @@
       "NotificationSettingsIn": {
         "additionalProperties": false,
         "properties": {
+          "call_enabled": {
+            "default": false,
+            "title": "Call Enabled",
+            "type": "boolean"
+          },
+          "call_number": {
+            "anyOf": [
+              {
+                "pattern": "^\\+[1-9][0-9]{7,14}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Number"
+          },
           "email_address": {
             "anyOf": [
               {
@@ -4174,6 +4213,21 @@
         "properties": {
           "available": {
             "$ref": "#/components/schemas/ChannelsAvailableOut"
+          },
+          "call_enabled": {
+            "title": "Call Enabled",
+            "type": "boolean"
+          },
+          "call_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Call Number"
           },
           "demo_email_set": {
             "title": "Demo Email Set",
@@ -4243,6 +4297,8 @@
           "push_devices",
           "whatsapp_enabled",
           "whatsapp_number",
+          "call_enabled",
+          "call_number",
           "demo_recipients",
           "demo_email_set",
           "demo_whatsapp_set",
@@ -5817,7 +5873,8 @@
             "enum": [
               "email",
               "push",
-              "whatsapp"
+              "whatsapp",
+              "call"
             ],
             "title": "Provider",
             "type": "string"
@@ -7476,7 +7533,8 @@
             "enum": [
               "email",
               "push",
-              "whatsapp"
+              "whatsapp",
+              "call"
             ],
             "title": "Channel",
             "type": "string"
@@ -19518,6 +19576,79 @@
         "summary": "Add a product",
         "tags": [
           "reference"
+        ]
+      }
+    },
+    "/api/v1/webhooks/twilio/gather": {
+      "post": {
+        "description": "Permission: public, but the request must carry Twilio's signature (checked with Twilio's own validator\nagainst the public address Twilio called). 1 = \"I'll book a visit\"; 2 = remind again in 3 days.",
+        "operationId": "webhooks_twilio_gather",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "d",
+            "required": true,
+            "schema": {
+              "maxLength": 40,
+              "title": "D",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "X-Twilio-Signature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Twilio-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Phone-call keypad answer (Twilio)",
+        "tags": [
+          "webhooks"
         ]
       }
     },

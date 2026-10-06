@@ -91,6 +91,10 @@ class Settings(BaseSettings):
     gemini_model: str | None = None
     ollama_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:3b"
+    # Optional phone calls: Twilio trial (verified numbers only; 75 voice minutes; expires after 30 days).
+    twilio_account_sid: str | None = None
+    twilio_auth_token: str | None = None
+    twilio_from_number: str | None = None
     # Certificate OCR: tesseract (local, eng+hin+tam) | gemini (demo organisations only) | off.
     ocr_engine: str = "tesseract"
     tesseract_cmd: str | None = None

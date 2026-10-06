@@ -1,7 +1,7 @@
 "use client";
 
 import type { Schemas } from "@pawguard/api-client";
-import { BellRing, Mail, MessageCircle } from "lucide-react";
+import { BellRing, Mail, MessageCircle, PhoneCall } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -13,7 +13,7 @@ import { browserApi, parseApiError, type FieldErrors } from "@/lib/api-browser";
 import { PushToggle } from "./push-toggle";
 
 type Settings = Schemas["NotificationSettingsOut"];
-type Channel = "email" | "push" | "whatsapp";
+type Channel = "email" | "push" | "whatsapp" | "call";
 
 /** Opt-in channels for vaccination reminders, with a test message per channel. */
 export function NotificationSettingsForm({ initial, vapidKey }: { initial: Settings; vapidKey: string | null }) {
@@ -36,6 +36,8 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
         push_enabled: next.push_enabled,
         whatsapp_enabled: next.whatsapp_enabled,
         whatsapp_number: next.whatsapp_number || null,
+        call_enabled: next.call_enabled,
+        call_number: next.call_number || null,
       },
     });
     setBusy(false);
@@ -181,6 +183,35 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
                 placeholder="+91…"
                 value={s.whatsapp_number ?? ""}
                 onChange={(e) => setS({ ...s, whatsapp_number: e.target.value })}
+              />
+            )}
+          </Field>
+          <Button type="submit" variant="secondary" disabled={busy}>
+            {tc("save")}
+          </Button>
+        </form>,
+      )}
+      {row(
+        "call",
+        PhoneCall,
+        s.call_enabled,
+        (v) => ({ ...s, call_enabled: v }),
+        <form
+          className="flex flex-wrap items-end gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void save(s);
+          }}
+        >
+          <Field id="notify-call" label={t("call.number")} hint={t("call.numberHint")} error={errors.call_number} className="min-w-0 flex-1">
+            {(aria) => (
+              <TextInput
+                {...aria}
+                type="tel"
+                autoComplete="tel"
+                placeholder="+91…"
+                value={s.call_number ?? ""}
+                onChange={(e) => setS({ ...s, call_number: e.target.value })}
               />
             )}
           </Field>

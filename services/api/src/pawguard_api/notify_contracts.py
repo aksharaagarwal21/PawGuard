@@ -8,13 +8,14 @@ from pydantic import Field
 
 from pawguard_api.contracts import Out, StrictModel
 
-ChannelName = Literal["email", "push", "whatsapp"]
+ChannelName = Literal["email", "push", "whatsapp", "call"]
 
 
 class ChannelsAvailableOut(Out):
     email: bool
     push: bool
     whatsapp: bool
+    call: bool
 
 
 class NotificationSettingsOut(Out):
@@ -26,6 +27,8 @@ class NotificationSettingsOut(Out):
     push_devices: int
     whatsapp_enabled: bool
     whatsapp_number: str | None
+    call_enabled: bool
+    call_number: str | None
     demo_recipients: bool  # demo memberships: messages go to the team's test inbox/number instead
     demo_email_set: bool
     demo_whatsapp_set: bool
@@ -38,6 +41,8 @@ class NotificationSettingsIn(StrictModel):
     push_enabled: bool = False
     whatsapp_enabled: bool = False
     whatsapp_number: str | None = Field(default=None, pattern=r"^\+[1-9][0-9]{7,14}$")
+    call_enabled: bool = False
+    call_number: str | None = Field(default=None, pattern=r"^\+[1-9][0-9]{7,14}$")
 
 
 class TestMessageIn(StrictModel):
@@ -61,6 +66,7 @@ class DeliveryOut(Out):
     created_at: datetime
     sent_at: datetime | None
     last_error: str | None
+    reply: Literal["1", "2"] | None = None  # phone-call keypad answer
 
 
 class NotificationsOverviewOut(Out):

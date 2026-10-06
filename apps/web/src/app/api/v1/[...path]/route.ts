@@ -51,7 +51,7 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
   target.search = request.nextUrl.search;
 
   const headers = new Headers();
-  for (const name of webhook ? [...FORWARD_REQUEST_HEADERS, "x-hub-signature-256"] : FORWARD_REQUEST_HEADERS) {
+  for (const name of webhook ? [...FORWARD_REQUEST_HEADERS, "x-hub-signature-256", "x-twilio-signature"] : FORWARD_REQUEST_HEADERS) {
     const v = request.headers.get(name);
     if (v) headers.set(name, v);
   }

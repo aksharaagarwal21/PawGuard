@@ -198,7 +198,7 @@ def test_staff_overview_has_states_not_addresses(client, setup, owner_engine):
     assert r.status_code == 200 and "owner-private@example.com" not in r.text
     body = r.json()
     assert body["deliveries"][0]["state"] == "sent" and body["deliveries"][0]["pet_name"] == "Coco"
-    assert {p["provider"] for p in body["providers"]} == {"email", "push", "whatsapp"}
+    assert {p["provider"] for p in body["providers"]} == {"email", "push", "whatsapp", "call"}
     # Demo-only scan trigger.
     assert client.post("/api/v1/clinic/notifications/run", headers=_h(w.tok["vet"], w.org)).status_code == 403
     assert uuid.UUID(body["deliveries"][0]["id"])
@@ -416,3 +416,70 @@ def test_overview_lists_confirmation_emails(client, setup, owner_engine, monkeyp
     r = client.get("/api/v1/clinic/notifications", headers=_h(w.tok["vet"], w.org))
     assert r.status_code == 200 and r.json()["deliveries"][0]["kind"] == "verify_email"
     assert "someone@example.com" not in r.text
+
+
+# ---- phone calls (Twilio trial) ----------------------------------------------------------------------------------
+
+def test_call_twiml_is_escaped_and_errors_map_to_states(setup, monkeypatch):
+    import httpx
+
+    msg = notify.compose({"kind": "vaccination_reminder", "pet": "<Say>evil</Say>", "vaccine": "Rabies",
+                          "clinic": "Lotus", "due_on": "2026-10-17", "today": "2026-10-07", "is_demo": True},
+                         setup.settings)
+    twiml = notify.call_twiml(msg, "https://pawguard.example/api/v1/webhooks/twilio/gather?d=1&x=<y>")
+    assert "<Say>evil</Say>" not in twiml and "&lt;Say&gt;evil" in twiml
+    assert '<Gather numDigits="1"' in twiml and "&lt;y&gt;" in twiml
+    assert "<Gather" not in notify.call_twiml(msg, None)  # no public address: no keypad
+    for k, v in {"twilio_account_sid": "AC123", "twilio_auth_token": "tok", "twilio_from_number": "+15550001111"}.items():
+        monkeypatch.setattr(setup.settings, k, v)
+    replies = [_Resp(400, {"code": 21219}), _Resp(401, {"code": 20005}), _Resp(201, {"sid": "CA999"})]
+    monkeypatch.setattr(httpx, "post", lambda url, data, auth, timeout: replies.pop(0))
+    with pytest.raises(notify.ProviderError) as e1:
+        notify.send_call(setup.settings, "+919800000001", msg, "d1")
+    assert e1.value.code == "not_verified_number"
+    with pytest.raises(notify.ProviderError) as e2:
+        notify.send_call(setup.settings, "+919800000001", msg, "d1")
+    assert e2.value.code == "trial_ended" and e2.value.status == "cap_reached"
+    assert notify.send_call(setup.settings, "+919800000001", msg, "d1") == "CA999"
+
+
+def test_call_reminder_and_signed_keypad_reply(client, setup, owner_engine, monkeypatch):
+    import httpx
+    from twilio.request_validator import RequestValidator
+
+    from pawguard_worker import notify as worker_notify
+
+    for k, v in {"twilio_account_sid": "AC123", "twilio_auth_token": "tok", "twilio_from_number": "+15550001111",
+                 "extra_web_origins": "https://pawguard.example"}.items():
+        monkeypatch.setattr(setup.settings, k, v)
+    calls: list = []
+
+    def fake_post(url, data, auth, timeout):
+        calls.append((url, data, auth))
+        return _Resp(201, {"sid": "CA1"})
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+    w = setup.build(demo=False)
+    r = client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
+                   json={"call_enabled": True, "call_number": "+919800000002"})
+    assert r.status_code == 200 and r.json()["call_enabled"] is True and r.json()["available"]["call"] is True
+    assert _queue(owner_engine) == 1
+    assert worker_notify.drain().get("sent") == 1
+    url, data, auth = calls[-1]
+    assert url.endswith("/Accounts/AC123/Calls.json") and data["To"] == "+919800000002" and auth == ("AC123", "tok")
+    assert "Coco" in data["Twiml"] and "https://pawguard.example/api/v1/webhooks/twilio/gather?d=" in data["Twiml"]
+    with owner_engine.begin() as c:
+        delivery = c.execute(text("select id from app.notification_deliveries where channel = 'call'")).scalar()
+    gather_url = f"https://pawguard.example/api/v1/webhooks/twilio/gather?d={delivery}"
+    params = {"Digits": "2", "CallSid": "CA1"}
+    sig = RequestValidator("tok").compute_signature(gather_url, params)
+    bad = client.post(f"/api/v1/webhooks/twilio/gather?d={delivery}", data=params,
+                      headers={"X-Twilio-Signature": "forged"})
+    assert bad.status_code == 403
+    ok = client.post(f"/api/v1/webhooks/twilio/gather?d={delivery}", data=params, headers={"X-Twilio-Signature": sig})
+    assert ok.status_code == 200 and "remind you again in 3 days" in ok.text
+    with owner_engine.begin() as c:
+        assert c.execute(text("select reply from app.notification_deliveries where id = :d"), {"d": delivery}).scalar() == "2"
+        snoozed = c.execute(text("select count(*) from app.vaccination_reminders where animal_id = :a "
+                                 "and snoozed_until is not null"), {"a": w.pet["id"]}).scalar()
+    assert snoozed >= 1

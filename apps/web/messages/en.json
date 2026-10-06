@@ -1753,7 +1753,8 @@
     "testQueued": {
       "email": "Test email on its way — check your inbox (and spam) in a minute.",
       "push": "Test notification on its way — it should appear in a few seconds.",
-      "whatsapp": "Test WhatsApp message on its way."
+      "whatsapp": "Test WhatsApp message on its way.",
+      "call": "Test call on its way — your phone should ring in a few seconds."
     },
     "testLimited": "You've sent several tests already. Try again in an hour.",
     "demoTitle": "In this demo",
@@ -1799,7 +1800,8 @@
       "provider": {
         "email": "Email",
         "push": "Notifications",
-        "whatsapp": "WhatsApp"
+        "whatsapp": "WhatsApp",
+        "call": "Calls"
       },
       "state": {
         "ok": "Working",
@@ -1830,7 +1832,11 @@
       "failed": "That didn't work. Try again.",
       "webhook": "WhatsApp webhook address (Meta dashboard → WhatsApp → Configuration; it changes when the public link restarts):",
       "verify": "Email confirmation",
-      "lostMessage": "Lost-pet message"
+      "lostMessage": "Lost-pet message",
+      "reply": {
+        "1": "Answer: will book a visit",
+        "2": "Answer: remind again in 3 days"
+      }
     },
     "verify": {
       "okTitle": "Email confirmed",
@@ -1838,6 +1844,13 @@
       "failTitle": "This link didn't work",
       "failBody": "It may have been used already or be older than 48 hours. Open Notifications and send a new confirmation link.",
       "open": "Open Notifications"
+    },
+    "call": {
+      "title": "Phone call (test only)",
+      "body": "A short automated call on the reminder days, with a keypad answer. Twilio trial: only numbers verified in your Twilio account can be called.",
+      "number": "Phone number",
+      "numberHint": "With country code, e.g. +91 98765 43210. It must be verified in the Twilio trial account.",
+      "unavailable": "Phone calls aren't set up on this server (optional)."
     }
   },
   "assistant": {

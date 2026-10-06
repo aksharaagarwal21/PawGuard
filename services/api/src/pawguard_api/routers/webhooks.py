@@ -3,8 +3,11 @@
 import hmac
 import json
 from typing import Annotated
+from urllib.parse import parse_qsl
+from uuid import UUID
 
 from fastapi import APIRouter, Header, Query, Request, Response
+from sqlalchemy import text
 
 from pawguard_api.db import public_tx
 from pawguard_api.domain import notifications
@@ -27,6 +30,36 @@ def whatsapp_verify(mode: Annotated[str | None, Query(alias="hub.mode")] = None,
     if mode == "subscribe" and expected and token and hmac.compare_digest(token, expected) and challenge:
         return Response(challenge, media_type="text/plain")
     raise Forbidden("Verification failed.", code="webhook_verification_failed")
+
+
+@router.post("/twilio/gather", summary="Phone-call keypad answer (Twilio)", response_class=Response)
+async def twilio_gather(request: Request, d: Annotated[str, Query(max_length=40)],
+                        signature: Annotated[str | None, Header(alias="X-Twilio-Signature")] = None) -> Response:
+    """Permission: public, but the request must carry Twilio's signature (checked with Twilio's own validator
+    against the public address Twilio called). 1 = "I'll book a visit"; 2 = remind again in 3 days."""
+    from twilio.request_validator import RequestValidator
+
+    s = get_settings()
+    raw = await request.body()
+    if len(raw) > 20_000:
+        raise Forbidden("Invalid request.", code="webhook_signature_invalid")
+    form = dict(parse_qsl(raw.decode("utf-8", "replace"), keep_blank_values=True))  # Twilio posts URL-encoded forms
+    public_url = f"{s.public_app_url}/api/v1/webhooks/twilio/gather?d={d}"
+    if not (s.twilio_auth_token and signature and RequestValidator(s.twilio_auth_token).validate(
+            public_url, form, signature)):
+        raise Forbidden("Invalid signature.", code="webhook_signature_invalid")
+    digit = form.get("Digits", "")
+    try:
+        delivery = str(UUID(d))
+    except ValueError:
+        delivery = ""
+    ok = False
+    if delivery and digit in ("1", "2"):
+        with public_tx() as db:
+            ok = bool(db.execute(text("select app.record_call_reply(:d, :g)"), {"d": delivery, "g": digit}).scalar())
+    say = {"1": "Thank you. Please book your visit with the clinic. Goodbye.",
+           "2": "OK. We will remind you again in 3 days. Goodbye."}.get(digit if ok else "", "Goodbye.")
+    return Response(f"<Response><Say>{say}</Say></Response>", media_type="text/xml")
 
 
 @router.post("/whatsapp", summary="WhatsApp delivery receipts")
