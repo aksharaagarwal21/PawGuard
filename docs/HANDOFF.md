@@ -12,7 +12,9 @@
 3. Verify: `bash scripts/check.sh --no-e2e`.
 
 ## Demo day
-`bash scripts/demo_up.sh --reset`, then follow `docs/RELEASE_REPORT_PREVENTION.md` §9–10.
+`bash scripts/demo_up.sh --reset`, then follow `docs/DEMO_GUIDE.md`. Backup: `bash scripts/make_demo_backup.sh`
+(restore steps in `docs/BACKUP_RESTORE.md`). Recorded journey: `cd tests && pnpm exec playwright test
+e2e/demo-journey.spec.ts --project=desktop` (needs a prepared demo; re-run `demo-reset` + `demo_prepare.py` afterwards).
 
 ## Environment notes
 - pnpm is provided by a corepack shim in `~/bin` (user-level; Program Files not writable).

@@ -10,7 +10,8 @@ what is tested, and what is blocked. Nothing here is clinically validated or end
 bash scripts/demo_up.sh --reset   # Docker Desktop running; starts everything and resets the fictional demo data
 ```
 
-Script, recovery steps, test results and limitations: `docs/RELEASE_REPORT_PREVENTION.md`.
+Step-by-step demo: `docs/DEMO_GUIDE.md`. Results and limitations: `docs/RELEASE_REPORT_PREVENTION.md`.
+Backup and restore: `docs/BACKUP_RESTORE.md`.
 
 ## Repository map
 
