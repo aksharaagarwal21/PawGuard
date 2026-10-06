@@ -17,7 +17,7 @@ for (const [label, viewport] of [
     await expect(page.getByRole("heading", { name: "Email" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Browser notifications" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "WhatsApp" })).toBeVisible();
-    await expect(page.getByText("In this demo")).toBeVisible();
+    await expect(page.getByText(/Confirmed:|We sent a confirmation link|isn't confirmed yet/).first()).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await expectNoAxeViolations(page);
     await page.screenshot({ path: `test-results/notify/settings-${label}.png`, fullPage: true });

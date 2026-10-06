@@ -2529,7 +2529,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "vaccination_reminder" | "test";
+            kind: "vaccination_reminder" | "test" | "verify_email";
             /** Last Error */
             last_error: string | null;
             /** Pet Name */

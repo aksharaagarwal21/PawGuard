@@ -55,7 +55,7 @@ class ProviderOut(Out):
 class DeliveryOut(Out):
     id: UUID
     channel: ChannelName
-    kind: Literal["vaccination_reminder", "test"]
+    kind: Literal["vaccination_reminder", "test", "verify_email"]
     state: Literal["queued", "sending", "sent", "deferred", "failed", "skipped"]
     pet_name: str | None
     created_at: datetime

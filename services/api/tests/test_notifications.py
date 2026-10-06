@@ -403,3 +403,16 @@ def test_email_must_be_confirmed_with_a_one_time_link(client, setup, owner_engin
     assert d["email_verified"] is False
     assert client.post("/api/v1/my/notification-settings/resend-confirmation",
                        headers=_h(w.tok["owner"])).status_code == 202
+
+
+def test_overview_lists_confirmation_emails(client, setup, owner_engine, monkeypatch):
+    from pawguard_worker import notify as worker_notify
+
+    monkeypatch.setattr(setup.settings, "demo_notify_email", None)
+    w = setup.build(demo=True)
+    client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
+               json={"email_enabled": True, "email_address": "someone@example.com"})
+    worker_notify.drain()
+    r = client.get("/api/v1/clinic/notifications", headers=_h(w.tok["vet"], w.org))
+    assert r.status_code == 200 and r.json()["deliveries"][0]["kind"] == "verify_email"
+    assert "someone@example.com" not in r.text

@@ -67,7 +67,7 @@ export function MessagesPanel({ data, tz, demo }: { data: Overview; tz: string; 
                 <tr key={d.id} className="border-b border-divider last:border-0">
                   <td className="py-2 pr-3">{formatDateTime(d.sent_at ?? d.created_at, locale, tz)}</td>
                   <td className="py-2 pr-3">{t(`provider.${d.channel}`)}</td>
-                  <td className="py-2 pr-3">{d.kind === "test" ? t("test") : (d.pet_name ?? "—")}</td>
+                  <td className="py-2 pr-3">{d.kind === "test" ? t("test") : d.kind === "verify_email" ? t("verify") : (d.pet_name ?? "—")}</td>
                   <td className="py-2">
                     <span className="inline-flex items-center gap-1">
                       {d.state === "sent" ? <CheckCircle2 aria-hidden className="size-3.5 text-primary" /> : d.state === "failed" ? <AlertTriangle aria-hidden className="size-3.5 text-urgent" /> : <Clock aria-hidden className="size-3.5 text-ink-2" />}
