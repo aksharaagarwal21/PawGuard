@@ -81,6 +81,11 @@ export function MessagesPanel({ data, tz, demo }: { data: Overview; tz: string; 
           </table>
         </div>
       )}
+      {data.whatsapp_webhook_url ? (
+        <p className="text-sm text-ink-2">
+          {t("webhook")} <code className="break-all rounded bg-canvas px-1.5 py-0.5 text-ink">{data.whatsapp_webhook_url}</code>
+        </p>
+      ) : null}
       {demo ? (
         <div className="flex flex-wrap items-center gap-2">
           <Button type="button" size="sm" variant="secondary" disabled={busy} onClick={runNow}>

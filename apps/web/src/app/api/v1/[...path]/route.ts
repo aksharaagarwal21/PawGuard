@@ -28,7 +28,10 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
     return errorJson(400, "bad_path", "Invalid path.");
   }
 
-  if (!SAFE.has(request.method)) {
+  // Provider webhooks (e.g. WhatsApp) are server-to-server: no browser session or CSRF token. The API
+  // authenticates them by the provider's signature, so the raw body and signature header are passed through.
+  const webhook = path[0] === "webhooks";
+  if (!SAFE.has(request.method) && !webhook) {
     const origin = request.headers.get("origin");
     const allowed = [env.PAWGUARD_WEB_ORIGIN, ...(env.PAWGUARD_EXTRA_WEB_ORIGINS ?? "").split(",")]
       .map((o) => o.trim())
@@ -41,15 +44,14 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
     }
   }
 
-  const supabase = await createSupabaseServerClient(); // may refresh and re-set cookies (allowed here)
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
+  const supabase = webhook ? null : await createSupabaseServerClient(); // may refresh and re-set cookies (allowed here)
+  const token = supabase ? (await supabase.auth.getSession()).data.session?.access_token : undefined;
 
   const target = new URL(`/api/v1/${path.map(encodeURIComponent).join("/")}`, env.PAWGUARD_API_INTERNAL_URL);
   target.search = request.nextUrl.search;
 
   const headers = new Headers();
-  for (const name of FORWARD_REQUEST_HEADERS) {
+  for (const name of webhook ? [...FORWARD_REQUEST_HEADERS, "x-hub-signature-256"] : FORWARD_REQUEST_HEADERS) {
     const v = request.headers.get(name);
     if (v) headers.set(name, v);
   }
@@ -57,7 +59,7 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
   // A page may name the organisation explicitly (e.g. an owner uploading for a pet at another clinic). It is only
   // a selection: FastAPI checks the caller's membership in it on every request.
   const explicit = request.headers.get("x-pawguard-org");
-  let org = explicit && UUID_RE.test(explicit) ? explicit : (await cookies()).get(ORG_COOKIE)?.value;
+  let org = webhook ? undefined : explicit && UUID_RE.test(explicit) ? explicit : (await cookies()).get(ORG_COOKIE)?.value;
   let resolvedOrg: string | undefined;
   const principalOnly = path.length === 1 && path[0] === "me"; // /me is about the person, not an organisation
   if (!org && token && !principalOnly) {

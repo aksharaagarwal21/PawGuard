@@ -246,3 +246,107 @@ def test_push_subscribe_send_and_revoke_gone_devices(client, setup, owner_engine
                        json={"endpoint": "https://fcm.googleapis.com/fcm/send/one"}).status_code == 204
     d = client.get("/api/v1/my/notification-settings", headers=_h(w.tok["owner"])).json()
     assert d["push_devices"] == 0 and d["push_enabled"] is False
+
+
+# ---- WhatsApp ----------------------------------------------------------------------------------------------------
+
+class _Resp:
+    def __init__(self, status, body):
+        self.status_code, self._body = status, body
+
+    def json(self):
+        return self._body
+
+
+def _wa(monkeypatch, setup, responses, captured):
+    import httpx
+
+    for k, v in {"whatsapp_token": "test-token", "whatsapp_phone_number_id": "1234567890",
+                 "demo_notify_whatsapp": "+919800000001", "whatsapp_app_secret": "app-secret",
+                 "whatsapp_verify_token": "verify-me"}.items():
+        monkeypatch.setattr(setup.settings, k, v)
+
+    def fake_post(url, json, headers, timeout):
+        captured.append((url, json, headers))
+        return responses.pop(0)
+
+    monkeypatch.setattr(httpx, "post", fake_post)
+
+
+def test_whatsapp_text_template_and_token_expiry(client, setup, owner_engine, monkeypatch):
+    from pawguard_worker import notify as worker_notify
+
+    captured: list = []
+    responses = [_Resp(200, {"messages": [{"id": "wamid.ONE"}]}),
+                 _Resp(400, {"error": {"code": 190, "message": "Error validating access token"}})]
+    _wa(monkeypatch, setup, responses, captured)
+    w = setup.build(demo=True)
+    client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]), json={"whatsapp_enabled": True})
+    _queue(owner_engine)
+    assert worker_notify.drain().get("sent") == 1
+    url, body, headers = captured[-1]
+    assert url == f"https://graph.facebook.com/{setup.settings.whatsapp_api_version}/1234567890/messages"
+    assert body["to"] == "919800000001" and body["type"] == "text"  # demo: only the test number
+    assert "Coco" in body["text"]["body"] and headers["Authorization"] == "Bearer test-token"
+    # A test message with an expired token: provider shows "token expired", the delivery fails clearly.
+    assert client.post("/api/v1/my/notification-settings/test", headers=_h(w.tok["owner"], w.org),
+                       json={"channel": "whatsapp"}).status_code == 202
+    assert worker_notify.drain().get("failed") == 1
+    over = client.get("/api/v1/clinic/notifications", headers=_h(w.tok["vet"], w.org)).json()
+    wa = next(p for p in over["providers"] if p["provider"] == "whatsapp")
+    assert wa["state"] == "token_expired" and "renew" in wa["detail"]
+    assert over["whatsapp_webhook_url"].endswith("/api/v1/webhooks/whatsapp")
+
+    # With an approved template configured, reminders use it (works outside the 24-hour window).
+    monkeypatch.setattr(setup.settings, "whatsapp_template", "pet_vaccination_reminder")
+    msg = notify.compose({"kind": "vaccination_reminder", "pet": "Coco", "vaccine": "Rabies", "clinic": "Lotus",
+                          "due_on": "2026-10-17", "today": "2026-10-07", "is_demo": True}, setup.settings)
+    responses.append(_Resp(200, {"messages": [{"id": "wamid.TWO"}]}))
+    notify.send_whatsapp(setup.settings, "+919800000001", msg,
+                         {"kind": "vaccination_reminder", "pet": "Coco", "vaccine": "Rabies", "clinic": "Lotus",
+                          "due_on": "2026-10-17"})
+    tpl = captured[-1][1]["template"]
+    assert tpl["name"] == "pet_vaccination_reminder"
+    assert [p["text"] for p in tpl["components"][0]["parameters"]] == ["Lotus", "Coco", "Rabies", "17 Oct 2026"]
+
+
+def test_whatsapp_outside_window_and_rate_limit_codes(setup, monkeypatch):
+    captured: list = []
+    responses = [_Resp(400, {"error": {"code": 131047}}), _Resp(400, {"error": {"code": 130429}})]
+    _wa(monkeypatch, setup, responses, captured)
+    msg = notify.Message("s", "t", "short", "link")
+    with pytest.raises(notify.ProviderError) as e1:
+        notify.send_whatsapp(setup.settings, "+919800000001", msg, {"kind": "test"})
+    assert e1.value.code == "outside_window" and e1.value.retry_in is None and "reply 'hi'" in e1.value.detail
+    with pytest.raises(notify.ProviderError) as e2:
+        notify.send_whatsapp(setup.settings, "+919800000001", msg, {"kind": "test"})
+    assert e2.value.code == "rate_limited" and e2.value.retry_in == 600
+
+
+def test_whatsapp_webhook_verification_and_signature(client, setup, owner_engine, monkeypatch):
+    import hashlib
+    import hmac
+    import json as _json
+
+    from pawguard_worker import notify as worker_notify
+
+    captured: list = []
+    _wa(monkeypatch, setup, [_Resp(200, {"messages": [{"id": "wamid.SENT1"}]})], captured)
+    ok = client.get("/api/v1/webhooks/whatsapp",
+                    params={"hub.mode": "subscribe", "hub.verify_token": "verify-me", "hub.challenge": "12345"})
+    assert ok.status_code == 200 and ok.text == "12345"
+    assert client.get("/api/v1/webhooks/whatsapp", params={"hub.mode": "subscribe", "hub.verify_token": "wrong",
+                                                            "hub.challenge": "1"}).status_code == 403
+    w = setup.build(demo=True)
+    client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]), json={"whatsapp_enabled": True})
+    _queue(owner_engine)
+    worker_notify.drain()
+    body = _json.dumps({"entry": [{"changes": [{"value": {"statuses": [{
+        "id": "wamid.SENT1", "status": "failed", "errors": [{"code": 131026, "title": "Message undeliverable"}]}]}}]}]})
+    raw = body.encode()
+    bad = client.post("/api/v1/webhooks/whatsapp", content=raw, headers={"X-Hub-Signature-256": "sha256=deadbeef"})
+    assert bad.status_code == 403
+    sig = "sha256=" + hmac.new(b"app-secret", raw, hashlib.sha256).hexdigest()
+    assert client.post("/api/v1/webhooks/whatsapp", content=raw, headers={"X-Hub-Signature-256": sig}).status_code == 200
+    rows = _deliveries(owner_engine, w.owner)
+    assert rows[-1].state == "failed" and rows[-1].last_error == "WhatsApp 131026: Message undeliverable"

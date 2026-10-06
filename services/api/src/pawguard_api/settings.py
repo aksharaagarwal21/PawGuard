@@ -85,7 +85,7 @@ class Settings(BaseSettings):
     whatsapp_app_secret: str | None = None
     whatsapp_verify_token: str | None = None
     whatsapp_template: str | None = None
-    whatsapp_api_version: str = "v23.0"
+    whatsapp_api_version: str = "v26.0"  # Graph API; v26.0 introduced 29 July 2026
     llm_provider: str = "off"
     gemini_api_key: str | None = None
     gemini_model: str | None = None

@@ -1787,7 +1787,8 @@
       "runNow": "Send due reminders now",
       "runHint": "Demo only. Normally this happens every 10 minutes.",
       "queued": "{count, plural, =0 {Nothing new to send.} one {# message queued.} other {# messages queued.}}",
-      "failed": "That didn't work. Try again."
+      "failed": "That didn't work. Try again.",
+      "webhook": "WhatsApp webhook address (Meta dashboard → WhatsApp → Configuration; it changes when the public link restarts):"
     }
   }
 }

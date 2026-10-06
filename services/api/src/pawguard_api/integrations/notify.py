@@ -166,3 +166,78 @@ def send_push(s: Settings, subscriptions: list[dict[str, str]], msg: Message, *,
     if ok == 0:
         raise ProviderError("push_failed", retry_in=600 if last_error else None, detail=last_error or "no device")
     return f"{ok} device(s)"
+
+
+# ---- WhatsApp Cloud API (test number) ----------------------------------------------------------------------------
+
+# Error codes from Meta's "WhatsApp error codes" page.
+_WA_TOKEN = {190, 0}
+_WA_RATE = {4, 80007, 130429, 131056}
+_WA_TEMPORARY = {131000, 131016}
+
+
+def whatsapp_configured(s: Settings) -> bool:
+    return bool(s.whatsapp_token and s.whatsapp_phone_number_id)
+
+
+def send_whatsapp(s: Settings, to: str, msg: Message, info: dict[str, Any]) -> str:
+    """Send a reminder: the approved template when configured (works outside the 24-hour window), otherwise a plain
+    text message (only inside the 24-hour window that opens when the recipient messages the test number)."""
+    import httpx
+
+    if not whatsapp_configured(s):
+        raise ProviderError("not_configured", status="not_configured",
+                            detail="WhatsApp token or phone number id not set")
+    url = f"https://graph.facebook.com/{s.whatsapp_api_version}/{s.whatsapp_phone_number_id}/messages"
+    number = to.lstrip("+")
+    if s.whatsapp_template and info.get("kind") == "vaccination_reminder":
+        due = date.fromisoformat(str(info["due_on"]))
+        params = [info["clinic"], info["pet"], info["vaccine"], _when(due)]
+        body: dict[str, Any] = {"messaging_product": "whatsapp", "to": number, "type": "template",
+                                "template": {"name": s.whatsapp_template, "language": {"code": "en"},
+                                             "components": [{"type": "body", "parameters": [
+                                                 {"type": "text", "text": str(p)[:100]} for p in params]}]}}
+    else:
+        body = {"messaging_product": "whatsapp", "to": number, "type": "text",
+                "text": {"preview_url": False, "body": f"{msg.short}\n{msg.link}"}}
+    try:
+        r = httpx.post(url, json=body, headers={"Authorization": f"Bearer {s.whatsapp_token}"}, timeout=15)
+    except httpx.HTTPError as exc:
+        raise ProviderError("unreachable", retry_in=300, detail="WhatsApp API not reachable") from exc
+    if r.status_code < 300:
+        try:
+            return str(r.json()["messages"][0]["id"])
+        except (ValueError, KeyError, IndexError) as exc:
+            raise ProviderError("bad_response", detail="Unexpected WhatsApp response") from exc
+    try:
+        err = r.json().get("error", {})
+    except ValueError:
+        err = {}
+    code = int(err.get("code", -1)) if str(err.get("code", "")).lstrip("-").isdigit() else -1
+    text_ = str(err.get("message", ""))[:160]
+    if code in _WA_TOKEN or r.status_code == 401:
+        raise ProviderError("token_expired", status="token_expired",
+                            detail="WhatsApp token expired — renew it in Meta's dashboard and update "
+                                   "PAWGUARD_WHATSAPP_TOKEN")
+    if code in _WA_RATE:
+        raise ProviderError("rate_limited", retry_in=600, status="rate_limited", detail=f"WhatsApp rate limit ({code})")
+    if code == 131047:
+        raise ProviderError("outside_window", detail="More than 24 hours since the recipient last messaged the test "
+                                                     "number — reply 'hi' on WhatsApp, or set an approved template")
+    if code == 132001:
+        raise ProviderError("template_not_approved", status="error",
+                            detail="The WhatsApp template isn't approved (or wrong name/language)")
+    if code in _WA_TEMPORARY or r.status_code >= 500:
+        raise ProviderError("temporary", retry_in=300, detail=f"WhatsApp temporary error ({code})")
+    raise ProviderError("rejected", detail=f"WhatsApp error {code}: {text_}")
+
+
+def whatsapp_signature_valid(s: Settings, raw_body: bytes, header: str | None) -> bool:
+    """Meta signs webhook POSTs: X-Hub-Signature-256 = 'sha256=' + HMAC-SHA256(app secret, raw body)."""
+    import hashlib
+    import hmac
+
+    if not (s.whatsapp_app_secret and header and header.startswith("sha256=")):
+        return False
+    expected = hmac.new(s.whatsapp_app_secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, header.removeprefix("sha256="))

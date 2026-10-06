@@ -72,8 +72,16 @@ def _send_push(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
         on_ok=lambda ep: _sql("select app.mark_push_success(:e)", e=ep))
 
 
+def _send_whatsapp(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
+    to = _recipient(info, s)
+    if not to:
+        raise notify.ProviderError("no_recipient",
+                                   detail="No WhatsApp number (demo: set PAWGUARD_DEMO_NOTIFY_WHATSAPP)")
+    return notify.send_whatsapp(s, to, msg, info)
+
+
 SENDERS: dict[str, Callable[[dict[str, Any], notify.Message, Settings], str]] = {
-    "email": _send_email, "push": _send_push}
+    "email": _send_email, "push": _send_push, "whatsapp": _send_whatsapp}
 
 
 def deliver(info: dict[str, Any], s: Settings) -> str:

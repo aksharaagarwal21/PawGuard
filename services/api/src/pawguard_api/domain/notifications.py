@@ -26,7 +26,7 @@ def channel_available() -> dict[str, bool]:
     s = get_settings()
     return {"email": notify.email_configured(s),
             "push": notify.push_configured(s),
-            "whatsapp": bool(s.whatsapp_token and s.whatsapp_phone_number_id)}
+            "whatsapp": notify.whatsapp_configured(s)}
 
 
 def get_prefs(p: Principal) -> dict[str, Any]:
@@ -105,7 +105,9 @@ def overview(db: Any, ctx: OrgContext) -> dict[str, Any]:
         left join app.vaccination_reminders r on r.id = d.reminder_id
         left join app.animals a on a.id = r.animal_id
         order by d.created_at desc limit 30""")).all()
-    return {"providers": providers, "deliveries": [dict(r._mapping) for r in rows]}
+    s = get_settings()
+    webhook = f"{s.public_app_url}/api/v1/webhooks/whatsapp" if available["whatsapp"] else None
+    return {"providers": providers, "deliveries": [dict(r._mapping) for r in rows], "whatsapp_webhook_url": webhook}
 
 
 def run_now(db: Any, ctx: OrgContext) -> int:
@@ -149,3 +151,24 @@ def remove_push_subscription(p: Principal, endpoint: str) -> None:
         if not left:
             db.execute(text("update app.notification_preferences set push_enabled = false where user_id = :u"),
                        {"u": p.user_id})
+
+
+# ---- WhatsApp webhook --------------------------------------------------------------------------------------------
+
+def whatsapp_receipts(db: Any, payload: dict[str, Any]) -> int:
+    """Record delivery receipts (failed → the delivery shows 'Failed' with Meta's reason). Incoming messages are
+    only counted: they open the 24-hour window on Meta's side; PawGuard stores no message content."""
+    updated = 0
+    for entry in payload.get("entry", []) if isinstance(payload, dict) else []:
+        for change in entry.get("changes", []) or []:
+            value = change.get("value", {}) or {}
+            for st in value.get("statuses", []) or []:
+                mid, status = str(st.get("id", ""))[:200], str(st.get("status", ""))[:20]
+                if not mid:
+                    continue
+                errs = st.get("errors") or []
+                reason = (f"WhatsApp {errs[0].get('code')}: {str(errs[0].get('title', ''))[:120]}"
+                          if errs and isinstance(errs[0], dict) else None)
+                updated += int(db.execute(text("select app.record_whatsapp_status(:m, :s, :e)"),
+                                          {"m": mid, "s": status, "e": reason}).scalar() or 0)
+    return updated

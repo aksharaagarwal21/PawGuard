@@ -64,6 +64,7 @@ class DeliveryOut(Out):
 class NotificationsOverviewOut(Out):
     providers: list[ProviderOut]
     deliveries: list[DeliveryOut]
+    whatsapp_webhook_url: str | None = None  # paste into Meta's dashboard (changes with the public tunnel)
 
 
 class ScanOut(Out):
