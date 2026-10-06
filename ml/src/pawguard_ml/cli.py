@@ -209,3 +209,32 @@ def dataset_register(manifest: Path = typer.Argument(...)) -> None:
 from pawguard_ml import identity_cmds  # noqa: E402 - registers identity commands on the same app
 
 identity_cmds.register(app)
+
+
+@app.command("dfn-clean")
+def dfn_clean() -> None:
+    """DogFaceNet real-data evaluation, step 1: decode, de-duplicate, flag near-duplicates, keep identities with
+    ≥ 3 images. Writes ml/eval/dogfacenet/clean_manifest.csv + clean_summary.json."""
+    from pawguard_ml import dfn_eval
+
+    typer.echo(json.dumps(dfn_eval.clean(), indent=1))
+
+
+@app.command("dfn-split")
+def dfn_split(max_identities: int = typer.Option(300)) -> None:
+    """Step 2: identity-disjoint open-set split (validation/test; known/unknown) with an automated leakage check."""
+    from pawguard_ml import dfn_eval
+
+    typer.echo(json.dumps(dfn_eval.split(max_identities), indent=1))
+
+
+@app.command("dfn-eval")
+def dfn_eval_cmd(smoke: bool = typer.Option(False, help="Bounded run on 10 + 10 identities"),
+                 reps: int = typer.Option(1000)) -> None:
+    """Step 3: frozen-model evaluation (aggregation + threshold chosen on validation; test once), baselines,
+    timings, charts and a local error gallery. Writes ml/eval/dogfacenet/results.json."""
+    from pawguard_ml import dfn_eval
+
+    r = dfn_eval.evaluate(smoke=smoke, reps=reps)
+    typer.echo(json.dumps({"selection": r["selection_on_validation"], "counts": r["dataset"]["counts"],
+                           "test": r["test"], "timing": r["timing"]}, indent=1))

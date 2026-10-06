@@ -57,3 +57,6 @@ backups/
 
 # Downloaded helper tools (e.g. cloudflared for the temporary public link)
 .tools/
+
+# DogFaceNet images (CC BY 4.0, research evaluation only) - never committed
+data/raw/dogfacenet/

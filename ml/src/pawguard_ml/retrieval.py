@@ -120,6 +120,9 @@ def metrics(sc: Scored, tau: float | None, k_list: int = 3, q_idx: np.ndarray | 
         out[f"coverage_at_{k_list}"] = float(((rank <= k_list) & (true_score >= tau)).mean())
         out["false_rejection"] = float((top[:, 0] < tau).mean())
         out["mean_candidates_shown"] = float((top[:, :k_list] >= tau).sum(1).mean())
+        # Known dogs: the single best suggestion is the right dog AND confident / the wrong dog but confident.
+        out["known_top1_correct_accepted"] = float(((rank <= 1) & (true_score >= tau)).mean())
+        out["known_top1_wrong_accepted"] = float(((rank > 1) & (top[:, 0] >= tau)).mean())
     return out
 
 
