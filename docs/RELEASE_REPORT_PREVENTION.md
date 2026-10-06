@@ -105,7 +105,7 @@ Thresholds: adapted head τ = **0.53846** (deployed), frozen baseline τ = 0.748
 false-suggestion rate ≤ 0.10; at most 3 candidates. Test results, run once: adapted head — right animal among
 shown candidates **0.887** [0.852–0.920], false suggestion for unknown animals **0.107** [0.056–0.169], top-1 0.954;
 frozen baseline — 0.800 and 0.167. Evidence: `docs/evidence/identity-*.json`; details `docs/EVALUATION.md`,
-`docs/MODEL_CARD.md`. The training run's environment hash (`2c136cbe…`) is `ml/uv.lock` as committed in `84249ff`;
+`docs/MODEL_CARD.md`. The training run's environment hash (`2c136cbe…`) is `ml/uv.lock` as committed in `2c1bb08`;
 the lock changed afterwards only because the worker gained OR-Tools for planning.
 
 **Limitations (must stay visible):** a research benchmark of aligned **face crops of pet dogs** with unreviewed labels
@@ -196,7 +196,7 @@ Then open three browser windows (separate profiles or one normal + two private):
 | Photo lookup says "unavailable" | Research preview off: `uv run pawguard-admin models research-preview dinov2_small_arcface_head ed25f3a3-resize224-head-v1 --reason "demo"` |
 | Model files missing | Detector: `models/yolox/yolox_s.onnx` (URL in `data/manifests/models/yolox_s-coco-0.1.1rc0.json`). Identity: `models/dinov2-small/ed25f3a3…/dinov2_small_arcface_head.onnx` — rebuild with the `pawid` steps in `docs/ML_PLAN.md` (needs DogFaceNet + about 20 min). **Keep a copy of `models/` on a USB stick.** |
 | Database lost | `bash scripts/demo_up.sh --reset` recreates schema and demo data; then `pawguard-admin models register` both manifests in `data/manifests/models/` and re-enable the research preview (row above) |
-| Code broken | `git log --oneline` then `git checkout <reviewed commit>`; the pre-audit checkpoint is `84249ff` |
+| Code broken | `git log --oneline` then `git checkout <reviewed commit>`; the pre-audit checkpoint is `2c1bb08` |
 | Total failure | Present from the screenshots in `docs/screenshots/phase9/` and `phase7/` / `phase8/` |
 
 Pre-audit database backup: `backups/pre-phase9-*.dump` (local only, gitignored).

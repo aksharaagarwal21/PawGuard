@@ -367,7 +367,7 @@ SQL NULL).
 
 Full report, test counts, feature matrix, demo script and recovery steps: `docs/RELEASE_REPORT_PREVENTION.md`.
 
-**Done:** pre-audit checkpoint commit `84249ff` + local DB backup; role walkthrough as an e2e spec on desktop and
+**Done:** pre-audit checkpoint commit `2c1bb08` + local DB backup; role walkthrough as an e2e spec on desktop and
 360 px (`release-walkthrough.spec.ts`) including forged self-verification (403) and cross-organisation isolation
 (404); research-preview boundary audit (migration 0011 column privileges, `test_boundaries.py`); ML evidence trace
 script (`scripts/check_ml_evidence.py`, in `check.sh`); offline access-change UI test; planning wording and estimate

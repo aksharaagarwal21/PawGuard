@@ -33,7 +33,7 @@ e2e/demo-journey.spec.ts --project=desktop` (needs a prepared demo; re-run `demo
 - ML tooling is a separate uv project: `cd ml && uv run pawid --help`; tests `uv run --group dev pytest tests`.
 
 ## State
-- Local git commits authorised (no push). Pre-audit checkpoint `84249ff`; see `git log` for the reviewed build.
+- Local git commits authorised (no push). Pre-audit checkpoint `2c1bb08`; see `git log` for the reviewed build.
 - Migration head: `0011`. Dataset `dogfacenet-224` v1 registered frozen (raw data under `data/raw/` is gitignored;
   re-download per `DATA_SOURCES.md` S05, then `pawid dataset-prepare` with seed 20261006 is expected to reproduce manifest
   sha256 10a6554b… — reproducibility not yet verified by a second run).
