@@ -12,6 +12,7 @@ from pawguard_api.errors import ErrorResponse, install_error_handlers
 from pawguard_api.logging import configure_logging, get_logger
 from pawguard_api.routers import (
     animals,
+    assistant,
     campaigns,
     clinic,
     demo,
@@ -82,7 +83,7 @@ def create_app() -> FastAPI:
     app.include_router(system.router)
     app.include_router(demo.router)
     for r in (animals, vaccinations, media, tasks, merges, reference, programme, imports, identity, sync, campaigns,
-              pets, clinic, public_cards, notifications, webhooks):
+              pets, clinic, public_cards, notifications, webhooks, assistant):
         app.include_router(r.router)
     return app
 

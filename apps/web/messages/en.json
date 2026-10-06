@@ -93,7 +93,8 @@
     "helpMenu": "Help",
     "showTour": "Show tour again",
     "howToUse": "How to use PawGuard",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "assistant": "Ask PawGuard"
   },
   "landing": {
     "headline": "Never miss your pet's vaccination again.",
@@ -1789,6 +1790,43 @@
       "queued": "{count, plural, =0 {Nothing new to send.} one {# message queued.} other {# messages queued.}}",
       "failed": "That didn't work. Try again.",
       "webhook": "WhatsApp webhook address (Meta dashboard → WhatsApp → Configuration; it changes when the public link restarts):"
+    }
+  },
+  "assistant": {
+    "title": "Ask PawGuard",
+    "intro": "Quick answers about using PawGuard and your pets' reminders.",
+    "offTitle": "The assistant isn't set up",
+    "offBody": "Ask your clinic, or use the guide: everything in PawGuard works without the assistant.",
+    "previewTitle": "AI preview — answers can be wrong",
+    "previewBody": "It only knows your pets' names, statuses, vaccines and dates. It never gives treatment or dose advice — your vet decides. Please don't type personal details such as phone numbers or addresses.",
+    "googleNote": "This uses Google's free Gemini service: Google may use these messages to improve its products, and people at Google may review them.",
+    "language": "Answer in",
+    "conversation": "Conversation",
+    "empty": "Ask something like “Which pet needs attention?” or “How do I add a past vaccination?”",
+    "you": "You said:",
+    "assistantName": "PawGuard said:",
+    "thinking": "Thinking…",
+    "guarded": "A safety rule shortened this answer.",
+    "busy": "The assistant is busy right now — try again shortly.",
+    "failed": "The assistant can't answer right now — try again shortly.",
+    "inputLabel": "Your question",
+    "placeholder": "Type your question…",
+    "send": "Send",
+    "footer": "If someone was bitten or scratched, open bite help straight away — it works without the assistant.",
+    "suggest": {
+      "attention": "Which pet needs attention?",
+      "waiting": "What does “Waiting for vet” mean?",
+      "addPast": "How do I add a past vaccination?"
+    },
+    "actions": {
+      "open_reminders": "Open reminders",
+      "mark_done": "Mark as done",
+      "add_calendar": "Add to calendar",
+      "open_pets": "My pets",
+      "open_card": "Vaccination card",
+      "notifications": "Notifications",
+      "how_to": "How to use PawGuard",
+      "bite_help": "Bite help — now"
     }
   }
 }

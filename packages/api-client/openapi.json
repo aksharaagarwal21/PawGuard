@@ -831,6 +831,124 @@
         "title": "AreaSummary",
         "type": "object"
       },
+      "AssistantIn": {
+        "additionalProperties": false,
+        "properties": {
+          "language": {
+            "default": "en",
+            "enum": [
+              "en",
+              "hi",
+              "ta"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/AssistantMessageIn"
+            },
+            "maxItems": 12,
+            "minItems": 1,
+            "title": "Messages",
+            "type": "array"
+          }
+        },
+        "required": [
+          "messages"
+        ],
+        "title": "AssistantIn",
+        "type": "object"
+      },
+      "AssistantMessageIn": {
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 1000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "text"
+        ],
+        "title": "AssistantMessageIn",
+        "type": "object"
+      },
+      "AssistantOut": {
+        "properties": {
+          "actions": {
+            "items": {
+              "enum": [
+                "open_reminders",
+                "mark_done",
+                "add_calendar",
+                "open_pets",
+                "open_card",
+                "notifications",
+                "how_to",
+                "bite_help"
+              ],
+              "type": "string"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "guarded": {
+            "title": "Guarded",
+            "type": "boolean"
+          },
+          "reply": {
+            "title": "Reply",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reply",
+          "actions",
+          "guarded"
+        ],
+        "title": "AssistantOut",
+        "type": "object"
+      },
+      "AssistantStatusOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "provider": {
+            "enum": [
+              "gemini",
+              "ollama",
+              "off"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "shares_with_google": {
+            "title": "Shares With Google",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available",
+          "provider",
+          "shares_with_google"
+        ],
+        "title": "AssistantStatusOut",
+        "type": "object"
+      },
       "AuditOut": {
         "properties": {
           "action": {
@@ -13053,6 +13171,154 @@
         "summary": "Revoke a membership",
         "tags": [
           "reference"
+        ]
+      }
+    },
+    "/api/v1/my/assistant": {
+      "get": {
+        "description": "Permission: any signed-in user.",
+        "operationId": "assistant_get_status",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Is the assistant available?",
+        "tags": [
+          "assistant"
+        ]
+      },
+      "post": {
+        "description": "Permission: pet owners. Sends only pet facts (name, species, status, vaccine, dates, clinic) and the\nconversation with emails and phone numbers removed. Never gives treatment advice; actions come from a fixed\nlist. 20 questions an hour per person.",
+        "operationId": "assistant_ask",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Ask the assistant",
+        "tags": [
+          "assistant"
         ]
       }
     },

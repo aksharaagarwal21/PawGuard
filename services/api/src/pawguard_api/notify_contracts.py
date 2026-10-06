@@ -88,3 +88,31 @@ class PushSubscriptionIn(StrictModel):
 
 class PushUnsubscribeIn(StrictModel):
     endpoint: str = Field(min_length=10, max_length=1000)
+
+
+# ---- assistant ---------------------------------------------------------------------------------------------------
+
+AssistantAction = Literal["open_reminders", "mark_done", "add_calendar", "open_pets", "open_card", "notifications",
+                          "how_to", "bite_help"]
+
+
+class AssistantStatusOut(Out):
+    available: bool
+    provider: Literal["gemini", "ollama", "off"]
+    shares_with_google: bool  # Gemini free tier: Google may use and human-review prompts
+
+
+class AssistantMessageIn(StrictModel):
+    role: Literal["user", "assistant"]
+    text: str = Field(min_length=1, max_length=1000)
+
+
+class AssistantIn(StrictModel):
+    messages: list[AssistantMessageIn] = Field(min_length=1, max_length=12)
+    language: Literal["en", "hi", "ta"] = "en"
+
+
+class AssistantOut(Out):
+    reply: str
+    actions: list[AssistantAction]
+    guarded: bool  # true when a safety rule replaced or limited the answer

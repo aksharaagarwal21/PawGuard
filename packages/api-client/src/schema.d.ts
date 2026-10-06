@@ -903,6 +903,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/assistant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Is the assistant available?
+         * @description Permission: any signed-in user.
+         */
+        get: operations["assistant_get_status"];
+        put?: never;
+        /**
+         * Ask the assistant
+         * @description Permission: pet owners. Sends only pet facts (name, species, status, vaccine, dates, clinic) and the
+         *     conversation with emails and phone numbers removed. Never gives treatment advice; actions come from a fixed
+         *     list. 20 questions an hour per person.
+         */
+        post: operations["assistant_ask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/clinics": {
         parameters: {
             query?: never;
@@ -2082,6 +2108,48 @@ export interface components {
             sightings_last_30_days: number;
             /** Submitted Awaiting Review */
             submitted_awaiting_review: number;
+        };
+        /** AssistantIn */
+        AssistantIn: {
+            /**
+             * Language
+             * @default en
+             * @enum {string}
+             */
+            language?: "en" | "hi" | "ta";
+            /** Messages */
+            messages: components["schemas"]["AssistantMessageIn"][];
+        };
+        /** AssistantMessageIn */
+        AssistantMessageIn: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "user" | "assistant";
+            /** Text */
+            text: string;
+        };
+        /** AssistantOut */
+        AssistantOut: {
+            /** Actions */
+            actions: ("open_reminders" | "mark_done" | "add_calendar" | "open_pets" | "open_card" | "notifications" | "how_to" | "bite_help")[];
+            /** Guarded */
+            guarded: boolean;
+            /** Reply */
+            reply: string;
+        };
+        /** AssistantStatusOut */
+        AssistantStatusOut: {
+            /** Available */
+            available: boolean;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "gemini" | "ollama" | "off";
+            /** Shares With Google */
+            shares_with_google: boolean;
         };
         /** AuditOut */
         AuditOut: {
@@ -7173,6 +7241,108 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    assistant_get_status: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantStatusOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    assistant_ask: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssistantIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantOut"];
+                };
             };
             /** @description Unauthorized */
             401: {
