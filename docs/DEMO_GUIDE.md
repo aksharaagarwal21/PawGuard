@@ -6,27 +6,37 @@ end to end through the real interface on 6 October (Playwright recording:
 
 ## 1. Start, check, stop
 
-All commands are for **Git Bash** on this Windows laptop, from `C:\PawGuard` (`cd /c/PawGuard`).
+Commands for **PowerShell** in `C:\PawGuard` (your usual terminal). Note: in PowerShell, `bash` is WSL's Linux
+bash and cannot run these scripts — always use the `.ps1` launcher (it runs Git Bash for you).
 
-1. Start **Docker Desktop** (whale icon steady, "Engine running").
-2. Start everything and prepare a clean demo (≈ 3–5 min):
-   ```bash
-   bash scripts/demo_up.sh --reset
+1. Start **Docker Desktop** and wait for "Engine running".
+2. Start everything with a clean, prepared demo (≈ 3–5 min):
+   ```powershell
+   cd C:\PawGuard
+   .\scripts\demo_up.ps1 --reset
    ```
-   It ends with a health line containing `"status":"ready"` and prints the prepared photo path.
-   Without `--reset` it only (re)starts services and keeps the current demo data.
-3. Open **http://localhost:3000/en/sign-in**.
+   It ends with a line containing `"status":"ready"`. Without `--reset` it only (re)starts the services and keeps
+   the current demo data. If PowerShell refuses to run scripts:
+   `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned` and retry.
+3. **Keep that PowerShell window open** (minimise it) — closing it can stop the services it started.
+4. Open **http://localhost:3000/en/sign-in**.
 
-Quick health check at any time:
-```bash
-curl -s http://127.0.0.1:8000/health/ready     # expect "status":"ready", migration 0011, all components ok
-```
+Quick commands (PowerShell, in `C:\PawGuard`):
+
+| Purpose | Command |
+|---|---|
+| Health check | `curl.exe -s http://127.0.0.1:8000/health/ready` → `"status":"ready"`, migration 0011 |
+| Quick reset after a rehearsal (≈ 30 s) | `.venv\Scripts\pawguard-admin.exe demo-reset --yes; .venv\Scripts\python.exe scripts\demo_prepare.py` |
+| Restart services, keep data | `.\scripts\demo_up.ps1` |
+| Make a backup | `& "$env:ProgramFiles\Git\bin\bash.exe" scripts/make_demo_backup.sh` |
+
+(Git Bash users: the same scripts run as `bash scripts/demo_up.sh --reset`, etc.)
 
 Stop after the demo (data is kept):
-```bash
-powershell -NoProfile -Command "Get-CimInstance Win32_Process | Where-Object { \$_.Name -in @('uvicorn.exe','pawguard-worker.exe') } | ForEach-Object { Stop-Process -Id \$_.ProcessId -Force }"
-powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force }"
-npx --yes supabase@2.119.0 stop --workdir infra        # optional: stops the database containers
+```powershell
+Get-CimInstance Win32_Process | Where-Object { $_.Name -in @('uvicorn.exe','pawguard-worker.exe') } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
+Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
+npx --yes supabase@2.119.0 stop --workdir infra    # optional: stops the database containers
 ```
 
 ## 2. Demo accounts
@@ -65,8 +75,7 @@ Tip: open Priya in a normal window and Dr Arun in a private window so you don't 
 
 **If matching shows "No similar animals found"** (e.g. after a reset without `demo_prepare.py`): say "it found no
 similar animal — that doesn't prove the dog is new", click **Search the registry instead**, open any animal, and
-continue from step 6. To restore the prepared match:
-`PYTHONIOENCODING=utf-8 uv run python scripts/demo_prepare.py`.
+continue from step 6. To restore the prepared match: `.venv\Scripts\python.exe scripts\demo_prepare.py`.
 
 **Optional extras if asked (30 s each)**
 - *Offline:* as Priya open **Offline field kit** → **Use this device for field work** (once) → browser DevTools →
@@ -78,17 +87,18 @@ continue from step 6. To restore the prepared match:
 
 | What happens | Do this |
 |---|---|
-| Photo stays on **Checking the file…** / "Saved. It will be checked shortly" for > 20 s | Worker or dispatcher stopped: run `bash scripts/demo_up.sh` (≈ 1 min), then **Remove** the photo and choose it again |
+| Photo stays on **Checking the file…** / "Saved. It will be checked shortly" for > 20 s | Worker or dispatcher stopped: run `.\scripts\demo_up.ps1` (≈ 2 min), then **Remove** the photo and choose it again |
 | "This file was not accepted: …" or "Upload failed. Check your connection and try again." | Use **Choose another file** with the same prepared photo; check the API with the health command |
 | "Automatic detection isn't available right now. You can still use this photo." | Choose **None of these / not sure** and continue — lookup then compares the whole photo; or use **Search the registry instead** |
-| "Photo comparison isn't available" (no lookup page) | Research preview is off: `uv run pawguard-admin models research-preview dinov2_small_arcface_head ed25f3a3-resize224-head-v1 --reason "demo"`; meanwhile use **Find the animal in the registry** |
-| "Photo comparison didn't work this time" / "Results may be incomplete" | Click **Search again**; if it persists, `bash scripts/demo_up.sh` and use the registry search |
+| "Photo comparison isn't available" (no lookup page) | Research preview is off: `.venv\Scripts\pawguard-admin.exe models research-preview dinov2_small_arcface_head ed25f3a3-resize224-head-v1 --reason "demo"`; meanwhile use **Find the animal in the registry** |
+| "Photo comparison didn't work this time" / "Results may be incomplete" | Click **Search again**; if it persists, `.\scripts\demo_up.ps1` and use the registry search |
 | "Your session has ended. Please sign in again." | Click **Sign in as …** again; work already submitted is saved |
-| Page error or blank | `bash scripts/restart-web.sh`; if the API is down, `bash scripts/demo_up.sh` |
-| Demo data messy | `uv run pawguard-admin demo-reset --yes && PYTHONIOENCODING=utf-8 uv run python scripts/demo_prepare.py` (demo organisations only) |
+| Page error or blank | `.\scripts\demo_up.ps1` (restarts API, worker and web; keeps data) |
+| Demo data messy | `.venv\Scripts\pawguard-admin.exe demo-reset --yes; .venv\Scripts\python.exe scripts\demo_prepare.py` (demo organisations only) |
+| "uv: command not found" | You ran `bash …` from PowerShell (that is WSL). Use `.\scripts\demo_up.ps1` |
 | Nothing works | Play `backups/demo-recording/demo-journey-2026-10-06.webm` and show `docs/screenshots/phase9/` |
 
-Backups and full restoration: `docs/BACKUP_RESTORE.md` (`bash scripts/make_demo_backup.sh`).
+Backups and full restoration: `docs/BACKUP_RESTORE.md`.
 
 ## 5. Real-phone check (Android Chrome recommended)
 
@@ -127,7 +137,7 @@ Not available offline (by design): photos, vaccination evidence, registering ani
 
 ## 7. Making the backup video yourself (checklist)
 
-1. `bash scripts/demo_up.sh --reset`; close other apps and notifications; browser zoom 100%, window ~1280×800.
+1. `.\scripts\demo_up.ps1 --reset`; close other apps and notifications; browser zoom 100%, window ~1280×800.
 2. Use only the **Sign in as …** buttons — never type the password on camera; keep `.env` and terminals off-screen.
 3. Windows: **Win + Alt + R** (Xbox Game Bar) records the active window; or OBS "Window capture".
 4. Follow §3 steps 1–9, speaking the "Say" column; aim for under 3 minutes.

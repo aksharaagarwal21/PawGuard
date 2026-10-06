@@ -6,8 +6,8 @@ what is tested, and what is blocked. Nothing here is clinically validated or end
 
 ## Demonstration
 
-```bash
-bash scripts/demo_up.sh --reset   # Docker Desktop running; starts everything and resets the fictional demo data
+```powershell
+.\scripts\demo_up.ps1 --reset     # PowerShell (Docker Desktop running); Git Bash: bash scripts/demo_up.sh --reset
 ```
 
 Step-by-step demo: `docs/DEMO_GUIDE.md`. Results and limitations: `docs/RELEASE_REPORT_PREVENTION.md`.

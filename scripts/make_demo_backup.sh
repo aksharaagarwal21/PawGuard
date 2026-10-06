@@ -6,6 +6,8 @@
 #   bash scripts/make_demo_backup.sh            → backups/demo-backup-<date>/
 set -euo pipefail
 cd "$(dirname "$0")/.."
+# shellcheck source=scripts/_tools.sh
+source scripts/_tools.sh
 DEST="backups/demo-backup-$(date +%Y-%m-%d)"
 rm -rf "$DEST" && mkdir -p "$DEST"/{repo,models,database,demo-media,video}
 
