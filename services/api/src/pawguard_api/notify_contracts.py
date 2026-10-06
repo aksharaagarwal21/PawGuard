@@ -20,6 +20,8 @@ class ChannelsAvailableOut(Out):
 class NotificationSettingsOut(Out):
     email_enabled: bool
     email_address: str | None
+    email_verified: bool  # reminders go only to a confirmed address
+    email_pending: bool  # a confirmation email was sent and not yet clicked
     push_enabled: bool
     push_devices: int
     whatsapp_enabled: bool
@@ -116,3 +118,11 @@ class AssistantOut(Out):
     reply: str
     actions: list[AssistantAction]
     guarded: bool  # true when a safety rule replaced or limited the answer
+
+
+class ConfirmEmailIn(StrictModel):
+    token: str = Field(min_length=20, max_length=100)
+
+
+class ConfirmEmailOut(Out):
+    confirmed: bool

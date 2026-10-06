@@ -40,6 +40,8 @@ def compose(info: dict[str, Any], s: Settings) -> Message:
     demo = "\n\n(Demo — fictional pets and clinics. Not for real medical use.)" if info.get("is_demo") else ""
     footer = ("\n\nPawGuard only reminds you; your vet decides what your pet needs."
               "\nTo stop these messages, open PawGuard → Notifications.")
+    if info["kind"] == "verify_email":
+        return Message("", "", "", link)  # built by compose_verification when the token is issued
     if info["kind"] == "test":
         subject = "PawGuard test message"
         short = "PawGuard: this is a test message. Your notifications are working."
@@ -54,6 +56,16 @@ def compose(info: dict[str, Any], s: Settings) -> Message:
             f"Please contact your vet to book a visit. If it has been given, mark it as done in the app:\n{link}"
             f"{footer}{demo}")
     return Message(subject, text, short, link)
+
+
+def compose_verification(token: str, s: Settings) -> Message:
+    """The confirmation email: fixed text and the one-time link; nothing typed by anyone else."""
+    link = f"{s.public_app_url}/en/verify-email?token={token}"
+    short = "Please confirm your email address for PawGuard reminders."
+    text = ("Hello,\n\nSomeone (hopefully you) asked PawGuard 360 to send vaccination reminders to this address.\n"
+            f"To confirm, open this link within 48 hours:\n{link}\n\n"
+            "If this wasn't you, ignore this email — nothing will be sent to you.\n\n— PawGuard 360 (demo)")
+    return Message("Confirm your email for PawGuard reminders", text, short, link)
 
 
 # ---- email -------------------------------------------------------------------------------------------------------

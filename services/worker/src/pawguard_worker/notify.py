@@ -18,6 +18,8 @@ from pawguard_api.settings import Settings, get_settings
 
 log = get_logger(__name__)
 MAX_ATTEMPTS = 5
+# Errors about one recipient (not the provider as a whole).
+RECIPIENT_CODES = {"no_recipient", "not_confirmed", "outside_window", "recipient_refused", "push_failed"}
 
 
 def _sql(sql: str, **params: Any) -> Any:
@@ -26,8 +28,9 @@ def _sql(sql: str, **params: Any) -> Any:
 
 
 def queue_due() -> int:
+    needs_confirmation = not get_settings().demo_notify_email
     with worker_engine().begin() as c:
-        return int(c.execute(text("select app.queue_due_notifications()")).scalar() or 0)
+        return int(c.execute(text("select app.queue_due_notifications(:c)"), {"c": needs_confirmation}).scalar() or 0)
 
 
 def has_ready() -> bool:
@@ -46,18 +49,35 @@ def _status(provider: str, state: str, detail: str = "") -> None:
     _sql("select app.set_provider_status(:p, :s, :d)", p=provider, s=state, d=detail)
 
 
+def _override(info: dict[str, Any], s: Settings) -> str | None:
+    """Optional team test recipient for demo organisations (empty = use each person's own address)."""
+    if not info["is_demo"]:
+        return None
+    return (s.demo_notify_email if info["channel"] == "email" else
+            s.demo_notify_whatsapp if info["channel"] == "whatsapp" else None) or None
+
+
 def _recipient(info: dict[str, Any], s: Settings) -> str | None:
     if info["channel"] == "email":
-        return s.demo_notify_email if info["is_demo"] else info.get("email_address")
+        return _override(info, s) or info.get("email_address")
     if info["channel"] == "whatsapp":
-        return s.demo_notify_whatsapp if info["is_demo"] else info.get("whatsapp_number")
+        return _override(info, s) or info.get("whatsapp_number")
     return None
 
 
 def _send_email(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
     to = _recipient(info, s)
     if not to:
-        raise notify.ProviderError("no_recipient", detail="No email address (demo: set PAWGUARD_DEMO_NOTIFY_EMAIL)")
+        raise notify.ProviderError("no_recipient", detail="No email address")
+    if info["kind"] == "verify_email":
+        if _override(info, s):
+            raise notify.ProviderError("no_recipient", detail="Demo uses the team inbox; no confirmation needed")
+        token = _sql("select app.issue_email_verification(:u)", u=str(info["user_id"])).scalar()
+        if not token:
+            raise notify.ProviderError("no_recipient", detail="No email address to confirm")
+        msg = notify.compose_verification(str(token), s)
+    elif not _override(info, s) and not info.get("email_verified"):
+        raise notify.ProviderError("not_confirmed", detail="Email address not confirmed yet")
     sent = int(_sql("select app.notifications_sent_last_day('email')").scalar() or 0)
     if sent >= s.email_daily_cap:
         raise notify.ProviderError("cap_reached", retry_in=3600, status="cap_reached",
@@ -97,9 +117,9 @@ def deliver(info: dict[str, Any], s: Settings) -> str:
     try:
         provider_id = sender(info, notify.compose(info, s), s)
     except notify.ProviderError as err:
-        if err.status in ("not_configured", "token_expired", "cap_reached", "rate_limited", "error"):
+        if err.code not in RECIPIENT_CODES:  # problems with one recipient don't change the provider's status
             _status(channel, err.status, err.detail or err.code)
-        if err.code in ("not_configured", "no_recipient"):
+        if err.code in ("not_configured", "no_recipient", "not_confirmed"):
             _finish(row_id, "skipped", error=err.detail or err.code)
             return "skipped"
         if err.retry_in is not None and info["attempts"] < MAX_ATTEMPTS:

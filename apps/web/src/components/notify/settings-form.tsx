@@ -56,6 +56,16 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
     const { error, response } = await browserApi.POST("/api/v1/my/notification-settings/test", { body: { channel } });
     if (response.status === 202) return setMessage({ tone: "success", text: t(`testQueued.${channel}`) });
     const p = parseApiError(error);
+    const text =
+      p.code === "rate_limited" ? t("testLimited") : p.code === "email_not_confirmed" ? t("email.confirmFirst") : p.message || tc("tryAgainLater");
+    setMessage({ tone: "urgent", text });
+  }
+
+  async function resend() {
+    setMessage(null);
+    const { error, response } = await browserApi.POST("/api/v1/my/notification-settings/resend-confirmation");
+    if (response.status === 202) return setMessage({ tone: "success", text: t("email.resent") });
+    const p = parseApiError(error);
     setMessage({ tone: "urgent", text: p.code === "rate_limited" ? t("testLimited") : p.message || tc("tryAgainLater") });
   }
 
@@ -114,6 +124,19 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
         </Notice>
       ) : null}
       {row("email", Mail, s.email_enabled, (v) => ({ ...s, email_enabled: v }),
+        <div className="space-y-3">
+        {s.email_address && !s.demo_recipients ? (
+          s.email_verified ? (
+            <p className="text-sm font-semibold">{t("email.confirmed", { address: s.email_address })}</p>
+          ) : (
+            <div className="space-y-2 rounded-control bg-sand p-3 text-sm">
+              <p>{s.email_pending ? t("email.pending", { address: s.email_address }) : t("email.notConfirmed")}</p>
+              <Button type="button" size="sm" variant="secondary" onClick={() => void resend()}>
+                {t("email.resend")}
+              </Button>
+            </div>
+          )
+        ) : null}
         <form
           className="flex flex-wrap items-end gap-2"
           onSubmit={(e) => {
@@ -135,7 +158,8 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
           <Button type="submit" variant="secondary" disabled={busy}>
             {tc("save")}
           </Button>
-        </form>,
+        </form>
+        </div>,
       )}
       {row("push", BellRing, s.push_enabled, (v) => ({ ...s, push_enabled: v }),
         <PushToggle vapidKey={vapidKey} devices={s.push_devices} onChanged={() => router.refresh()} />,

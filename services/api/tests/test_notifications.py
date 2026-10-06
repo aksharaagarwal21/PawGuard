@@ -60,9 +60,19 @@ def setup(world, make_token, owner_engine, client, monkeypatch):
     return SimpleNamespace(build=build, sent=sent, settings=s)
 
 
-def _queue(owner_engine):
+def _confirmed(owner_engine, user):
+    """Mark the person's address as confirmed and drop the queued confirmation email (tests of other features)."""
     with owner_engine.begin() as c:
-        return c.execute(text("select app.queue_due_notifications()")).scalar()
+        c.execute(text("update app.notification_preferences set email_verified_at = now() where user_id = :u"),
+                  {"u": user})
+        c.execute(text("delete from app.notification_deliveries where user_id = :u and kind = 'verify_email'"),
+                  {"u": user})
+
+
+def _queue(owner_engine):
+    needs_confirmation = not get_settings().demo_notify_email
+    with owner_engine.begin() as c:
+        return c.execute(text("select app.queue_due_notifications(:c)"), {"c": needs_confirmation}).scalar()
 
 
 def _deliveries(owner_engine, user):
@@ -109,6 +119,7 @@ def test_scan_is_idempotent_and_sends_to_own_address(client, setup, owner_engine
     assert _queue(owner_engine) == 0  # nothing enabled yet
     client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
                json={"email_enabled": True, "email_address": "owner@example.com"})
+    _confirmed(owner_engine, w.owner)
     assert _queue(owner_engine) == 1
     assert _queue(owner_engine) == 0  # same reminder, same channel: never twice
     counts = worker_notify.drain()
@@ -145,6 +156,7 @@ def test_unconfigured_provider_and_stale_reminders_are_skipped(client, setup, ow
     w = setup.build(demo=False)
     client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
                json={"email_enabled": True, "email_address": "owner@example.com"})
+    _confirmed(owner_engine, w.owner)
     _queue(owner_engine)
     with owner_engine.begin() as c:  # the owner marked it done before the worker ran
         c.execute(text("update app.vaccination_reminders set state = 'done' where animal_id = :a"), {"a": w.pet["id"]})
@@ -162,6 +174,7 @@ def test_test_messages_are_rate_limited(client, setup, owner_engine):
     w = setup.build(demo=False)
     client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
                json={"email_enabled": False, "email_address": "owner@example.com"})
+    _confirmed(owner_engine, w.owner)
     for _ in range(5):
         assert client.post("/api/v1/my/notification-settings/test", headers=_h(w.tok["owner"], w.org),
                            json={"channel": "email"}).status_code == 202
@@ -177,6 +190,7 @@ def test_staff_overview_has_states_not_addresses(client, setup, owner_engine):
     w = setup.build(demo=False)
     client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
                json={"email_enabled": True, "email_address": "owner-private@example.com"})
+    _confirmed(owner_engine, w.owner)
     _queue(owner_engine)
     worker_notify.drain()
     assert client.get("/api/v1/clinic/notifications", headers=_h(w.tok["owner"], w.org)).status_code == 403
@@ -350,3 +364,42 @@ def test_whatsapp_webhook_verification_and_signature(client, setup, owner_engine
     assert client.post("/api/v1/webhooks/whatsapp", content=raw, headers={"X-Hub-Signature-256": sig}).status_code == 200
     rows = _deliveries(owner_engine, w.owner)
     assert rows[-1].state == "failed" and rows[-1].last_error == "WhatsApp 131026: Message undeliverable"
+
+
+
+def test_email_must_be_confirmed_with_a_one_time_link(client, setup, owner_engine, monkeypatch):
+    from pawguard_worker import notify as worker_notify
+
+    monkeypatch.setattr(setup.settings, "demo_notify_email", None)  # use each person's own address
+    w = setup.build(demo=True)
+    r = client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
+                   json={"email_enabled": True, "email_address": "Owner.Real@Example.com"})
+    assert r.status_code == 200 and r.json()["email_verified"] is False
+    # Unconfirmed: no test email, no reminders.
+    t = client.post("/api/v1/my/notification-settings/test", headers=_h(w.tok["owner"], w.org), json={"channel": "email"})
+    assert t.status_code == 409 and t.json()["error"]["code"] == "email_not_confirmed"
+    assert _queue(owner_engine) == 0  # unconfirmed: the reminder waits instead of being used up
+    counts = worker_notify.drain()
+    assert counts == {"sent": 1}  # only the confirmation email
+    to, msg = next((to, m) for to, m in setup.sent if m.subject.startswith("Confirm"))
+    assert to == "owner.real@example.com" and "/en/verify-email?token=" in msg.text
+    token = msg.text.split("token=")[1].split()[0]
+    with owner_engine.begin() as c:
+        stored = c.execute(text("select email_verify_hash from app.notification_preferences where user_id = :u"),
+                           {"u": w.owner}).scalar()
+    assert stored and token not in stored  # only the hash is stored
+    assert client.get("/api/v1/my/notification-settings", headers=_h(w.tok["owner"])).json()["email_pending"] is True
+    assert client.post("/api/v1/notify/confirm-email", json={"token": token}).json() == {"confirmed": True}
+    assert client.post("/api/v1/notify/confirm-email", json={"token": token}).json() == {"confirmed": False}  # once
+    assert client.post("/api/v1/notify/confirm-email", json={"token": "x" * 43}).json() == {"confirmed": False}
+    assert client.get("/api/v1/my/notification-settings", headers=_h(w.tok["owner"])).json()["email_verified"] is True
+    # Confirmed: the waiting reminder is queued and sent.
+    assert _queue(owner_engine) == 1
+    assert worker_notify.drain().get("sent") == 1
+    assert setup.sent[-1][0] == "owner.real@example.com" and setup.sent[-1][1].subject.startswith("Reminder")
+    # A new address must be confirmed again.
+    d = client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
+                   json={"email_enabled": True, "email_address": "other@example.com"}).json()
+    assert d["email_verified"] is False
+    assert client.post("/api/v1/my/notification-settings/resend-confirmation",
+                       headers=_h(w.tok["owner"])).status_code == 202

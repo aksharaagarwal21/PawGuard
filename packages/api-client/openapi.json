@@ -1840,6 +1840,35 @@
         "title": "ClinicVaccinationIn",
         "type": "object"
       },
+      "ConfirmEmailIn": {
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "maxLength": 100,
+            "minLength": 20,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "ConfirmEmailIn",
+        "type": "object"
+      },
+      "ConfirmEmailOut": {
+        "properties": {
+          "confirmed": {
+            "title": "Confirmed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "confirmed"
+        ],
+        "title": "ConfirmEmailOut",
+        "type": "object"
+      },
       "DeliveryOut": {
         "properties": {
           "channel": {
@@ -3714,6 +3743,14 @@
             "title": "Email Enabled",
             "type": "boolean"
           },
+          "email_pending": {
+            "title": "Email Pending",
+            "type": "boolean"
+          },
+          "email_verified": {
+            "title": "Email Verified",
+            "type": "boolean"
+          },
           "push_devices": {
             "title": "Push Devices",
             "type": "integer"
@@ -3741,6 +3778,8 @@
         "required": [
           "email_enabled",
           "email_address",
+          "email_verified",
+          "email_pending",
           "push_enabled",
           "push_devices",
           "whatsapp_enabled",
@@ -13544,6 +13583,74 @@
         ]
       }
     },
+    "/api/v1/my/notification-settings/resend-confirmation": {
+      "post": {
+        "description": "Permission: any signed-in user, own address only. At most 3 confirmation emails an hour.",
+        "operationId": "notifications_resend_confirmation",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Send the email confirmation link again",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/api/v1/my/notification-settings/test": {
       "post": {
         "description": "Permission: any member. At most 5 test messages an hour. Sent by the worker within about 15 seconds.",
@@ -14875,6 +14982,68 @@
         "summary": "Snooze a reminder for 1 or 3 days",
         "tags": [
           "pets"
+        ]
+      }
+    },
+    "/api/v1/notify/confirm-email": {
+      "post": {
+        "description": "Permission: public — the one-time token from the confirmation email is the proof (48 hours).",
+        "operationId": "notifications_confirm_email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmEmailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Confirm an email address",
+        "tags": [
+          "notifications"
         ]
       }
     },

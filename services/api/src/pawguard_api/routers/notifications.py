@@ -5,6 +5,8 @@ from fastapi import APIRouter, Response
 from pawguard_api.deps import CurrentOrg, CurrentPrincipal
 from pawguard_api.domain import notifications
 from pawguard_api.notify_contracts import (
+    ConfirmEmailIn,
+    ConfirmEmailOut,
     NotificationSettingsIn,
     NotificationSettingsOut,
     NotificationsOverviewOut,
@@ -74,3 +76,17 @@ def remove_push(body: PushUnsubscribeIn, p: CurrentPrincipal) -> Response:
     """Permission: any signed-in user, own subscriptions only."""
     notifications.remove_push_subscription(p, body.endpoint)
     return Response(status_code=204)
+
+
+@router.post("/my/notification-settings/resend-confirmation", status_code=202,
+             summary="Send the email confirmation link again")
+def resend_confirmation(p: CurrentPrincipal) -> Response:
+    """Permission: any signed-in user, own address only. At most 3 confirmation emails an hour."""
+    notifications.resend_verification(p)
+    return Response(status_code=202)
+
+
+@router.post("/notify/confirm-email", response_model=ConfirmEmailOut, summary="Confirm an email address")
+def confirm_email(body: ConfirmEmailIn) -> ConfirmEmailOut:
+    """Permission: public — the one-time token from the confirmation email is the proof (48 hours)."""
+    return ConfirmEmailOut(confirmed=notifications.confirm_email(body.token))

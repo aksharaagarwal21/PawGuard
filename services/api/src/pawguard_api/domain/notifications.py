@@ -20,6 +20,7 @@ from pawguard_api.settings import get_settings
 
 Channel = Literal["email", "push", "whatsapp"]
 TEST_LIMIT_PER_HOUR = 5
+VERIFY_LIMIT_PER_HOUR = 3
 
 
 def channel_available() -> dict[str, bool]:
@@ -41,11 +42,32 @@ def get_prefs(p: Principal) -> dict[str, Any]:
     s = get_settings()
     return {
         "email_enabled": bool(row and row.email_enabled), "email_address": row.email_address if row else None,
+        "email_verified": bool(row and row.email_verified_at),
+        "email_pending": bool(row and row.email_address and not row.email_verified_at and row.email_verify_sent_at),
         "push_enabled": bool(row and row.push_enabled), "push_devices": push_devices,
         "whatsapp_enabled": bool(row and row.whatsapp_enabled), "whatsapp_number": row.whatsapp_number if row else None,
-        "demo_recipients": demo, "available": channel_available(),
+        "demo_recipients": demo and bool(s.demo_notify_email or s.demo_notify_whatsapp),
+        "available": channel_available(),
         "demo_email_set": bool(s.demo_notify_email), "demo_whatsapp_set": bool(s.demo_notify_whatsapp),
     }
+
+
+def _queue_verification(db: Any, user_id: Any) -> bool:
+    """Queue one confirmation email (max 3 an hour). Needs any active membership for the organisation id."""
+    recent = db.execute(text("""select count(*) from app.notification_deliveries where user_id = :u
+                                and kind = 'verify_email' and created_at > now() - interval '1 hour'"""),
+                        {"u": user_id}).scalar()
+    if (recent or 0) >= VERIFY_LIMIT_PER_HOUR:
+        return False
+    org = db.execute(text("""select m.org_id from app.memberships m where m.user_id = :u and m.status = 'active'
+                             order by m.created_at limit 1"""), {"u": user_id}).scalar()
+    if org is None:
+        return False
+    db.execute(text("select app.set_request_context(:u, :o)"), {"u": user_id, "o": org})
+    db.execute(text("""insert into app.notification_deliveries (org_id, user_id, channel, kind, dedupe_key)
+                       values (:o, :u, 'email', 'verify_email', :k)"""),
+               {"o": org, "u": user_id, "k": f"verify:{uuid.uuid4()}"})
+    return True
 
 
 def update_prefs(p: Principal, data: dict[str, Any]) -> dict[str, Any]:
@@ -57,7 +79,11 @@ def update_prefs(p: Principal, data: dict[str, Any]) -> dict[str, Any]:
         raise Unprocessable("Add the WhatsApp number for reminders.",
                             fields=[FieldError(field="whatsapp_number", code="required",
                                                message="Enter the number with country code, e.g. +91…")])
+    new_email = (data.get("email_address") or "").strip().lower() or None
     with user_tx(p.user_id) as db:
+        old = db.execute(text("select email_address, email_verified_at from app.notification_preferences "
+                              "where user_id = :u"), {"u": p.user_id}).one_or_none()
+        changed = (old.email_address if old else None) != new_email
         db.execute(text("""
             insert into app.notification_preferences (user_id, email_enabled, email_address, push_enabled,
               whatsapp_enabled, whatsapp_number, updated_at)
@@ -66,15 +92,54 @@ def update_prefs(p: Principal, data: dict[str, Any]) -> dict[str, Any]:
               email_address = excluded.email_address, push_enabled = excluded.push_enabled,
               whatsapp_enabled = excluded.whatsapp_enabled, whatsapp_number = excluded.whatsapp_number,
               updated_at = now()"""),
-            {"u": p.user_id, "ee": data["email_enabled"], "ea": data.get("email_address") or None,
+            {"u": p.user_id, "ee": data["email_enabled"], "ea": new_email,
              "pe": data["push_enabled"], "we": data["whatsapp_enabled"], "wn": data.get("whatsapp_number") or None})
+        if changed:  # a new address must be confirmed again
+            db.execute(text("""update app.notification_preferences set email_verified_at = null,
+                               email_verify_hash = null, email_verify_sent_at = null where user_id = :u"""),
+                       {"u": p.user_id})
+        verified = bool(old and old.email_verified_at and not changed)
+        s = get_settings()
+        if (data["email_enabled"] and new_email and not verified and channel_available()["email"]
+                and not s.demo_notify_email and (changed or not (old and old.email_verified_at))):
+            _queue_verification(db, p.user_id)
     return get_prefs(p)
+
+
+def resend_verification(p: Principal) -> None:
+    if not channel_available()["email"]:
+        raise ApiError("Email isn't set up on this server yet.", code="channel_unavailable", status_code=409)
+    with user_tx(p.user_id) as db:
+        row = db.execute(text("select email_address, email_verified_at from app.notification_preferences "
+                              "where user_id = :u"), {"u": p.user_id}).one_or_none()
+        if not row or not row.email_address:
+            raise Unprocessable("Add your email address first.", code="no_email")
+        if row.email_verified_at:
+            return
+        if not _queue_verification(db, p.user_id):
+            raise ApiError("Several confirmation emails were sent already. Try again in an hour.",
+                           code="rate_limited", status_code=429)
+
+
+def confirm_email(token: str) -> bool:
+    from pawguard_api.db import public_tx
+
+    if not (20 <= len(token) <= 100):
+        return False
+    with public_tx() as db:
+        return bool(db.execute(text("select app.confirm_email(:t)"), {"t": token}).scalar())
 
 
 def send_test(db: Any, ctx: OrgContext, channel: Channel) -> None:
     """Queue a test message to yourself on one channel (sent within about 15 seconds by the worker)."""
     if not channel_available()[channel]:
         raise ApiError("This channel is not set up on the server yet.", code="channel_unavailable", status_code=409)
+    if channel == "email" and not get_settings().demo_notify_email:
+        ok = db.execute(text("select email_verified_at is not null from app.notification_preferences "
+                             "where user_id = :u"), {"u": ctx.user_id}).scalar()
+        if not ok:
+            raise ApiError("Confirm your email address first — open the link we sent you.",
+                           code="email_not_confirmed", status_code=409)
     recent = db.execute(text("""select count(*) from app.notification_deliveries where user_id = :u and kind = 'test'
                                 and created_at > now() - interval '1 hour'"""), {"u": ctx.user_id}).scalar()
     if (recent or 0) >= TEST_LIMIT_PER_HOUR:
@@ -117,7 +182,8 @@ def run_now(db: Any, ctx: OrgContext) -> int:
     is_demo = db.execute(text("select is_demo from app.organisations where id = :o"), {"o": ctx.org_id}).scalar()
     if not (is_demo and get_settings().demo_mode):
         raise Forbidden("Only available in demo organisations.", code="not_demo")
-    n = int(db.execute(text("select app.queue_due_notifications()")).scalar() or 0)
+    n = int(db.execute(text("select app.queue_due_notifications(:c)"),
+                       {"c": not get_settings().demo_notify_email}).scalar() or 0)
     record_audit(db, ctx, "notification.scan_requested", "organisation", ctx.org_id, {"queued": n})
     return n
 

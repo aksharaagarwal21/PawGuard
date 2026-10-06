@@ -973,6 +973,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/notification-settings/resend-confirmation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send the email confirmation link again
+         * @description Permission: any signed-in user, own address only. At most 3 confirmation emails an hour.
+         */
+        post: operations["notifications_resend_confirmation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/notification-settings/test": {
         parameters: {
             query?: never;
@@ -1257,6 +1277,26 @@ export interface paths {
          * @description Permission: the reminder's owner.
          */
         post: operations["pets_snooze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notify/confirm-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm an email address
+         * @description Permission: public — the one-time token from the confirmation email is the proof (48 hours).
+         */
+        post: operations["notifications_confirm_email"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2458,6 +2498,16 @@ export interface components {
              */
             product_id: string;
         };
+        /** ConfirmEmailIn */
+        ConfirmEmailIn: {
+            /** Token */
+            token: string;
+        };
+        /** ConfirmEmailOut */
+        ConfirmEmailOut: {
+            /** Confirmed */
+            confirmed: boolean;
+        };
         /** DeliveryOut */
         DeliveryOut: {
             /**
@@ -3175,6 +3225,10 @@ export interface components {
             email_address: string | null;
             /** Email Enabled */
             email_enabled: boolean;
+            /** Email Pending */
+            email_pending: boolean;
+            /** Email Verified */
+            email_verified: boolean;
             /** Push Devices */
             push_devices: number;
             /** Push Enabled */
@@ -7524,6 +7578,55 @@ export interface operations {
             };
         };
     };
+    notifications_resend_confirmation: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     notifications_send_test: {
         parameters: {
             query?: never;
@@ -8328,6 +8431,57 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_confirm_email: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmEmailIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConfirmEmailOut"];
+                };
             };
             /** @description Unauthorized */
             401: {

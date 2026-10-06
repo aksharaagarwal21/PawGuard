@@ -1715,7 +1715,7 @@
     "on": "On",
     "off": "Off",
     "notSetUp": "Not set up",
-    "saved": "Saved. You'll get reminders the way you chose.",
+    "saved": "Saved. If you added a new email address, check your inbox for a confirmation link.",
     "sendTest": "Send me a test",
     "testQueued": {
       "email": "Test email on its way — check your inbox (and spam) in a minute.",
@@ -1730,8 +1730,14 @@
       "title": "Email",
       "body": "A short email on the reminder days: 14, 7 and 1 day before, and if overdue.",
       "address": "Email address",
-      "addressHint": "Where we send reminders. In the demo, the team's test inbox is used.",
-      "unavailable": "Email isn't set up on this server yet."
+      "addressHint": "Where we send reminders. We'll email you a link to confirm it first.",
+      "unavailable": "Email isn't set up on this server yet.",
+      "confirmed": "Confirmed: {address}",
+      "pending": "We sent a confirmation link to {address}. Open it to start getting emails (check spam too).",
+      "notConfirmed": "This address isn't confirmed yet.",
+      "resend": "Send the confirmation link again",
+      "resent": "Confirmation link sent — check your inbox (and spam).",
+      "confirmFirst": "Confirm your email address first — open the link we sent you."
     },
     "push": {
       "title": "Browser notifications",
@@ -1790,6 +1796,13 @@
       "queued": "{count, plural, =0 {Nothing new to send.} one {# message queued.} other {# messages queued.}}",
       "failed": "That didn't work. Try again.",
       "webhook": "WhatsApp webhook address (Meta dashboard → WhatsApp → Configuration; it changes when the public link restarts):"
+    },
+    "verify": {
+      "okTitle": "Email confirmed",
+      "okBody": "You'll now get PawGuard vaccination reminders at this address. You can turn them off any time in Notifications.",
+      "failTitle": "This link didn't work",
+      "failBody": "It may have been used already or be older than 48 hours. Open Notifications and send a new confirmation link.",
+      "open": "Open Notifications"
     }
   },
   "assistant": {
