@@ -1,6 +1,6 @@
 """Celery tasks. Each receives only a job id; state is loaded from PostgreSQL and duplicate deliveries are no-ops."""
 
-from pawguard_worker import analysis, identity, jobs, media, plan_job
+from pawguard_worker import analysis, identity, jobs, media, notify, plan_job
 from pawguard_worker.celery_app import app
 
 
@@ -37,3 +37,9 @@ def search_identity(job_id: str) -> str:
 def solve_plan(job_id: str) -> str:
     """Campaign day plan. A proposal only; people approve and publish."""
     return jobs.run(job_id, plan_job.solve, on_terminal=plan_job.failed)
+
+
+@app.task(name="pawguard.notify.drain")
+def drain_notifications() -> dict[str, int]:
+    """Send one batch of queued notifications (email, push, WhatsApp)."""
+    return notify.drain()

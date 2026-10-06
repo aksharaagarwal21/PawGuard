@@ -60,9 +60,42 @@ def dispatch_batch(batch: int = 50) -> int:
     return len(rows)
 
 
+SCAN_EVERY = 600  # seconds between scans for reminders that are due today
+SEND_CHECK_EVERY = 15  # seconds between checks for queued notifications
+
+
+class NotificationTicker:
+    """Periodic notification work inside the dispatcher loop: queue due reminders, then publish a send task when
+    anything is ready. Failures are logged and retried on the next tick; they never stop job dispatch."""
+
+    def __init__(self) -> None:
+        self.next_scan = 0.0
+        self.next_check = 0.0
+
+    def tick(self, now: float) -> None:
+        from pawguard_worker import notify
+
+        try:
+            if now >= self.next_scan:
+                self.next_scan = now + SCAN_EVERY
+                queued = notify.queue_due()
+                if queued:
+                    log.info("notifications_queued", count=queued)
+            if now >= self.next_check:
+                self.next_check = now + SEND_CHECK_EVERY
+                if notify.has_ready():
+                    from pawguard_worker.celery_app import app
+
+                    app.send_task("pawguard.notify.drain")
+        except Exception as exc:
+            log.warning("notification_tick_failed", error=type(exc).__name__)
+
+
 def run_dispatcher(once: bool = False, poll_seconds: float = 1.0) -> None:
     log.info("dispatcher_started")
+    ticker = NotificationTicker()
     while True:
+        ticker.tick(time.monotonic())
         try:
             n = dispatch_batch()
         except Exception as exc:

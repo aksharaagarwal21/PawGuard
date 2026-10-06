@@ -63,6 +63,35 @@ class Settings(BaseSettings):
     map_tile_url: str | None = None
     map_tile_attribution: str | None = None
 
+    # Public web address used in links inside messages (the first extra origin wins: the public tunnel).
+    web_origin: str = "http://localhost:3000"
+    extra_web_origins: str = ""
+
+    # Free notification providers (docs/FREE_SERVICES_SETUP.md). Demo organisations send only to these test
+    # recipients, never to the fictional demo addresses.
+    demo_notify_email: str | None = None
+    demo_notify_whatsapp: str | None = None
+    smtp_host: str = "smtp.gmail.com"
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    email_from: str | None = None
+    email_daily_cap: int = 100
+    vapid_public_key: str | None = None
+    vapid_private_key: str | None = None
+    vapid_contact: str | None = None
+    whatsapp_token: str | None = None
+    whatsapp_phone_number_id: str | None = None
+    whatsapp_app_secret: str | None = None
+    whatsapp_verify_token: str | None = None
+    whatsapp_template: str | None = None
+    whatsapp_api_version: str = "v23.0"
+    llm_provider: str = "off"
+    gemini_api_key: str | None = None
+    gemini_model: str | None = None
+    ollama_url: str = "http://127.0.0.1:11434"
+    ollama_model: str = "qwen2.5:3b"
+
     @model_validator(mode="after")
     def _defaults_and_guards(self) -> "Settings":
         base = self.supabase_url.rstrip("/")
@@ -75,6 +104,11 @@ class Settings(BaseSettings):
         if self.env == "production" and self.demo_mode:
             raise ValueError("PAWGUARD_DEMO_MODE must not be enabled in production")
         return self
+
+    @property
+    def public_app_url(self) -> str:
+        extra = [o.strip() for o in self.extra_web_origins.split(",") if o.strip()]
+        return (extra[0] if extra else self.web_origin).rstrip("/")
 
     @property
     def is_production(self) -> bool:
