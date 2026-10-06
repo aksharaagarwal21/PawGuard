@@ -5,6 +5,7 @@ staff should see for the provider (e.g. "token_expired" → "WhatsApp token expi
 only what a reminder needs (pet name, vaccine, date, clinic) — no notes, photos or contact details.
 """
 
+import logging
 import smtplib
 import ssl
 from dataclasses import dataclass
@@ -14,6 +15,9 @@ from email.utils import make_msgid
 from typing import Any
 
 from pawguard_api.settings import Settings
+
+# The Twilio SDK logs every request (URL with the account SID, headers) at INFO; keep it out of our logs.
+logging.getLogger("twilio.http_client").setLevel(logging.WARNING)
 
 
 class ProviderError(Exception):
