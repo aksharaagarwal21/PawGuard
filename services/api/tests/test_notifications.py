@@ -48,7 +48,7 @@ def setup(world, make_token, owner_engine, client, monkeypatch):
 
     s = get_settings()
     for k, v in {"smtp_user": "sender@example.com", "smtp_password": "app-password", "email_daily_cap": 100,
-                 "demo_notify_email": "team-inbox@example.com"}.items():
+                 "demo_notify_email": "team-inbox@example.com", "whatsapp_provider": "meta"}.items():
         monkeypatch.setattr(s, k, v)
     sent: list[tuple[str, notify.Message]] = []
 
@@ -483,3 +483,266 @@ def test_call_reminder_and_signed_keypad_reply(client, setup, owner_engine, monk
         snoozed = c.execute(text("select count(*) from app.vaccination_reminders where animal_id = :a "
                                  "and snoozed_until is not null"), {"a": w.pet["id"]}).scalar()
     assert snoozed >= 1
+
+
+# ---- WhatsApp through Twilio (trial template, demo recipient only) — the Twilio SDK is faked; nothing is sent ----
+
+TEMPLATE_TEXT = "Reminder: Appt Tue Oct 29, 3:00 PM. Reply C to confirm or R to reschedule. Test message from Twilio."
+TOKEN = "fake-auth-token-value"
+STATUS_URL = "https://pawguard.example/api/v1/webhooks/twilio/status"
+
+
+@pytest.fixture
+def twa(setup, monkeypatch):
+    """Twilio WhatsApp configured with fake credentials and a fake SDK client that records every request."""
+    import twilio.rest
+
+    for k, v in {"whatsapp_provider": "twilio", "twilio_account_sid": "ACfake0001", "twilio_auth_token": TOKEN,
+                 "twilio_whatsapp_from": "whatsapp:+15550001111", "twilio_content_sid": "HXfake0001",
+                 "demo_notify_whatsapp": "+919800001527", "extra_web_origins": "https://pawguard.example",
+                 "demo_mode": True}.items():
+        monkeypatch.setattr(setup.settings, k, v)
+    state = SimpleNamespace(created=[], auth=[], outcomes=[], fetched={})
+
+    class FakeMessages:
+        def create(self, **kw):
+            state.created.append(kw)
+            out = state.outcomes.pop(0) if state.outcomes else None
+            if isinstance(out, Exception):
+                raise out
+            return SimpleNamespace(sid=f"SM{len(state.created):032d}", status="queued", body=TEMPLATE_TEXT)
+
+        def __call__(self, sid):
+            return SimpleNamespace(fetch=lambda: SimpleNamespace(status=state.fetched.get(sid, "sent"),
+                                                                 error_code=None))
+
+    class FakeClient:
+        def __init__(self, sid, token, http_client=None):
+            state.auth.append((sid, token))
+            self.messages = FakeMessages()
+
+    monkeypatch.setattr(twilio.rest, "Client", FakeClient)
+    return state
+
+
+def _demo(client, w, path="", method="get"):
+    url = f"/api/v1/clinic/whatsapp-demo{path}"
+    return getattr(client, method)(url, headers=_h(w.tok["vet"], w.org))
+
+
+def _wa_rows(owner_engine, org):
+    with owner_engine.begin() as c:
+        return c.execute(text("""select id, kind, state, attempts, provider, provider_message_id, provider_status,
+                                        provider_error_code, last_error, recipient_masked, send_started_at
+                                   from app.notification_deliveries where org_id = :o and channel = 'whatsapp'
+                                  order by created_at"""), {"o": org}).all()
+
+
+def _due_now(owner_engine):
+    with owner_engine.begin() as c:
+        c.execute(text("update app.notification_deliveries set available_at = now() - interval '1 second' "
+                       "where state in ('queued','deferred')"))
+
+
+def _callback(client, params, token=TOKEN):
+    from twilio.request_validator import RequestValidator
+
+    sig = RequestValidator(token).compute_signature(STATUS_URL, params)
+    return client.post("/api/v1/webhooks/twilio/status", data=params, headers={"X-Twilio-Signature": sig})
+
+
+def test_twilio_request_reproduces_trial_template_and_maps_errors(setup, twa):
+    import requests
+    from twilio.base.exceptions import TwilioRestException
+
+    r = notify.send_whatsapp_twilio(setup.settings, "+919800001527", STATUS_URL)
+    assert r.sid.startswith("SM") and r.status == "queued" and r.body == TEMPLATE_TEXT
+    assert twa.auth[-1] == ("ACfake0001", TOKEN)
+    assert twa.created[-1] == {"from_": "whatsapp:+15550001111", "to": "whatsapp:+919800001527",
+                               "content_sid": "HXfake0001", "status_callback": STATUS_URL}  # no variables, no text
+    notify.send_whatsapp_twilio(setup.settings, "whatsapp:+919800001527", None)  # prefix added exactly once
+    assert twa.created[-1]["to"] == "whatsapp:+919800001527" and "status_callback" not in twa.created[-1]
+    cases = [(TwilioRestException(401, "u", "auth", code=20003), "auth_failed", None),
+             (TwilioRestException(400, "u", "stop", code=21610), "recipient_refused", None),
+             (TwilioRestException(429, "u", "slow", code=20429), "rate_limited", 600),
+             (TwilioRestException(503, "u", "down"), "temporary", 120),
+             (TwilioRestException(400, "u", "bad", code=63016), "rejected", None),
+             (requests.exceptions.ReadTimeout(), "timeout_unknown", None),  # may have been accepted: never resent
+             (requests.exceptions.ConnectionError(), "unreachable", 120)]
+    for exc, code, retry in cases:
+        twa.outcomes.append(exc)
+        with pytest.raises(notify.ProviderError) as e:
+            notify.send_whatsapp_twilio(setup.settings, "+919800001527", None)
+        assert (e.value.code, e.value.retry_in) == (code, retry)
+    setup.settings.twilio_content_sid = None
+    with pytest.raises(notify.ProviderError) as e:
+        notify.send_whatsapp_twilio(setup.settings, "+919800001527", None)
+    assert e.value.code == "not_configured" and "Content SID" in (e.value.detail or "")
+
+
+def test_demo_test_send_is_sent_once_with_tracking(client, setup, twa, owner_engine):
+    from pawguard_worker import notify as worker_notify
+
+    w = setup.build(demo=True)
+    st = _demo(client, w)
+    assert st.status_code == 200, st.text
+    body = st.json()
+    assert body["ready"] is True and body["missing"] == [] and body["recipient_masked"] == "••••1527"
+    assert body["callback_url"] == STATUS_URL and body["template_body"] is None
+    assert TOKEN not in st.text and "ACfake0001" not in st.text and "9800001527" not in st.text
+    first = _demo(client, w, "/test", "post")
+    assert first.status_code == 202, first.text
+    again = _demo(client, w, "/test", "post")  # double click while the first is waiting
+    assert again.status_code == 409 and again.json()["error"]["code"] == "already_queued"
+    assert worker_notify.drain().get("sent") == 1
+    assert worker_notify.drain() == {}  # repeated runs never resend
+    assert len(twa.created) == 1 and twa.created[0]["to"] == "whatsapp:+919800001527"
+    (row,) = _wa_rows(owner_engine, w.org)
+    assert (row.kind, row.state, row.attempts, row.provider, row.provider_status) == ("test", "sent", 1, "twilio",
+                                                                                      "queued")
+    assert row.provider_message_id == "SM" + "1".zfill(32) and row.recipient_masked == "••••1527"
+    assert row.send_started_at is None
+    hist = _demo(client, w).json()
+    assert hist["template_body"] == TEMPLATE_TEXT and hist["sends_left_this_hour"] == 4
+    assert hist["history"][0]["message_sid"] == row.provider_message_id
+    assert hist["history"][0]["provider_status"] == "queued" and hist["history"][0]["explanation"] is None
+
+
+def test_scheduled_demo_reminder_runs_without_the_browser_and_can_be_cancelled(client, setup, twa, owner_engine):
+    from datetime import UTC, datetime
+
+    from pawguard_worker import notify as worker_notify
+
+    w = setup.build(demo=True)
+    r = _demo(client, w, "/schedule", "post")
+    assert r.status_code == 202, r.text
+    ahead = datetime.fromisoformat(r.json()["scheduled_for"]) - datetime.now(UTC)
+    assert 100 < ahead.total_seconds() <= 121
+    assert _demo(client, w, "/schedule", "post").status_code == 409  # double click
+    assert worker_notify.drain() == {}  # not due yet
+    _due_now(owner_engine)  # two minutes later (the dispatcher's 15-second check publishes the drain)
+    assert worker_notify.drain().get("sent") == 1
+    assert worker_notify.drain() == {} and len(twa.created) == 1
+    # A second one, cancelled before it is due, is never sent; cancelling twice is refused.
+    second = _demo(client, w, "/schedule", "post").json()
+    assert _demo(client, w, f"/{second['id']}/cancel", "post").status_code == 204
+    assert _demo(client, w, f"/{second['id']}/cancel", "post").status_code == 409
+    _due_now(owner_engine)
+    assert worker_notify.drain() == {} and len(twa.created) == 1
+    kinds = [(x.kind, x.state, x.last_error) for x in _wa_rows(owner_engine, w.org)]
+    assert kinds == [("demo_reminder", "sent", None), ("demo_reminder", "skipped", "Cancelled before sending")]
+
+
+def test_twilio_only_for_demo_org_staff_and_demo_kinds(client, setup, twa, owner_engine):
+    from pawguard_worker import notify as worker_notify
+
+    real = setup.build(demo=False)
+    demo = setup.build(demo=True)
+    assert _demo(client, real).status_code == 403  # not a demo organisation
+    assert client.get("/api/v1/clinic/whatsapp-demo",
+                      headers=_h(demo.tok["owner"], demo.org)).status_code == 403  # pet owner, not staff
+    # Another organisation's scheduled reminder can't be cancelled.
+    other = _demo(client, demo, "/schedule", "post").json()
+    second_demo = setup.build(demo=True)
+    assert _demo(client, second_demo, f"/{other['id']}/cancel", "post").status_code == 409
+    # A test from a real organisation and a real vaccination reminder are never sent through the trial template.
+    assert client.post("/api/v1/my/notification-settings/test", headers=_h(real.tok["owner"], real.org),
+                       json={"channel": "whatsapp"}).status_code == 202
+    client.put("/api/v1/my/notification-settings", headers=_h(demo.tok["owner"]),
+               json={"whatsapp_enabled": True, "whatsapp_number": "+919800000009"})
+    _queue(owner_engine)
+    worker_notify.drain()
+    assert twa.created == []
+    (real_row,) = _wa_rows(owner_engine, real.org)
+    assert real_row.state == "skipped" and "demo organisation only" in real_row.last_error
+    reminder = [x for x in _wa_rows(owner_engine, demo.org) if x.kind == "vaccination_reminder"]
+    assert reminder and all(x.state == "skipped" and "demo sends only" in x.last_error for x in reminder)
+
+
+def test_opted_out_reminder_is_skipped_at_send_time(client, setup, twa, owner_engine, monkeypatch):
+    from pawguard_worker import notify as worker_notify
+
+    monkeypatch.setattr(setup.settings, "whatsapp_provider", "meta")
+    w = setup.build(demo=False)
+    client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]),
+               json={"whatsapp_enabled": True, "whatsapp_number": "+919800000009"})
+    assert _queue(owner_engine) >= 1
+    client.put("/api/v1/my/notification-settings", headers=_h(w.tok["owner"]), json={"whatsapp_enabled": False})
+    worker_notify.drain()
+    rows = [x for x in _deliveries(owner_engine, w.owner) if x.channel == "whatsapp"]
+    assert rows and all(x.state == "skipped" and "switched off" in x.last_error for x in rows)
+
+
+def test_status_callbacks_are_signed_matched_and_forward_only(client, setup, twa, owner_engine):
+    from pawguard_worker import notify as worker_notify
+
+    w = setup.build(demo=True)
+    _demo(client, w, "/test", "post")
+    worker_notify.drain()
+    _demo(client, w, "/schedule", "post")
+    _due_now(owner_engine)
+    worker_notify.drain()
+    a, b = (x.provider_message_id for x in _wa_rows(owner_engine, w.org))
+    base = {"AccountSid": "ACfake0001", "MessageSid": a}
+    assert _callback(client, {**base, "MessageStatus": "sent"}, token="wrong-token").status_code == 403
+    assert client.post("/api/v1/webhooks/twilio/status", data={**base, "MessageStatus": "read"}).status_code == 403
+    for status in ("sent", "delivered", "delivered", "read", "sent", "failed"):  # duplicate and out of order
+        assert _callback(client, {**base, "MessageStatus": status}).status_code == 204
+    assert _callback(client, {"AccountSid": "ACsomeoneelse", "MessageSid": b, "MessageStatus": "delivered"}
+                     ).status_code == 204  # another account: ignored
+    assert _callback(client, {"AccountSid": "ACfake0001", "MessageSid": b, "MessageStatus": "undelivered",
+                              "ErrorCode": "63015"}).status_code == 204
+    assert _callback(client, {"AccountSid": "ACfake0001", "MessageSid": b, "MessageStatus": "delivered"}
+                     ).status_code == 204  # after a final failure: ignored
+    first, second = _wa_rows(owner_engine, w.org)
+    assert (first.state, first.provider_status) == ("sent", "read")
+    assert (second.state, second.provider_status, second.provider_error_code) == ("failed", "undelivered", "63015")
+    hist = {h["message_sid"]: h for h in _demo(client, w).json()["history"]}
+    assert hist[a]["provider_status"] == "read" and hist[a]["explanation"] is None
+    assert hist[b]["provider_status"] == "undelivered" and "joined" in hist[b]["explanation"]
+
+
+def test_polling_fallback_is_bounded_and_forward_only(client, setup, twa, owner_engine):
+    from pawguard_worker import notify as worker_notify
+
+    w = setup.build(demo=True)
+    _demo(client, w, "/test", "post")
+    worker_notify.drain()
+    assert worker_notify.poll_twilio_status() == 0  # just sent: callbacks get the first chance
+    with owner_engine.begin() as c:
+        c.execute(text("update app.notification_deliveries set provider_status_at = now() - interval '1 minute'"))
+    (row,) = _wa_rows(owner_engine, w.org)
+    twa.fetched[row.provider_message_id] = "delivered"
+    assert worker_notify.poll_twilio_status() == 1
+    with owner_engine.begin() as c:
+        c.execute(text("update app.notification_deliveries set provider_status_at = now() - interval '1 minute'"))
+    assert worker_notify.poll_twilio_status() == 0  # final status: not checked again
+    assert _wa_rows(owner_engine, w.org)[0].provider_status == "delivered"
+
+
+def test_timeouts_and_interrupted_sends_are_never_resent(client, setup, twa, owner_engine):
+    import requests
+
+    from pawguard_worker import notify as worker_notify
+
+    w = setup.build(demo=True)
+    twa.outcomes.append(requests.exceptions.ReadTimeout())
+    _demo(client, w, "/test", "post")
+    assert worker_notify.drain().get("failed") == 1
+    (row,) = _wa_rows(owner_engine, w.org)
+    assert row.state == "failed" and "may have been accepted" in row.last_error and len(twa.created) == 1
+    # Nothing reached Twilio: retried later, and sent once.
+    twa.outcomes.append(requests.exceptions.ConnectionError())
+    _demo(client, w, "/test", "post")
+    assert worker_notify.drain().get("deferred") == 1
+    _due_now(owner_engine)
+    assert worker_notify.drain().get("sent") == 1 and len(twa.created) == 3
+    # The worker stopped mid-request: the row is reclaimed after its lock expires, but not sent again.
+    _demo(client, w, "/schedule", "post")
+    with owner_engine.begin() as c:
+        c.execute(text("""update app.notification_deliveries set state = 'sending', send_started_at = now(),
+                          locked_until = now() - interval '1 second', attempts = 1, provider = 'twilio'
+                          where kind = 'demo_reminder'"""))
+    assert worker_notify.drain().get("failed") == 1 and len(twa.created) == 3
+    hist = _demo(client, w).json()["history"]
+    assert "not resending" in hist[0]["explanation"]

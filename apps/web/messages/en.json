@@ -1836,7 +1836,8 @@
       "reply": {
         "1": "Answer: will book a visit",
         "2": "Answer: remind again in 3 days"
-      }
+      },
+      "demoReminder": "Demo reminder (fictional pet)"
     },
     "verify": {
       "okTitle": "Email confirmed",
@@ -1851,6 +1852,54 @@
       "number": "Phone number",
       "numberHint": "With country code, e.g. +91 98765 43210. It must be verified in the Twilio trial account.",
       "unavailable": "Phone calls aren't set up on this server (optional)."
+    },
+    "waDemo": {
+      "title": "WhatsApp demo (Twilio trial)",
+      "ready": "Ready",
+      "notReady": "Not set up yet",
+      "missingIntro": "These server settings are still missing (values are never shown here):",
+      "missingHint": "Add them to the server's private .env file, then restart the API, worker and dispatcher.",
+      "recipient": "Sends only to the demo number",
+      "recipientNote": "(set on the server; it can't be changed here).",
+      "previewLabel": "Message preview — generic Twilio trial template.",
+      "previewExact": "This is the exact text Twilio reported for the configured template.",
+      "previewSample": "Example of Twilio's fixed trial text; the exact text appears here after the first send.",
+      "previewNote": "On a Twilio trial, WhatsApp only allows Twilio's pre-approved sample templates, so the message doesn't name the pet or clinic. Real reminders need your own approved template.",
+      "sendTest": "Send test WhatsApp",
+      "schedule": "Schedule demo reminder in 2 minutes",
+      "sending": "Please wait…",
+      "left": "{count, plural, =0 {No demo sends left this hour} one {# demo send left this hour} other {# demo sends left this hour}}",
+      "closeTab": "Scheduled reminders are sent by the server — you can close this tab. The reminder is for a fictional pet; no records change.",
+      "queuedNow": "Queued — it is sent within about 15 seconds.",
+      "scheduledFor": "Scheduled for {time} IST.",
+      "cancelled": "Cancelled — it won't be sent.",
+      "failed": "Something went wrong. Please try again.",
+      "none": "Nothing sent from here yet.",
+      "colWhen": "Scheduled (IST)",
+      "colWhat": "What",
+      "colStatus": "Delivery status",
+      "colSid": "Twilio message ID",
+      "kindTest": "Test message",
+      "kindReminder": "Demo reminder",
+      "cancel": "Cancel",
+      "updated": "Updated {time} IST",
+      "callback": "Delivery updates come from Twilio to {url}",
+      "noCallback": "No public HTTPS address, so delivery status is checked with Twilio every minute instead.",
+      "status": {
+        "scheduled": "Scheduled",
+        "waiting": "Waiting to send",
+        "sending": "Sending…",
+        "deferred": "Will retry shortly",
+        "skipped": "Not sent",
+        "failed": "Failed",
+        "twilio_accepted": "Accepted by Twilio (queued)",
+        "twilio_sending": "Twilio is sending",
+        "twilio_sent": "Sent to WhatsApp",
+        "twilio_delivered": "Delivered to the phone",
+        "twilio_read": "Read on the phone",
+        "twilio_undelivered": "Not delivered",
+        "twilio_failed": "Failed at Twilio"
+      }
     }
   },
   "assistant": {

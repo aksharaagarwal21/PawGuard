@@ -1,9 +1,11 @@
 """Notification settings (own), test messages, and the clinic's delivery overview."""
 
+from uuid import UUID
+
 from fastapi import APIRouter, Response
 
 from pawguard_api.deps import CurrentOrg, CurrentPrincipal
-from pawguard_api.domain import notifications
+from pawguard_api.domain import notifications, whatsapp_demo
 from pawguard_api.notify_contracts import (
     ConfirmEmailIn,
     ConfirmEmailOut,
@@ -15,6 +17,8 @@ from pawguard_api.notify_contracts import (
     PushUnsubscribeIn,
     ScanOut,
     TestMessageIn,
+    WhatsAppDemoOut,
+    WhatsAppDemoQueuedOut,
 )
 from pawguard_api.settings import get_settings
 
@@ -90,3 +94,36 @@ def resend_confirmation(p: CurrentPrincipal) -> Response:
 def confirm_email(body: ConfirmEmailIn) -> ConfirmEmailOut:
     """Permission: public — the one-time token from the confirmation email is the proof (48 hours)."""
     return ConfirmEmailOut(confirmed=notifications.confirm_email(body.token))
+
+
+@router.get("/clinic/whatsapp-demo", response_model=WhatsAppDemoOut, summary="Twilio WhatsApp demo: status and history")
+def whatsapp_demo_status(ctx: CurrentOrg) -> WhatsAppDemoOut:
+    """Permission: clinic staff in the demo organisation with demo mode on. Shows which settings are missing (names
+    only), the masked demo recipient, the template preview and recent demo sends with Twilio's delivery status."""
+    with ctx.tx() as db:
+        return WhatsAppDemoOut(**whatsapp_demo.status(db, ctx))
+
+
+@router.post("/clinic/whatsapp-demo/test", status_code=202, response_model=WhatsAppDemoQueuedOut,
+             summary="Send a test WhatsApp now (demo recipient only)")
+def whatsapp_demo_test(ctx: CurrentOrg) -> WhatsAppDemoQueuedOut:
+    """Permission: as above. Sent by the worker within about 15 seconds. Refused while another one is waiting."""
+    with ctx.tx() as db:
+        return WhatsAppDemoQueuedOut(**whatsapp_demo.queue(db, ctx, "test"))
+
+
+@router.post("/clinic/whatsapp-demo/schedule", status_code=202, response_model=WhatsAppDemoQueuedOut,
+             summary="Schedule a demo WhatsApp reminder 2 minutes ahead")
+def whatsapp_demo_schedule(ctx: CurrentOrg) -> WhatsAppDemoQueuedOut:
+    """Permission: as above. For a fictional pet; no records change. Sent by the server even if the page is closed."""
+    with ctx.tx() as db:
+        return WhatsAppDemoQueuedOut(**whatsapp_demo.queue(db, ctx, "demo_reminder"))
+
+
+@router.post("/clinic/whatsapp-demo/{delivery_id}/cancel", status_code=204,
+             summary="Cancel a scheduled demo reminder")
+def whatsapp_demo_cancel(delivery_id: UUID, ctx: CurrentOrg) -> Response:
+    """Permission: as above. Only before it has been sent."""
+    with ctx.tx() as db:
+        whatsapp_demo.cancel(db, ctx, str(delivery_id))
+    return Response(status_code=204)

@@ -457,6 +457,87 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/clinic/whatsapp-demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Twilio WhatsApp demo: status and history
+         * @description Permission: clinic staff in the demo organisation with demo mode on. Shows which settings are missing (names
+         *     only), the masked demo recipient, the template preview and recent demo sends with Twilio's delivery status.
+         */
+        get: operations["notifications_whatsapp_demo_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clinic/whatsapp-demo/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Schedule a demo WhatsApp reminder 2 minutes ahead
+         * @description Permission: as above. For a fictional pet; no records change. Sent by the server even if the page is closed.
+         */
+        post: operations["notifications_whatsapp_demo_schedule"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clinic/whatsapp-demo/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a test WhatsApp now (demo recipient only)
+         * @description Permission: as above. Sent by the worker within about 15 seconds. Refused while another one is waiting.
+         */
+        post: operations["notifications_whatsapp_demo_test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clinic/whatsapp-demo/{delivery_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel a scheduled demo reminder
+         * @description Permission: as above. Only before it has been sent.
+         */
+        post: operations["notifications_whatsapp_demo_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/demo/accounts": {
         parameters: {
             query?: never;
@@ -2100,6 +2181,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/webhooks/twilio/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * WhatsApp delivery status (Twilio)
+         * @description Permission: public, but the request must carry Twilio's signature, checked with Twilio's own validator against
+         *     the exact public address we gave Twilio as StatusCallback. Status only moves forward (late or repeated callbacks
+         *     never undo "delivered" or "read").
+         */
+        post: operations["webhooks_twilio_status"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/webhooks/whatsapp": {
         parameters: {
             query?: never;
@@ -2843,7 +2946,7 @@ export interface components {
              * Kind
              * @enum {string}
              */
-            kind: "vaccination_reminder" | "test" | "verify_email" | "lost_message";
+            kind: "vaccination_reminder" | "test" | "verify_email" | "lost_message" | "demo_reminder";
             /** Last Error */
             last_error: string | null;
             /** Pet Name */
@@ -5078,6 +5181,82 @@ export interface components {
              */
             status: "verified_record" | "submitted_only" | "no_verified_record";
         };
+        /** WhatsAppDemoItemOut */
+        WhatsAppDemoItemOut: {
+            /** Attempts */
+            attempts: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Error Code */
+            error_code: string | null;
+            /** Explanation */
+            explanation: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "test" | "demo_reminder";
+            /** Message Sid */
+            message_sid: string | null;
+            /** Provider Status */
+            provider_status: ("accepted" | "queued" | "sending" | "sent" | "delivered" | "read" | "undelivered" | "failed" | "canceled" | "scheduled") | null;
+            /** Provider Status At */
+            provider_status_at: string | null;
+            /** Recipient Masked */
+            recipient_masked: string | null;
+            /**
+             * Scheduled For
+             * Format: date-time
+             */
+            scheduled_for: string;
+            /** Sent At */
+            sent_at: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "sending" | "sent" | "deferred" | "failed" | "skipped";
+        };
+        /** WhatsAppDemoOut */
+        WhatsAppDemoOut: {
+            /** Callback Url */
+            callback_url: string | null;
+            /** History */
+            history: components["schemas"]["WhatsAppDemoItemOut"][];
+            /** Missing */
+            missing: string[];
+            /** Ready */
+            ready: boolean;
+            /** Recipient Masked */
+            recipient_masked: string;
+            /** Sends Left This Hour */
+            sends_left_this_hour: number;
+            /** Template Body */
+            template_body: string | null;
+            /** Template Sample */
+            template_sample: string;
+        };
+        /** WhatsAppDemoQueuedOut */
+        WhatsAppDemoQueuedOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Scheduled For
+             * Format: date-time
+             */
+            scheduled_for: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -6504,6 +6683,206 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ClinicDashboardOut"];
                 };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_whatsapp_demo_status: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppDemoOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_whatsapp_demo_schedule: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppDemoQueuedOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_whatsapp_demo_test: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WhatsAppDemoQueuedOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_whatsapp_demo_cancel: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                delivery_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Unauthorized */
             401: {
@@ -11194,6 +11573,53 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    webhooks_twilio_status: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Twilio-Signature"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
                 headers: {
                     [name: string]: unknown;
                 };

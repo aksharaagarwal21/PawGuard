@@ -7,6 +7,7 @@ import { PageBody } from "@/components/page-header";
 import { ClinicBoard } from "@/components/pets/clinic-board";
 import { ClinicRecordForm } from "@/components/pets/clinic-record-form";
 import { MessagesPanel } from "@/components/notify/messages-panel";
+import { WhatsAppDemo } from "@/components/notify/whatsapp-demo";
 import { DemoClockControl } from "@/components/pets/demo-clock";
 import { WelcomeTour } from "@/components/tour/welcome-tour";
 import { pageContext } from "@/lib/page-context";
@@ -78,6 +79,7 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
           </h2>
           <p className="text-sm text-ink-2">{t("demoToolsIntro")}</p>
           <DemoClockControl offsetDays={d.demo_offset_days} today={d.today} />
+          <WhatsAppDemo />
         </section>
       ) : null}
       <WelcomeTour id="clinic" steps={tour} />

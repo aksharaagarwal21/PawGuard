@@ -2015,7 +2015,8 @@
               "vaccination_reminder",
               "test",
               "verify_email",
-              "lost_message"
+              "lost_message",
+              "demo_reminder"
             ],
             "title": "Kind",
             "type": "string"
@@ -8666,6 +8667,245 @@
         ],
         "title": "VaccinationSummary",
         "type": "object"
+      },
+      "WhatsAppDemoItemOut": {
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "test",
+              "demo_reminder"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message_sid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message Sid"
+          },
+          "provider_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "accepted",
+                  "queued",
+                  "sending",
+                  "sent",
+                  "delivered",
+                  "read",
+                  "undelivered",
+                  "failed",
+                  "canceled",
+                  "scheduled"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Status"
+          },
+          "provider_status_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Status At"
+          },
+          "recipient_masked": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipient Masked"
+          },
+          "scheduled_for": {
+            "format": "date-time",
+            "title": "Scheduled For",
+            "type": "string"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "sending",
+              "sent",
+              "deferred",
+              "failed",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "state",
+          "scheduled_for",
+          "created_at",
+          "sent_at",
+          "attempts",
+          "message_sid",
+          "provider_status",
+          "provider_status_at",
+          "error_code",
+          "explanation",
+          "recipient_masked"
+        ],
+        "title": "WhatsAppDemoItemOut",
+        "type": "object"
+      },
+      "WhatsAppDemoOut": {
+        "properties": {
+          "callback_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Callback Url"
+          },
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/WhatsAppDemoItemOut"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "ready": {
+            "title": "Ready",
+            "type": "boolean"
+          },
+          "recipient_masked": {
+            "title": "Recipient Masked",
+            "type": "string"
+          },
+          "sends_left_this_hour": {
+            "title": "Sends Left This Hour",
+            "type": "integer"
+          },
+          "template_body": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Body"
+          },
+          "template_sample": {
+            "title": "Template Sample",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ready",
+          "missing",
+          "recipient_masked",
+          "callback_url",
+          "template_body",
+          "template_sample",
+          "sends_left_this_hour",
+          "history"
+        ],
+        "title": "WhatsAppDemoOut",
+        "type": "object"
+      },
+      "WhatsAppDemoQueuedOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "scheduled_for": {
+            "format": "date-time",
+            "title": "Scheduled For",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scheduled_for"
+        ],
+        "title": "WhatsAppDemoQueuedOut",
+        "type": "object"
       }
     }
   },
@@ -11542,6 +11782,357 @@
         "summary": "Record a vaccination given at the clinic (vet)",
         "tags": [
           "clinic"
+        ]
+      }
+    },
+    "/api/v1/clinic/whatsapp-demo": {
+      "get": {
+        "description": "Permission: clinic staff in the demo organisation with demo mode on. Shows which settings are missing (names\nonly), the masked demo recipient, the template preview and recent demo sends with Twilio's delivery status.",
+        "operationId": "notifications_whatsapp_demo_status",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatsAppDemoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Twilio WhatsApp demo: status and history",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/clinic/whatsapp-demo/schedule": {
+      "post": {
+        "description": "Permission: as above. For a fictional pet; no records change. Sent by the server even if the page is closed.",
+        "operationId": "notifications_whatsapp_demo_schedule",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatsAppDemoQueuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Schedule a demo WhatsApp reminder 2 minutes ahead",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/clinic/whatsapp-demo/test": {
+      "post": {
+        "description": "Permission: as above. Sent by the worker within about 15 seconds. Refused while another one is waiting.",
+        "operationId": "notifications_whatsapp_demo_test",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatsAppDemoQueuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Send a test WhatsApp now (demo recipient only)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/clinic/whatsapp-demo/{delivery_id}/cancel": {
+      "post": {
+        "description": "Permission: as above. Only before it has been sent.",
+        "operationId": "notifications_whatsapp_demo_cancel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "delivery_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Delivery Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Cancel a scheduled demo reminder",
+        "tags": [
+          "notifications"
         ]
       }
     },
@@ -19647,6 +20238,69 @@
           }
         },
         "summary": "Phone-call keypad answer (Twilio)",
+        "tags": [
+          "webhooks"
+        ]
+      }
+    },
+    "/api/v1/webhooks/twilio/status": {
+      "post": {
+        "description": "Permission: public, but the request must carry Twilio's signature, checked with Twilio's own validator against\nthe exact public address we gave Twilio as StatusCallback. Status only moves forward (late or repeated callbacks\nnever undo \"delivered\" or \"read\").",
+        "operationId": "webhooks_twilio_status",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Twilio-Signature",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Twilio-Signature"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "WhatsApp delivery status (Twilio)",
         "tags": [
           "webhooks"
         ]

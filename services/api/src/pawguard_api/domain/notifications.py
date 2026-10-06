@@ -47,7 +47,9 @@ def get_prefs(p: Principal) -> dict[str, Any]:
         "push_enabled": bool(row and row.push_enabled), "push_devices": push_devices,
         "whatsapp_enabled": bool(row and row.whatsapp_enabled), "whatsapp_number": row.whatsapp_number if row else None,
         "call_enabled": bool(row and row.call_enabled), "call_number": row.call_number if row else None,
-        "demo_recipients": demo and bool(s.demo_notify_email or s.demo_notify_whatsapp),
+        # Email override only: it decides whether confirmation applies (WhatsApp demo sends use their own check).
+        "demo_recipients": demo and bool(s.demo_notify_email),
+        "_demo_whatsapp": demo and bool(s.demo_notify_whatsapp),
         "available": channel_available(),
         "demo_email_set": bool(s.demo_notify_email), "demo_whatsapp_set": bool(s.demo_notify_whatsapp),
     }
@@ -76,7 +78,7 @@ def update_prefs(p: Principal, data: dict[str, Any]) -> dict[str, Any]:
         raise Unprocessable("Add the email address for reminders.",
                             fields=[FieldError(field="email_address", code="required",
                                                message="Enter an email address.")])
-    if data.get("whatsapp_enabled") and not data.get("whatsapp_number") and not get_prefs(p)["demo_recipients"]:
+    if data.get("whatsapp_enabled") and not data.get("whatsapp_number") and not get_prefs(p)["_demo_whatsapp"]:
         raise Unprocessable("Add the WhatsApp number for reminders.",
                             fields=[FieldError(field="whatsapp_number", code="required",
                                                message="Enter the number with country code, e.g. +91…")])

@@ -95,6 +95,10 @@ class Settings(BaseSettings):
     twilio_account_sid: str | None = None
     twilio_auth_token: str | None = None
     twilio_from_number: str | None = None
+    # WhatsApp provider: meta (Cloud API) | twilio (trial template). Twilio settings are backend-only.
+    whatsapp_provider: str = "meta"
+    twilio_whatsapp_from: str | None = None  # e.g. whatsapp:+1… (the sender of the successful trial request)
+    twilio_content_sid: str | None = None  # HX… from the Twilio Console's WhatsApp try-out page
     # Certificate OCR: tesseract (local, eng+hin+tam) | gemini (demo organisations only) | off.
     ocr_engine: str = "tesseract"
     tesseract_cmd: str | None = None

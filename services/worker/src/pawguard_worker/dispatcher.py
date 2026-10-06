@@ -71,6 +71,7 @@ class NotificationTicker:
     def __init__(self) -> None:
         self.next_scan = 0.0
         self.next_check = 0.0
+        self.next_status = 0.0
 
     def tick(self, now: float) -> None:
         from pawguard_worker import notify
@@ -81,6 +82,9 @@ class NotificationTicker:
                 queued = notify.queue_due()
                 if queued:
                     log.info("notifications_queued", count=queued)
+            if now >= self.next_status:  # Twilio delivery status fallback (callbacks are the main path)
+                self.next_status = now + 60
+                notify.poll_twilio_status()
             if now >= self.next_check:
                 self.next_check = now + SEND_CHECK_EVERY
                 if notify.has_ready():

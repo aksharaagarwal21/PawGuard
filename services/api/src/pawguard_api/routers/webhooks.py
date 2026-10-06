@@ -62,6 +62,33 @@ async def twilio_gather(request: Request, d: Annotated[str, Query(max_length=40)
     return Response(f"<Response><Say>{say}</Say></Response>", media_type="text/xml")
 
 
+@router.post("/twilio/status", summary="WhatsApp delivery status (Twilio)", status_code=204)
+async def twilio_status(request: Request,
+                        signature: Annotated[str | None, Header(alias="X-Twilio-Signature")] = None) -> Response:
+    """Permission: public, but the request must carry Twilio's signature, checked with Twilio's own validator against
+    the exact public address we gave Twilio as StatusCallback. Status only moves forward (late or repeated callbacks
+    never undo "delivered" or "read")."""
+    from twilio.request_validator import RequestValidator
+
+    s = get_settings()
+    raw = await request.body()
+    if len(raw) > 20_000:
+        raise Forbidden("Invalid request.", code="webhook_signature_invalid")
+    form = dict(parse_qsl(raw.decode("utf-8", "replace"), keep_blank_values=True))
+    public_url = f"{s.public_app_url}/api/v1/webhooks/twilio/status"
+    if not (s.twilio_auth_token and signature and RequestValidator(s.twilio_auth_token).validate(
+            public_url, form, signature)):
+        raise Forbidden("Invalid signature.", code="webhook_signature_invalid")
+    sid, status = form.get("MessageSid", ""), form.get("MessageStatus", "")
+    n = 0
+    if form.get("AccountSid") == s.twilio_account_sid and sid and status in notify.TWILIO_STATUSES:
+        with public_tx() as db:
+            n = int(db.execute(text("select app.record_twilio_status(:s, :st, :e)"),
+                               {"s": sid[:64], "st": status, "e": (form.get("ErrorCode") or None)}).scalar() or 0)
+    log.info("twilio_status_webhook", status=status, updated=n)
+    return Response(status_code=204)
+
+
 @router.post("/whatsapp", summary="WhatsApp delivery receipts")
 async def whatsapp_receive(request: Request,
                            signature: Annotated[str | None, Header(alias="X-Hub-Signature-256")] = None) -> Response:

@@ -50,6 +50,9 @@ def compose(info: dict[str, Any], s: Settings) -> Message:
                 f"and reply:\n{lost_link}\n\nYour name, phone and email are not shared with them unless you "
                 f"choose to.{demo}")
         return Message(f"Message about {pet}", text, short, lost_link)
+    if info["kind"] == "demo_reminder":
+        short = f"PawGuard demo: {info.get('pet') or 'Biscuit'} (fictional pet) has a vaccination reminder."
+        return Message("PawGuard demo reminder", f"Hello,\n\n{short}\n\n{link}{demo}", short, link)
     if info["kind"] == "test":
         subject = "PawGuard test message"
         short = "PawGuard: this is a test message. Your notifications are working."
@@ -197,7 +200,84 @@ _WA_TEMPORARY = {131000, 131016}
 
 
 def whatsapp_configured(s: Settings) -> bool:
+    if s.whatsapp_provider == "twilio":
+        return twilio_whatsapp_configured(s)
     return bool(s.whatsapp_token and s.whatsapp_phone_number_id)
+
+
+def twilio_whatsapp_configured(s: Settings) -> bool:
+    return bool(s.twilio_account_sid and s.twilio_auth_token and s.twilio_whatsapp_from and s.twilio_content_sid)
+
+
+def mask_number(n: str | None) -> str:
+    digits = "".join(ch for ch in (n or "") if ch.isdigit())
+    return f"••••{digits[-4:]}" if len(digits) >= 4 else "—"
+
+
+def twilio_whatsapp_address(number: str) -> str:
+    """'whatsapp:+91…' exactly once, whatever form the stored number has."""
+    n = number.strip().removeprefix("whatsapp:").strip()
+    return "whatsapp:" + (n if n.startswith("+") else "+" + n)
+
+
+TWILIO_STATUSES = {"accepted", "queued", "sending", "sent", "delivered", "read", "undelivered", "failed", "canceled",
+                   "scheduled"}
+
+
+@dataclass(frozen=True)
+class TwilioResult:
+    sid: str
+    status: str
+    body: str
+
+
+def send_whatsapp_twilio(s: Settings, to: str, status_callback: str | None) -> TwilioResult:
+    """Send the trial's pre-approved template, reproducing the successful request: From, To, ContentSid (no
+    variables, no free text — the trial doesn't allow either). Adds StatusCallback when a public HTTPS URL exists.
+    Errors: a timeout after the request may have been accepted is NOT retried (no duplicate messages); a
+    connection failure before sending is."""
+    import requests
+    from twilio.base.exceptions import TwilioRestException
+    from twilio.http.http_client import TwilioHttpClient
+    from twilio.rest import Client
+
+    if not twilio_whatsapp_configured(s):
+        missing = "Content SID" if not s.twilio_content_sid else "account SID, auth token or sender"
+        raise ProviderError("not_configured", status="not_configured", detail=f"Twilio WhatsApp {missing} not set")
+    client = Client(s.twilio_account_sid, s.twilio_auth_token, http_client=TwilioHttpClient(timeout=20))
+    params: dict[str, Any] = {"from_": twilio_whatsapp_address(s.twilio_whatsapp_from or ""),
+                              "to": twilio_whatsapp_address(to), "content_sid": s.twilio_content_sid}
+    if status_callback:
+        params["status_callback"] = status_callback
+    try:
+        m = client.messages.create(**params)
+    except TwilioRestException as exc:
+        code = exc.code or 0
+        detail = f"Twilio {code}: {str(exc.msg)[:150]}"
+        if code == 20003 or exc.status == 401:
+            raise ProviderError("auth_failed", status="error",
+                                detail="Twilio rejected the account SID or auth token") from exc
+        if code == 21610:  # the recipient sent STOP: respect the opt-out
+            raise ProviderError("recipient_refused", detail="Recipient opted out (replied STOP)") from exc
+        if code == 20429 or exc.status == 429:
+            raise ProviderError("rate_limited", retry_in=600, status="rate_limited", detail=detail) from exc
+        if exc.status and exc.status >= 500:
+            raise ProviderError("temporary", retry_in=120, detail=detail) from exc
+        raise ProviderError("rejected", detail=detail) from exc
+    except requests.exceptions.ReadTimeout as exc:
+        raise ProviderError("timeout_unknown", detail="Twilio didn't answer in time; the message may have been "
+                            "accepted, so it isn't resent — check the Twilio message log") from exc
+    except requests.exceptions.ConnectionError as exc:
+        raise ProviderError("unreachable", retry_in=120, detail="Twilio not reachable (nothing was sent)") from exc
+    return TwilioResult(str(m.sid), str(m.status or "queued"), str(m.body or ""))
+
+
+def twilio_message_status(s: Settings, sid: str) -> tuple[str, str | None]:
+    """Server-side status check (fallback when callbacks can't reach us)."""
+    from twilio.rest import Client
+
+    m = Client(s.twilio_account_sid, s.twilio_auth_token).messages(sid).fetch()
+    return str(m.status), (str(m.error_code) if m.error_code else None)
 
 
 def send_whatsapp(s: Settings, to: str, msg: Message, info: dict[str, Any]) -> str:

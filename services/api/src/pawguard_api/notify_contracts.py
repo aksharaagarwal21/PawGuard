@@ -60,7 +60,7 @@ class ProviderOut(Out):
 class DeliveryOut(Out):
     id: UUID
     channel: ChannelName
-    kind: Literal["vaccination_reminder", "test", "verify_email", "lost_message"]
+    kind: Literal["vaccination_reminder", "test", "verify_email", "lost_message", "demo_reminder"]
     state: Literal["queued", "sending", "sent", "deferred", "failed", "skipped"]
     pet_name: str | None
     created_at: datetime
@@ -217,3 +217,39 @@ class FinderThreadOut(Out):
     open: bool
     found: bool
     messages: list[LostMessageOut]
+
+
+TwilioStatus = Literal["accepted", "queued", "sending", "sent", "delivered", "read", "undelivered", "failed",
+                       "canceled", "scheduled"]
+
+
+class WhatsAppDemoItemOut(Out):
+    id: UUID
+    kind: Literal["test", "demo_reminder"]
+    state: Literal["queued", "sending", "sent", "deferred", "failed", "skipped"]
+    scheduled_for: datetime
+    created_at: datetime
+    sent_at: datetime | None
+    attempts: int
+    message_sid: str | None  # Twilio's Message SID (not a secret; matches the Twilio message log)
+    provider_status: TwilioStatus | None
+    provider_status_at: datetime | None
+    error_code: str | None
+    explanation: str | None
+    recipient_masked: str | None
+
+
+class WhatsAppDemoOut(Out):
+    ready: bool
+    missing: list[str]  # names of settings still to fill in (never values)
+    recipient_masked: str
+    callback_url: str | None
+    template_body: str | None  # the exact text Twilio reported for the configured template, after the first send
+    template_sample: str
+    sends_left_this_hour: int
+    history: list[WhatsAppDemoItemOut]
+
+
+class WhatsAppDemoQueuedOut(Out):
+    id: UUID
+    scheduled_for: datetime

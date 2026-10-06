@@ -20,7 +20,7 @@ log = get_logger(__name__)
 MAX_ATTEMPTS = 5
 # Errors about one recipient (not the provider as a whole).
 RECIPIENT_CODES = {"no_recipient", "not_confirmed", "outside_window", "recipient_refused", "push_failed",
-                   "not_verified_number"}
+                   "not_verified_number", "timeout_unknown"}
 
 
 def _sql(sql: str, **params: Any) -> Any:
@@ -94,11 +94,66 @@ def _send_push(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
 
 
 def _send_whatsapp(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
+    if s.whatsapp_provider == "twilio":
+        return _send_whatsapp_twilio(info, s)
     to = _recipient(info, s)
     if not to:
         raise notify.ProviderError("no_recipient",
                                    detail="No WhatsApp number (demo: set PAWGUARD_DEMO_NOTIFY_WHATSAPP)")
     return notify.send_whatsapp(s, to, msg, info)
+
+
+# The trial template is fixed sample text, so only demo sends use it (never real vaccination reminders).
+TWILIO_TRIAL_KINDS = {"test", "demo_reminder"}
+
+
+def _send_whatsapp_twilio(info: dict[str, Any], s: Settings) -> str:
+    """Twilio trial: only the demo organisation, only the configured demo recipient, never sent twice."""
+    row_id = str(info["id"])
+    if not info.get("org_is_demo"):
+        raise notify.ProviderError("no_recipient", detail="Twilio WhatsApp trial is for the demo organisation only")
+    if info["kind"] not in TWILIO_TRIAL_KINDS:
+        raise notify.ProviderError("no_recipient", detail="Twilio trial template is generic; used for demo sends only")
+    to = s.demo_notify_whatsapp
+    if not to:
+        raise notify.ProviderError("no_recipient", detail="PAWGUARD_DEMO_NOTIFY_WHATSAPP is not set")
+    if info.get("provider_message_id"):  # accepted earlier; the worker stopped before recording it
+        return str(info["provider_message_id"])
+    if info.get("send_started"):  # an earlier request's outcome is unknown: never resend blindly
+        raise notify.ProviderError("timeout_unknown", detail="An earlier attempt may have been sent; not resending. "
+                                                             "Check the Twilio message log.")
+    _sql("select app.set_delivery_provider(:i, 'twilio', :r)", i=row_id, r=notify.mask_number(to))
+    callback = (f"{s.public_app_url}/api/v1/webhooks/twilio/status" if s.public_app_url.startswith("https://")
+                else None)
+    try:
+        result = notify.send_whatsapp_twilio(s, to, callback)
+    except notify.ProviderError as err:
+        if err.code != "timeout_unknown":  # definitely not sent: a later retry is safe
+            _sql("select app.clear_delivery_send(:i)", i=row_id)
+        raise
+    _sql("select app.set_provider_result(:i, :sid, :st, :b)", i=row_id, sid=result.sid,
+         st=result.status if result.status in notify.TWILIO_STATUSES else "queued", b=result.body)
+    return result.sid
+
+
+def poll_twilio_status(limit: int = 10) -> int:
+    """Fallback when status callbacks can't reach us: ask Twilio about recent, unfinished messages (bounded)."""
+    s = get_settings()
+    if s.whatsapp_provider != "twilio" or not notify.twilio_whatsapp_configured(s):
+        return 0
+    with worker_engine().begin() as c:
+        rows = c.execute(text("select * from app.twilio_status_to_check(:n)"), {"n": limit}).all()
+    updated = 0
+    for row in rows:
+        try:
+            status, error = notify.twilio_message_status(s, row.sid)
+        except Exception as exc:  # checked again on the next tick
+            log.warning("twilio_status_check_failed", error=type(exc).__name__)
+            continue
+        if status in notify.TWILIO_STATUSES:
+            updated += int(_sql("select app.record_twilio_status(:s, :st, :e)", s=row.sid, st=status, e=error).scalar()
+                           or 0)
+    return updated
 
 
 def _send_call(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
@@ -117,6 +172,9 @@ def deliver(info: dict[str, Any], s: Settings) -> str:
     row_id, channel = str(info["id"]), info["channel"]
     if info["kind"] == "vaccination_reminder" and info.get("reminder_state") != "pending":
         _finish(row_id, "skipped", error="reminder no longer pending")
+        return "skipped"
+    if info["kind"] == "vaccination_reminder" and not info.get(f"{channel}_enabled", True):
+        _finish(row_id, "skipped", error=f"{channel} reminders were switched off")  # opt-out checked at send time
         return "skipped"
     sender = SENDERS.get(channel)
     if sender is None:
