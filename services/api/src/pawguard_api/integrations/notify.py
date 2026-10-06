@@ -42,6 +42,14 @@ def compose(info: dict[str, Any], s: Settings) -> Message:
               "\nTo stop these messages, open PawGuard → Notifications.")
     if info["kind"] == "verify_email":
         return Message("", "", "", link)  # built by compose_verification when the token is issued
+    if info["kind"] == "lost_message":
+        pet = info.get("pet") or "your pet"
+        lost_link = f"{s.public_app_url}/en/app/lost"
+        short = f"PawGuard: someone sent a message about {pet} (reported lost). Open PawGuard to read and reply."
+        text = (f"Hello,\n\nSomeone who may have found {pet} sent you a message in PawGuard. Open it here to read "
+                f"and reply:\n{lost_link}\n\nYour name, phone and email are not shared with them unless you "
+                f"choose to.{demo}")
+        return Message(f"Message about {pet}", text, short, lost_link)
     if info["kind"] == "test":
         subject = "PawGuard test message"
         short = "PawGuard: this is a test message. Your notifications are working."

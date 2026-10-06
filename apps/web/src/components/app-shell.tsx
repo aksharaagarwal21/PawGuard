@@ -16,6 +16,7 @@ import {
   Menu,
   MessageCircleQuestion,
   PawPrint,
+  SearchCheck,
   Send,
   Stethoscope,
 } from "lucide-react";
@@ -42,6 +43,7 @@ const ICONS: Record<NavItem["icon"], React.ComponentType<{ className?: string; "
   reminders: Bell,
   notifications: Send,
   assistant: MessageCircleQuestion,
+  lost: SearchCheck,
   clinic: Stethoscope,
   animals: PawPrint,
   capture: Camera,

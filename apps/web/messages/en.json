@@ -94,7 +94,8 @@
     "showTour": "Show tour again",
     "howToUse": "How to use PawGuard",
     "notifications": "Notifications",
-    "assistant": "Ask PawGuard"
+    "assistant": "Ask PawGuard",
+    "lost": "Lost & found"
   },
   "landing": {
     "headline": "Never miss your pet's vaccination again.",
@@ -1828,7 +1829,8 @@
       "queued": "{count, plural, =0 {Nothing new to send.} one {# message queued.} other {# messages queued.}}",
       "failed": "That didn't work. Try again.",
       "webhook": "WhatsApp webhook address (Meta dashboard → WhatsApp → Configuration; it changes when the public link restarts):",
-      "verify": "Email confirmation"
+      "verify": "Email confirmation",
+      "lostMessage": "Lost-pet message"
     },
     "verify": {
       "okTitle": "Email confirmed",
@@ -1892,6 +1894,69 @@
         "hi": "Hindi",
         "ta": "Tamil"
       }
+    }
+  },
+  "lost": {
+    "title": "Lost & found",
+    "intro": "Messages from people who may have found your pet. Your name, phone and email are never shown to them.",
+    "loadFailed": "Couldn't load your lost reports. Try again shortly.",
+    "emptyTitle": "No pets reported lost",
+    "emptyBody": "If your pet goes missing, open the pet and choose “Report lost”. Anyone who scans its QR tag can then message you privately.",
+    "stateOpen": "Lost",
+    "stateFound": "Found",
+    "reportedLine": "Last seen {date} · {area}",
+    "unknownDate": "date not given",
+    "unknownArea": "area not given",
+    "noMessagesYet": "No messages yet. Make sure your pet wears its QR tag (Vaccination card → Print collar tags).",
+    "noMessages": "No messages.",
+    "finderShared": "The finder shared: {contact}",
+    "finderNoContact": "The finder didn't share a contact — reply here.",
+    "privacyOwner": "Messages are private between you and the finder. Your name, phone and email aren't shared unless you write them yourself.",
+    "reportTitle": "Report {name} lost",
+    "reportIntro": "{name}'s QR card will show “lost”, and anyone who scans the tag can message you privately. You can mark {name} found any time.",
+    "lastSeenOn": "Last seen on",
+    "area": "Where (area in words)",
+    "areaHint": "For example “near the park gate, Anna Nagar”. Don't give your home address.",
+    "note": "Note for finders",
+    "noteHint": "For example the collar colour, or “shy — don't chase”.",
+    "optional": "(optional)",
+    "report": "Report lost",
+    "markFound": "Mark found",
+    "failed": "That didn't work. Try again.",
+    "bannerOwner": "{name} is reported lost",
+    "bannerOwnerBody": "{count, plural, =0 {No messages from finders yet.} one {# conversation with a finder.} other {# conversations with finders.}}",
+    "openMessages": "{count, plural, =0 {Open messages} one {Open messages (# new)} other {Open messages (# new)}}",
+    "conversation": "Conversation",
+    "ownerLabel": "Owner",
+    "finderLabel": "Finder",
+    "replyLabel": "Your message",
+    "replyPlaceholder": "Write a message…",
+    "send": "Send",
+    "finder": {
+      "bannerTitle": "{name} is lost — have you found this pet?",
+      "bannerBody": "Last seen {date} · {area}. You can send the owner a private message; you'll get a private link to read their reply.",
+      "recently": "recently",
+      "unknownArea": "area not given",
+      "message": "Your message to the owner",
+      "messageHint": "Where and when you saw or found the pet. Please don't share other people's details.",
+      "messageRequired": "Write a short message.",
+      "contact": "How the owner can reach you",
+      "contactHint": "Only if you want to share it — a phone number or email. You can also just keep using your private link.",
+      "optional": "(optional)",
+      "send": "Send to the owner",
+      "failed": "That didn't send — try again.",
+      "privacy": "Your message goes only to the owner. The owner's details aren't shown to you.",
+      "sentTitle": "Sent to the owner — thank you!",
+      "sentBody": "Keep this private link to read the owner's reply and write again (bookmark or copy it):",
+      "notFoundTitle": "This conversation isn't available",
+      "notFoundBody": "The link may be mistyped.",
+      "threadTitle": "About {name}",
+      "threadIntro": "A private conversation with the owner. The pet is registered with {clinic}.",
+      "isLost": "Still lost",
+      "isFound": "Found — thank you!",
+      "demo": "Demo data",
+      "closed": "The owner has marked the pet found, so this conversation is closed.",
+      "keepLink": "Keep this page's link to come back. Anyone with the link can read this conversation."
     }
   }
 }

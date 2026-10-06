@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Button, Card, Notice, StatusChip, cn } from "@pawguard/ui";
 
 import { PageBody, PageHeader } from "@/components/page-header";
+import { MarkFoundButton, ReportLostForm } from "@/components/lost/lost-forms";
 import { NextStepCard, pickNextStep } from "@/components/pets/next-step";
 import { OwnerRecordForm } from "@/components/pets/owner-record-form";
 import { ReminderCard } from "@/components/pets/reminder-card";
@@ -36,6 +37,9 @@ export default async function PetPage({
   const pet = petRes.data;
   if (!pet) return <PageBody><Notice tone="urgent">{t("loadFailed")}</Notice></PageBody>;
   const products = productsRes.data ?? [];
+  const { data: lostReports } = await ctx.api.GET("/api/v1/my/lost");
+  const lostOpen = (lostReports ?? []).find((r) => r.pet_id === pet.id && r.state === "open");
+  const tl = await getTranslations("lost");
   const realToday = new Date().toLocaleDateString("en-CA", { timeZone: ctx.tz });
   const fmt = (d: string | null | undefined) => formatPartialDate(d, "day", locale, tc("notRecorded"));
 
@@ -87,6 +91,18 @@ export default async function PetPage({
         </div>
       </Card>
 
+      {lostOpen ? (
+        <section aria-labelledby="lost-banner" className="space-y-2 rounded-card border-2 border-urgent bg-urgent-soft p-4">
+          <h2 id="lost-banner" className="text-lg text-urgent">{tl("bannerOwner", { name: pet.name })}</h2>
+          <p className="text-sm">{tl("bannerOwnerBody", { count: lostOpen.threads.length })}</p>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/app/lost" className="inline-flex min-h-11 items-center rounded-control border border-control bg-surface px-4 font-semibold no-underline">
+              {tl("openMessages", { count: lostOpen.threads.reduce((n, th) => n + th.unread, 0) })}
+            </Link>
+            <MarkFoundButton petId={pet.id} />
+          </div>
+        </section>
+      ) : null}
       <NextStepCard step={pickNextStep([pet], tn)} label={tn("label")} />
 
       {pet.reminders.length > 0 ? (
@@ -160,6 +176,14 @@ export default async function PetPage({
           />
         </div>
       </details>
+      {!lostOpen ? (
+        <details className="rounded-card border border-divider bg-surface p-4">
+          <summary className="cursor-pointer font-display font-semibold">{tl("reportTitle", { name: pet.name })}</summary>
+          <div className="mt-3">
+            <ReportLostForm petId={pet.id} petName={pet.name} today={realToday} />
+          </div>
+        </details>
+      ) : null}
       <p className="text-sm text-ink-2">{t("remindOnly")}</p>
     </PageBody>
   );

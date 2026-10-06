@@ -55,7 +55,7 @@ class ProviderOut(Out):
 class DeliveryOut(Out):
     id: UUID
     channel: ChannelName
-    kind: Literal["vaccination_reminder", "test", "verify_email"]
+    kind: Literal["vaccination_reminder", "test", "verify_email", "lost_message"]
     state: Literal["queued", "sending", "sent", "deferred", "failed", "skipped"]
     pet_name: str | None
     created_at: datetime
@@ -148,3 +148,66 @@ class CertificateDraftOut(Out):
     lot_text: str | None
     confidence: float | None
     warnings: list[str]
+
+
+# ---- lost pets ---------------------------------------------------------------------------------------------------
+
+class LostReportIn(StrictModel):
+    last_seen_on: date | None = None
+    area_text: str | None = Field(default=None, max_length=120)
+    note: str | None = Field(default=None, max_length=300)
+
+
+class LostMessageOut(Out):
+    sender: Literal["finder", "owner"]
+    body: str
+    created_at: datetime
+
+
+class LostThreadOut(Out):
+    id: UUID
+    finder_contact: str | None
+    created_at: datetime
+    unread: int
+    messages: list[LostMessageOut]
+
+
+class LostReportOut(Out):
+    report_id: UUID
+    pet_id: UUID
+    pet_name: str
+    state: Literal["open", "found", "cancelled"]
+    last_seen_on: date | None
+    area_text: str | None
+    note: str | None
+    created_at: datetime
+    threads: list[LostThreadOut]
+
+
+class MessageIn(StrictModel):
+    message: str = Field(min_length=1, max_length=500)
+
+
+class FinderStartIn(StrictModel):
+    message: str = Field(min_length=1, max_length=500)
+    contact: str | None = Field(default=None, max_length=120)
+
+
+class FinderStartOut(Out):
+    conversation_token: str  # the finder's private link: /found/<token>
+
+
+class LostStatusOut(Out):
+    lost: bool
+    last_seen_on: date | None
+    area_text: str | None
+
+
+class FinderThreadOut(Out):
+    pet_name: str
+    species: str
+    clinic: str
+    is_demo: bool
+    open: bool
+    found: bool
+    messages: list[LostMessageOut]
