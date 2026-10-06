@@ -65,7 +65,15 @@ def _send_email(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
     return notify.send_email(s, to, msg)
 
 
-SENDERS: dict[str, Callable[[dict[str, Any], notify.Message, Settings], str]] = {"email": _send_email}
+def _send_push(info: dict[str, Any], msg: notify.Message, s: Settings) -> str:
+    return notify.send_push(
+        s, list(info.get("push") or []), msg,
+        on_gone=lambda ep: _sql("select app.revoke_push_endpoint(:e)", e=ep),
+        on_ok=lambda ep: _sql("select app.mark_push_success(:e)", e=ep))
+
+
+SENDERS: dict[str, Callable[[dict[str, Any], notify.Message, Settings], str]] = {
+    "email": _send_email, "push": _send_push}
 
 
 def deliver(info: dict[str, Any], s: Settings) -> str:
