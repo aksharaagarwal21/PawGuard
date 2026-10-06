@@ -885,6 +885,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/pets/{pet_id}/card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My pet's vaccination card (QR)
+         * @description Permission: the caller owns this pet. Creates the card's random token on first use.
+         */
+        get: operations["pets_get_card"];
+        put?: never;
+        post?: never;
+        /**
+         * Turn off the public card
+         * @description Permission: the caller owns this pet. The QR code stops working until a new card is created.
+         */
+        delete: operations["pets_revoke_card"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/pets/{pet_id}/card.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vaccination card as PDF
+         * @description Permission: the caller owns this pet. Verified vaccinations only, with the QR code and disclaimer.
+         */
+        get: operations["pets_card_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/pets/{pet_id}/card/regenerate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * New QR code (old one stops working)
+         * @description Permission: the caller owns this pet. Revokes the current token and issues a new one.
+         */
+        post: operations["pets_regenerate_card"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/pets/{pet_id}/vaccinations": {
         parameters: {
             query?: never;
@@ -1142,6 +1206,27 @@ export interface paths {
          * @description Permission: ``animal.read``. Counts are registry measures, not coverage (see ``note``).
          */
         get: operations["programme_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/cards/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Public vaccination card
+         * @description Permission: public. Unknown and revoked tokens both return 404. Shows the pet's name, species, photo, clinic
+         *     name and verified vaccinations only — nothing about the owner or any location.
+         */
+        get: operations["public_get_card"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1960,6 +2045,20 @@ export interface components {
             profile_state: string;
             /** Reference Code */
             reference_code: string;
+        };
+        /** CardOut */
+        CardOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Qr Svg */
+            qr_svg: string;
+            /** Token */
+            token: string;
+            /** Url Path */
+            url_path: string;
         };
         /** ClinicOut */
         ClinicOut: {
@@ -3130,6 +3229,36 @@ export interface components {
                     [key: string]: unknown;
                 };
             };
+        };
+        /** PublicCardOut */
+        PublicCardOut: {
+            /** Clinic Name */
+            clinic_name: string;
+            /**
+             * Disclaimer
+             * @default This card shows recorded vaccinations. It is not a health guarantee.
+             */
+            disclaimer: string;
+            /** Is Demo */
+            is_demo: boolean;
+            /** Pet Name */
+            pet_name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Species */
+            species: string;
+            status: components["schemas"]["PetStatusOut"];
+            /** Vaccinations */
+            vaccinations: components["schemas"]["PublicVaccinationOut"][];
+        };
+        /** PublicVaccinationOut */
+        PublicVaccinationOut: {
+            /** Administered On */
+            administered_on: string | null;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Vaccine */
+            vaccine: string;
         };
         /** QualityOut */
         QualityOut: {
@@ -6608,6 +6737,217 @@ export interface operations {
             };
         };
     };
+    pets_get_card: {
+        parameters: {
+            query?: {
+                /** @description Web origin for the QR link, e.g. https://example.org */
+                base_url?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CardOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_revoke_card: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_card_pdf: {
+        parameters: {
+            query?: {
+                /** @description Web origin for the QR link, e.g. https://example.org */
+                base_url?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_regenerate_card: {
+        parameters: {
+            query?: {
+                /** @description Web origin for the QR link, e.g. https://example.org */
+                base_url?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CardOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     pets_add_vaccination: {
         parameters: {
             query?: never;
@@ -7268,6 +7608,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProgrammeSummary"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    public_get_card: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicCardOut"];
                 };
             };
             /** @description Unauthorized */

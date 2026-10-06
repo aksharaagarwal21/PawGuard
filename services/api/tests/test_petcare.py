@@ -288,3 +288,41 @@ def test_demo_clock_is_staff_only_demo_only_and_moves_reminders(client, clinic, 
     staff = world.member(real, "field_volunteer")
     tok = make_token(staff, session_id=world.session(staff))
     assert client.put("/api/v1/clinic/demo-clock", headers=_h(tok, real), json={"offset_days": 3}).status_code == 403
+
+
+def test_card_token_public_view_regenerate_revoke_and_pdf(client, clinic, owner_engine):
+    pet = _pet(client, clinic, name="Misty", species="cat")
+    first = _owner_record(client, clinic, owner_engine, pet).json()["timeline"][0]["event_id"]
+    _verify(client, clinic, first, next_due_on=str(date.today() + timedelta(days=200)))
+    _owner_record(client, clinic, owner_engine, pet, days_ago=1)  # unverified: must not appear publicly
+    owner = _h(clinic.tokens["owner_a"])
+    card = client.get(f"/api/v1/my/pets/{pet['id']}/card", headers=owner, params={"base_url": "https://pets.example"})
+    assert card.status_code == 200, card.text
+    token = card.json()["token"]
+    assert len(token) >= 32 and card.json()["qr_svg"].lstrip().startswith("<svg")
+    assert client.get(f"/api/v1/my/pets/{pet['id']}/card", headers=owner).json()["token"] == token  # stable
+    assert client.get(f"/api/v1/my/pets/{pet['id']}/card", headers=_h(clinic.tokens["owner_b"])).status_code == 404
+    assert client.get(f"/api/v1/my/pets/{pet['id']}/card", headers=owner,
+                      params={"base_url": "javascript:alert(1)"}).status_code == 422
+
+    pub = client.get(f"/api/v1/public/cards/{token}")
+    assert pub.status_code == 200 and pub.headers["cache-control"] == "no-store"
+    body = pub.json()
+    assert set(body) == {"pet_name", "species", "photo_url", "clinic_name", "status", "vaccinations", "is_demo",
+                         "disclaimer"}
+    assert body["pet_name"] == "Misty" and body["status"]["status"] == "up_to_date"
+    assert len(body["vaccinations"]) == 1  # verified only
+    assert body["disclaimer"] == "This card shows recorded vaccinations. It is not a health guarantee."
+    assert str(clinic.users["owner_a"]) not in pub.text
+
+    pdf = client.get(f"/api/v1/my/pets/{pet['id']}/card.pdf", headers=owner)
+    assert pdf.status_code == 200 and pdf.content.startswith(b"%PDF") and pdf.headers["content-type"] == "application/pdf"
+
+    new = client.post(f"/api/v1/my/pets/{pet['id']}/card/regenerate", headers=owner).json()["token"]
+    assert new != token
+    assert client.get(f"/api/v1/public/cards/{token}").status_code == 404  # old QR stops working
+    assert client.get(f"/api/v1/public/cards/{new}").status_code == 200
+    assert client.delete(f"/api/v1/my/pets/{pet['id']}/card", headers=owner).status_code == 204
+    revoked = client.get(f"/api/v1/public/cards/{new}")
+    assert revoked.status_code == 404 and revoked.json()["error"]["code"] == "card_not_found"
+    assert client.get("/api/v1/public/cards/" + "x" * 40).status_code == 404

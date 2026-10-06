@@ -1224,6 +1224,24 @@
       "submitDone": "Mark as done",
       "saving": "Saving…",
       "saved": "Saved. The clinic's vet will check the certificate."
+    },
+    "card": {
+      "open": "Vaccination card (QR)",
+      "title": "Vaccination card",
+      "intro": "Show this QR code to a groomer, boarding kennel or new vet so they can check your pet's verified vaccinations.",
+      "back": "Back to pet",
+      "qrAlt": "QR code linking to the pet's public vaccination card",
+      "scanHint": "Anyone with this QR code or link can see your pet's name, photo, clinic and verified vaccinations — never your name, phone or address.",
+      "downloadPdf": "Download PDF",
+      "disclaimer": "This card shows recorded vaccinations. It is not a health guarantee.",
+      "shows": "Only vaccinations verified by a vet appear on the card.",
+      "regenerate": "New QR code",
+      "regenerateConfirm": "Make a new QR code? The old QR code and link will stop working.",
+      "regenerated": "New QR code made. The old one no longer works.",
+      "turnOff": "Turn off the card",
+      "turnOffConfirm": "Turn off the public card? The QR code will stop working.",
+      "turnedOff": "The public card is turned off.",
+      "failed": "That didn't work. Try again."
     }
   },
   "reminders": {
@@ -1260,5 +1278,13 @@
     "advance": "+{days, plural, one {# day} other {# days}}",
     "reset": "Back to the real date",
     "failed": "The demo date could not be changed."
+  },
+  "publicCard": {
+    "title": "Vaccination card for {name}",
+    "verifiedTitle": "Vaccinations verified by a vet",
+    "disclaimerTitle": "Please note",
+    "verifiedOnly": "Only vaccinations verified by the clinic's vet are listed. Ask the clinic if you need confirmation.",
+    "notFoundTitle": "This card is not available",
+    "notFoundBody": "The QR code may have been replaced or turned off by the pet's owner."
   }
 }

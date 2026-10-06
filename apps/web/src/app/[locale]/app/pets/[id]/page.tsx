@@ -1,12 +1,14 @@
+import { QrCode } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
-import { Card, Notice, StatusChip } from "@pawguard/ui";
+import { Button, Card, Notice, StatusChip } from "@pawguard/ui";
 
 import { PageBody, PageHeader } from "@/components/page-header";
 import { OwnerRecordForm } from "@/components/pets/owner-record-form";
 import { ReminderCard } from "@/components/pets/reminder-card";
 import { DueSource, NextDueLine, PetAvatar, PetStatusChip, VerificationChip } from "@/components/pets/status";
+import { Link } from "@/i18n/navigation";
 import { formatPartialDate } from "@/lib/format";
 import { pageContext } from "@/lib/page-context";
 
@@ -32,6 +34,14 @@ export default async function PetPage({ params }: { params: Promise<{ locale: st
       <PageHeader
         title={pet.name}
         back={{ href: "/app/pets", label: t("title") }}
+        actions={
+          <Button asChild variant="secondary">
+            <Link href={`/app/pets/${pet.id}/card`}>
+              <QrCode aria-hidden className="size-5" />
+              {t("card.open")}
+            </Link>
+          </Button>
+        }
       />
       {pet.demo_offset_days !== 0 ? (
         <Notice tone="neutral">{t("demoDate", { date: fmt(pet.today), days: pet.demo_offset_days })}</Notice>

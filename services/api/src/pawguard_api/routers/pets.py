@@ -1,12 +1,14 @@
 """Pet owners ("My pets"): only pets linked to the signed-in owner, across the clinics they belong to."""
 
+from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Query, Request, Response
 
 from pawguard_api.deps import CurrentPrincipal
-from pawguard_api.domain import petcare
+from pawguard_api.domain import petcards, petcare
 from pawguard_api.pet_contracts import (
+    CardOut,
     ClinicOut,
     OwnerVaccinationIn,
     PetCardOut,
@@ -94,3 +96,36 @@ def calendar(reminder_id: UUID, p: CurrentPrincipal, request: Request) -> Respon
     body, filename = petcare.reminder_ics(p, reminder_id, _rid(request))
     return Response(body, media_type="text/calendar; charset=utf-8",
                     headers={"content-disposition": f'attachment; filename="{filename}"'})
+
+
+# ---- vaccination card (QR) ---------------------------------------------------------------------------------------
+
+BaseUrl = Annotated[str | None, Query(max_length=200, description="Web origin for the QR link, e.g. https://example.org")]
+
+
+@router.get("/pets/{pet_id}/card", response_model=CardOut, summary="My pet's vaccination card (QR)")
+def get_card(pet_id: UUID, p: CurrentPrincipal, request: Request, base_url: BaseUrl = None) -> CardOut:
+    """Permission: the caller owns this pet. Creates the card's random token on first use."""
+    return petcards.owner_card(p, pet_id, base_url, request_id=_rid(request))
+
+
+@router.post("/pets/{pet_id}/card/regenerate", response_model=CardOut, summary="New QR code (old one stops working)")
+def regenerate_card(pet_id: UUID, p: CurrentPrincipal, request: Request, base_url: BaseUrl = None) -> CardOut:
+    """Permission: the caller owns this pet. Revokes the current token and issues a new one."""
+    return petcards.owner_card(p, pet_id, base_url, regenerate=True, request_id=_rid(request))
+
+
+@router.delete("/pets/{pet_id}/card", status_code=204, summary="Turn off the public card")
+def revoke_card(pet_id: UUID, p: CurrentPrincipal, request: Request) -> Response:
+    """Permission: the caller owns this pet. The QR code stops working until a new card is created."""
+    petcards.revoke(p, pet_id, _rid(request))
+    return Response(status_code=204)
+
+
+@router.get("/pets/{pet_id}/card.pdf", summary="Vaccination card as PDF", response_class=Response,
+            responses={200: {"content": {"application/pdf": {}}}})
+def card_pdf(pet_id: UUID, p: CurrentPrincipal, request: Request, base_url: BaseUrl = None) -> Response:
+    """Permission: the caller owns this pet. Verified vaccinations only, with the QR code and disclaimer."""
+    body = petcards.owner_card_pdf(p, pet_id, base_url, _rid(request))
+    return Response(body, media_type="application/pdf",
+                    headers={"content-disposition": 'attachment; filename="vaccination-card.pdf"'})

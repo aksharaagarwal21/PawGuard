@@ -1,0 +1,178 @@
+"""Pet vaccination card: a random, revocable token behind a QR code, a PDF, and a public status page.
+
+The public card shows only the pet's name, species, photo, the clinic's name and *verified* vaccinations (vaccine,
+date given, next due date). Nothing about the owner or any location. Revoking or regenerating the token makes old
+QR codes stop working at once. The card shows recorded vaccinations; it is not a health guarantee.
+"""
+
+import io
+import secrets
+from datetime import datetime, timedelta
+from typing import Any
+from uuid import UUID
+from zoneinfo import ZoneInfo
+
+import segno
+from fpdf import FPDF
+from sqlalchemy import text
+
+from pawguard_api.auth import Principal
+from pawguard_api.db import public_tx
+from pawguard_api.domain import petcare, reminders
+from pawguard_api.domain.common import record_audit
+from pawguard_api.errors import NotFound, Unprocessable
+from pawguard_api.pet_contracts import CardOut, PetStatusOut, PublicCardOut, PublicVaccinationOut
+
+DISCLAIMER = "This card shows recorded vaccinations. It is not a health guarantee."
+
+
+def card_path(token: str) -> str:
+    return f"/card/{token}"
+
+
+def _base(base_url: str | None) -> str:
+    if base_url is None:
+        return ""
+    b = base_url.rstrip("/")
+    if not (b.startswith(("http://", "https://")) and len(b) <= 200 and b.count("/") == 2):
+        raise Unprocessable("Invalid base URL.", code="invalid_base_url")
+    return b
+
+
+def _qr_svg(url: str) -> str:
+    buf = io.BytesIO()
+    # No <title>: the page wraps the SVG in one labelled image for screen readers.
+    segno.make(url, error="m").save(buf, kind="svg", scale=6, border=2, xmldecl=False, svgns=True)
+    return buf.getvalue().decode("utf-8")
+
+
+def _live_card(db: Any, ctx: Any, animal_id: UUID, *, regenerate: bool) -> Any:
+    live = db.execute(text("select token, created_at from app.pet_cards where animal_id = :a and revoked_at is null"),
+                      {"a": animal_id}).one_or_none()
+    if live is not None and not regenerate:
+        return live
+    if live is not None:
+        db.execute(text("update app.pet_cards set revoked_at = now() where animal_id = :a and revoked_at is null"),
+                   {"a": animal_id})
+    row = db.execute(text("""insert into app.pet_cards (org_id, animal_id, token, created_by)
+                             values (:o, :a, :t, :u) returning token, created_at"""),
+                     {"o": ctx.org_id, "a": animal_id, "t": petcare_token(), "u": ctx.user_id}).one()
+    record_audit(db, ctx, "pet_card.regenerated" if live is not None else "pet_card.created", "animal", animal_id, {})
+    return row
+
+
+def petcare_token() -> str:
+    return secrets.token_urlsafe(32)  # 256 bits; never derived from the pet or owner
+
+
+def owner_card(p: Principal, animal_id: UUID, base_url: str | None, *, regenerate: bool = False,
+               request_id: str | None = None) -> CardOut:
+    base = _base(base_url)
+    ctx = petcare.owned_context(p, animal_id, request_id)
+    with ctx.tx() as db:
+        row = _live_card(db, ctx, animal_id, regenerate=regenerate)
+    path = card_path(row.token)
+    return CardOut(token=row.token, url_path=path, qr_svg=_qr_svg(base + path), created_at=row.created_at)
+
+
+def revoke(p: Principal, animal_id: UUID, request_id: str | None = None) -> None:
+    ctx = petcare.owned_context(p, animal_id, request_id)
+    with ctx.tx() as db:
+        n = db.execute(text("update app.pet_cards set revoked_at = now() where animal_id = :a and revoked_at is null"),
+                       {"a": animal_id}).rowcount
+        if n:
+            record_audit(db, ctx, "pet_card.revoked", "animal", animal_id, {})
+
+
+def public_card(token: str, *, with_photo: bool = True) -> PublicCardOut:
+    if not (32 <= len(token) <= 100):
+        raise NotFound("Card not found.", code="card_not_found")
+    with public_tx() as db:
+        rows = db.execute(text("select * from app.public_card(:t)"), {"t": token}).all()
+    if not rows:
+        raise NotFound("Card not found.", code="card_not_found")  # unknown or revoked: same answer
+    first = rows[0]
+    today = datetime.now(ZoneInfo(first.timezone)).date() + timedelta(days=first.offset_days)
+    records = [reminders.Record("verified", r.vaccine, r.administered_on, r.next_due_on, r.next_due_source)
+               for r in rows if r.vaccine is not None]
+    status = reminders.pet_status(records, today) if records else PetStatusOut(status="no_verified_record")
+    latest = reminders.latest_verified(records)
+    photo_url = None
+    if with_photo and first.photo_key:
+        from pawguard_api.integrations.storage import get_storage
+
+        try:
+            photo_url = get_storage().signed_download_urls([first.photo_key]).get(first.photo_key)
+        except Exception:
+            photo_url = None
+    return PublicCardOut(
+        pet_name=first.animal_name, species=first.species, photo_url=photo_url, clinic_name=first.clinic_name,
+        status=status, is_demo=first.is_demo,
+        vaccinations=[PublicVaccinationOut(vaccine=r.vaccine, administered_on=r.administered_on,
+                                           next_due_on=r.next_due_on)
+                      for r in sorted(latest.values(), key=lambda r: r.vaccine)],
+        disclaimer=DISCLAIMER)
+
+
+# ---- PDF ---------------------------------------------------------------------------------------------------------
+
+_LATIN = str.maketrans({"—": "-", "–": "-", "‘": "'", "’": "'", "“": '"', "”": '"', "…": "..."})
+
+
+def _latin(s: str) -> str:
+    """The PDF uses a built-in Latin font: map common punctuation, replace anything else it cannot show."""
+    return s.translate(_LATIN).encode("latin-1", "replace").decode("latin-1")
+
+
+STATUS_TEXT = {"up_to_date": "Up to date", "due_soon": "Due soon", "overdue": "Overdue",
+               "unverified_record": "Entered by owner (unverified)", "no_verified_record": "No verified record"}
+
+
+def owner_card_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_id: str | None = None) -> bytes:
+    card = owner_card(p, animal_id, base_url, request_id=request_id)
+    data = public_card(card.token, with_photo=False)
+    url = _base(base_url) + card.url_path
+    pdf = FPDF(format="A5", orientation="portrait")
+    pdf.set_auto_page_break(auto=True, margin=12)
+    pdf.add_page()
+    pdf.set_title(_latin(f"Vaccination card - {data.pet_name}"))
+    if data.is_demo:
+        pdf.set_font("Helvetica", "B", 9)
+        pdf.set_fill_color(230, 225, 245)
+        pdf.cell(0, 7, "DEMO DATA - fictional pet and clinic, not a real record", new_x="LMARGIN", new_y="NEXT",
+                 fill=True, align="C")
+        pdf.ln(2)
+    pdf.set_font("Helvetica", "B", 18)
+    pdf.cell(0, 10, _latin(data.pet_name), new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 10)
+    pdf.cell(0, 6, _latin(f"{data.species.capitalize()} - {data.clinic_name}"), new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "B", 11)
+    pdf.cell(0, 8, _latin(f"Status: {STATUS_TEXT[data.status.status]}"), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+    pdf.set_font("Helvetica", "B", 9)
+    widths = (62, 33, 33)
+    for w, h in zip(widths, ("Vaccine (verified by vet)", "Given on", "Next due"), strict=True):
+        pdf.cell(w, 7, h, border="B")
+    pdf.ln()
+    pdf.set_font("Helvetica", "", 9)
+    if not data.vaccinations:
+        pdf.cell(0, 7, "No verified record.", new_x="LMARGIN", new_y="NEXT")
+    for v in data.vaccinations:
+        pdf.cell(widths[0], 7, _latin(v.vaccine)[:40])
+        pdf.cell(widths[1], 7, f"{v.administered_on:%d %b %Y}" if v.administered_on else "-")
+        pdf.cell(widths[2], 7, f"{v.next_due_on:%d %b %Y}" if v.next_due_on else "-")
+        pdf.ln()
+    pdf.ln(4)
+    png = io.BytesIO()
+    segno.make(url, error="m").save(png, kind="png", scale=8, border=2)
+    png.seek(0)
+    pdf.image(png, w=40)
+    pdf.set_font("Helvetica", "", 8)
+    pdf.multi_cell(0, 4.5, _latin(f"Scan to check the current status: {url}"), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(2)
+    pdf.set_font("Helvetica", "B", 9)
+    pdf.multi_cell(0, 5, DISCLAIMER, new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 8)
+    pdf.multi_cell(0, 4.5, "Only vaccinations verified by a vet are listed. PawGuard only reminds; your vet decides "
+                           "treatment.", new_x="LMARGIN", new_y="NEXT")
+    return bytes(pdf.output())

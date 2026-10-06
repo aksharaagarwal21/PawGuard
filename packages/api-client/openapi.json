@@ -1403,6 +1403,35 @@
         "title": "CandidateAnimalOut",
         "type": "object"
       },
+      "CardOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "qr_svg": {
+            "title": "Qr Svg",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "url_path": {
+            "title": "Url Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "url_path",
+          "qr_svg",
+          "created_at"
+        ],
+        "title": "CardOut",
+        "type": "object"
+      },
       "ClinicOut": {
         "properties": {
           "is_member": {
@@ -4617,6 +4646,103 @@
           "capabilities"
         ],
         "title": "ProvidersOut",
+        "type": "object"
+      },
+      "PublicCardOut": {
+        "properties": {
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "disclaimer": {
+            "default": "This card shows recorded vaccinations. It is not a health guarantee.",
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "species": {
+            "title": "Species",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PetStatusOut"
+          },
+          "vaccinations": {
+            "items": {
+              "$ref": "#/components/schemas/PublicVaccinationOut"
+            },
+            "title": "Vaccinations",
+            "type": "array"
+          }
+        },
+        "required": [
+          "pet_name",
+          "species",
+          "photo_url",
+          "clinic_name",
+          "status",
+          "vaccinations",
+          "is_demo",
+          "disclaimer"
+        ],
+        "title": "PublicCardOut",
+        "type": "object"
+      },
+      "PublicVaccinationOut": {
+        "properties": {
+          "administered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Administered On"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "vaccine": {
+            "title": "Vaccine",
+            "type": "string"
+          }
+        },
+        "required": [
+          "vaccine",
+          "administered_on",
+          "next_due_on"
+        ],
+        "title": "PublicVaccinationOut",
         "type": "object"
       },
       "QualityOut": {
@@ -12179,6 +12305,370 @@
         ]
       }
     },
+    "/api/v1/my/pets/{pet_id}/card": {
+      "delete": {
+        "description": "Permission: the caller owns this pet. The QR code stops working until a new card is created.",
+        "operationId": "pets_revoke_card",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Turn off the public card",
+        "tags": [
+          "pets"
+        ]
+      },
+      "get": {
+        "description": "Permission: the caller owns this pet. Creates the card's random token on first use.",
+        "operationId": "pets_get_card",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Web origin for the QR link, e.g. https://example.org",
+            "in": "query",
+            "name": "base_url",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Web origin for the QR link, e.g. https://example.org",
+              "title": "Base Url"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "My pet's vaccination card (QR)",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/pets/{pet_id}/card.pdf": {
+      "get": {
+        "description": "Permission: the caller owns this pet. Verified vaccinations only, with the QR code and disclaimer.",
+        "operationId": "pets_card_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Web origin for the QR link, e.g. https://example.org",
+            "in": "query",
+            "name": "base_url",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Web origin for the QR link, e.g. https://example.org",
+              "title": "Base Url"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Vaccination card as PDF",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/pets/{pet_id}/card/regenerate": {
+      "post": {
+        "description": "Permission: the caller owns this pet. Revokes the current token and issues a new one.",
+        "operationId": "pets_regenerate_card",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Web origin for the QR link, e.g. https://example.org",
+            "in": "query",
+            "name": "base_url",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Web origin for the QR link, e.g. https://example.org",
+              "title": "Base Url"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "New QR code (old one stops working)",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
     "/api/v1/my/pets/{pet_id}/vaccinations": {
       "post": {
         "description": "Permission: the caller owns this pet. Creates an unverified owner-entered record that goes to the clinic's\nvet workbench. It never counts as verified until a vet verifies it.",
@@ -13379,6 +13869,69 @@
         "summary": "Registry measures by area",
         "tags": [
           "programme"
+        ]
+      }
+    },
+    "/api/v1/public/cards/{token}": {
+      "get": {
+        "description": "Permission: public. Unknown and revoked tokens both return 404. Shows the pet's name, species, photo, clinic\nname and verified vaccinations only — nothing about the owner or any location.",
+        "operationId": "public_get_card",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicCardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Public vaccination card",
+        "tags": [
+          "public"
         ]
       }
     },

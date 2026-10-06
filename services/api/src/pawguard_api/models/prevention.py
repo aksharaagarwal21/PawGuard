@@ -132,7 +132,8 @@ class ObservationMedia(Base, _Owned):
     id: Mapped[UUID] = uuid_pk()
     observation_id: Mapped[UUID]
     media_id: Mapped[UUID]
-    subject_bbox: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))  # SQL NULL, not JSON null, when no box
+    # SQL NULL, not JSON null, when no box
+    subject_bbox: Mapped[dict[str, Any] | None] = mapped_column(JSONB(none_as_null=True))
     subject_count: Mapped[int | None]
     crop_version: Mapped[str | None]
     capture_session_id: Mapped[UUID | None]
