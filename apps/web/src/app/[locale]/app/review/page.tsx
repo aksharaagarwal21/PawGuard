@@ -138,6 +138,9 @@ export default async function ReviewPage({
                 </Card>
                 <Card>
                   <h3 className="text-base">{tv("title")}</h3>
+                  {e.source_type === "owner_entry" ? (
+                    <p className="mt-1 text-sm font-semibold">{tv("sourceTypes.owner_entry")}</p>
+                  ) : null}
                   <dl className="mt-2 grid grid-cols-[9rem_1fr] gap-x-4 gap-y-1.5 text-sm">
                     {(
                       [

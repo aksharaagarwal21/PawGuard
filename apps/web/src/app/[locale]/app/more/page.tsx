@@ -16,7 +16,7 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
   if (result.state !== "ok") return null;
   const active = await activeMembership(result.me);
   if (!active) return null;
-  const extra = visibleNav(active.capabilities, active.professional_scopes).filter((i) => !i.mobile);
+  const extra = visibleNav(active.capabilities, active.professional_scopes, active.org_type).filter((i) => !i.mobile);
   return (
     <div className="mx-auto max-w-xl space-y-8 px-4 py-6">
       <h1 className="text-2xl">{t("more")}</h1>

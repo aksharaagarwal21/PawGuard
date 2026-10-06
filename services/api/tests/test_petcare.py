@@ -326,3 +326,49 @@ def test_card_token_public_view_regenerate_revoke_and_pdf(client, clinic, owner_
     revoked = client.get(f"/api/v1/public/cards/{new}")
     assert revoked.status_code == 404 and revoked.json()["error"]["code"] == "card_not_found"
     assert client.get("/api/v1/public/cards/" + "x" * 40).status_code == 404
+
+
+def test_clinic_dashboard_and_vet_clinic_record_with_isolation(client, clinic, owner_engine, world, make_token):
+    due_pet = _pet(client, clinic, name="Bruno")
+    _pet(client, clinic, name="Kitty", species="cat")  # no records
+    vet = _h(clinic.tokens["vet"], clinic.org)
+    r = client.post("/api/v1/clinic/vaccinations", headers=vet, json={
+        "animal_id": due_pet["id"], "product_id": str(clinic.product),
+        "administered_on": str(date.today() - timedelta(days=360)),
+        "next_due_on": str(date.today() + timedelta(days=5))})
+    assert r.status_code == 201, r.text
+    dash = r.json()
+    assert dash["pets_total"] == 2 and dash["no_verified_record"] == 1 and dash["up_to_date"] == 0
+    assert [p["pet_name"] for p in dash["due_this_week"]] == ["Bruno"]
+    assert dash["coverage_note"] == "Based on pets registered in this app — not population coverage."
+    d = client.get(f"/api/v1/my/pets/{due_pet['id']}", headers=_h(clinic.tokens["owner_a"])).json()
+    assert d["timeline"][0]["verification"] == "verified_by_vet" and d["timeline"][0]["next_due_source"] == "vet"
+    assert [x["kind"] for x in client.get("/api/v1/my/reminders", headers=_h(clinic.tokens["owner_a"])).json()] \
+        == ["due_in_7"]
+    # Template when the vet gives no date; owner upload shows as awaiting verification.
+    r = client.post("/api/v1/clinic/vaccinations", headers=vet, json={
+        "animal_id": due_pet["id"], "product_id": str(clinic.product), "administered_on": str(date.today())})
+    assert r.status_code == 201 and r.json()["up_to_date"] == 1
+    _owner_record(client, clinic, owner_engine, due_pet)
+    awaiting = client.get("/api/v1/clinic/dashboard", headers=vet).json()["awaiting_verification"]
+    assert len(awaiting) == 1 and awaiting[0]["entered_by_owner"] is True
+
+    # Who may record: not field staff without review authority, not owners.
+    body = {"animal_id": due_pet["id"], "product_id": str(clinic.product), "administered_on": str(date.today())}
+    assert client.post("/api/v1/clinic/vaccinations", headers=_h(clinic.tokens["staff"], clinic.org),
+                       json=body).status_code == 403
+    assert client.post("/api/v1/clinic/vaccinations", headers=_h(clinic.tokens["owner_a"], clinic.org),
+                       json=body).status_code == 403
+    assert client.get("/api/v1/clinic/dashboard", headers=_h(clinic.tokens["owner_a"], clinic.org)).status_code == 403
+
+    # Another clinic sees none of these pets and cannot record against them.
+    other = world.org("Other clinic")
+    other_vet = world.member(other, "veterinary_reviewer")
+    world.approve(other, other_vet)
+    ov = _h(make_token(other_vet, session_id=world.session(other_vet)), other)
+    assert client.get("/api/v1/clinic/dashboard", headers=ov).json()["pets_total"] == 0
+    with owner_engine.begin() as c:
+        other_product = c.execute(text("insert into app.vaccine_products (org_id, name) values (:o, 'X') returning id"),
+                                  {"o": other}).scalar_one()
+    r = client.post("/api/v1/clinic/vaccinations", headers=ov, json={**body, "product_id": str(other_product)})
+    assert r.status_code == 404

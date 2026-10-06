@@ -63,7 +63,7 @@ export async function AppShell({
   const t = await getTranslations("nav");
   const ta = await getTranslations("app");
   const tr = await getTranslations("roles");
-  const items = visibleNav(active.capabilities, active.professional_scopes);
+  const items = visibleNav(active.capabilities, active.professional_scopes, active.org_type);
   const mobileItems = items.filter((i) => i.mobile);
   // Pet owners: count of reminders showing today, for the bell (in-app only; nothing is sent).
   let reminderCount = 0;

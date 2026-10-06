@@ -39,7 +39,8 @@ def _load_me(p: CurrentPrincipal) -> MeOut:
         user_id=p.user_id, email=p.email, preferred_name=profile.preferred_name, locale=profile.locale,
         profile_row_version=profile.row_version,
         memberships=[MembershipOut(membership_id=m.id, org_id=o.id, org_name=o.name, org_is_demo=o.is_demo,
-                                   timezone=o.timezone, role=m.role, capabilities=sorted(m.capabilities),
+                                   org_type=o.org_type, timezone=o.timezone, role=m.role,
+                                   capabilities=sorted(m.capabilities),
                                    professional_scopes=sorted(by_org.get(o.id, [])))
                      for m, o in rows if o.activation_state == "active"],
         environment=EnvironmentOut(env=s.env, demo_mode=s.demo_mode),

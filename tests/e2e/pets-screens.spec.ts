@@ -14,8 +14,7 @@ for (const [label, viewport] of [
     await expect(page.getByRole("heading", { name: "My pets", level: 1 })).toBeVisible();
     for (const name of ["Bruno", "Misty", "Coco"]) await expect(page.getByText(name, { exact: true })).toBeVisible();
     await expect(page.getByText("Up to date").first()).toBeVisible();
-    await expect(page.getByText("Due soon").first()).toBeVisible();
-    await expect(page.getByText("Overdue").first()).toBeVisible();
+    await expect(page.getByText("Due soon").first()).toBeVisible(); // Misty (the journey test changes Coco)
     const noScroll = async () =>
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await noScroll();
@@ -24,6 +23,7 @@ for (const [label, viewport] of [
 
     await page.getByRole("link", { name: /Coco/ }).first().click();
     await expect(page.getByRole("heading", { name: "Coco", level: 1 })).toBeVisible();
+    await expect(page.getByText(/Overdue|Up to date/).first()).toBeVisible();
     await expect(page.getByText("Verified by vet").first()).toBeVisible();
     await noScroll();
     await expectNoAxeViolations(page);
@@ -36,5 +36,21 @@ for (const [label, viewport] of [
     await noScroll();
     await expectNoAxeViolations(page);
     await page.screenshot({ path: `test-results/pets/${label}-reminders.png`, fullPage: true });
+  });
+}
+
+for (const [label, viewport] of [
+  ["phone", { width: 390, height: 844 }],
+  ["desktop", { width: 1440, height: 900 }],
+] as const) {
+  test(`clinic dashboard renders without horizontal scroll (${label})`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await signIn(page, DEMO.clinicVet.email);
+    await page.goto("/en/app/clinic");
+    await expect(page.getByRole("heading", { name: "Clinic dashboard", level: 1 })).toBeVisible();
+    await expect(page.getByText("Based on pets registered in this app — not population coverage.")).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await expectNoAxeViolations(page);
+    await page.screenshot({ path: `test-results/pets/${label}-clinic.png`, fullPage: true });
   });
 }

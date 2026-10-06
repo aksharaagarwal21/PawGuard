@@ -929,6 +929,67 @@
         "title": "AuditOut",
         "type": "object"
       },
+      "AwaitingRowOut": {
+        "properties": {
+          "administered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Administered On"
+          },
+          "entered_by_owner": {
+            "title": "Entered By Owner",
+            "type": "boolean"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "pet_id": {
+            "format": "uuid",
+            "title": "Pet Id",
+            "type": "string"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "vaccine": {
+            "title": "Vaccine",
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "pet_id",
+          "pet_name",
+          "vaccine",
+          "administered_on",
+          "submitted_at",
+          "entered_by_owner"
+        ],
+        "title": "AwaitingRowOut",
+        "type": "object"
+      },
       "BoxIn": {
         "additionalProperties": false,
         "description": "Pixel box in the oriented original image (as returned by the analysis endpoint).",
@@ -1432,6 +1493,104 @@
         "title": "CardOut",
         "type": "object"
       },
+      "ClinicDashboardOut": {
+        "properties": {
+          "awaiting_verification": {
+            "items": {
+              "$ref": "#/components/schemas/AwaitingRowOut"
+            },
+            "title": "Awaiting Verification",
+            "type": "array"
+          },
+          "coverage_note": {
+            "default": "Based on pets registered in this app — not population coverage.",
+            "title": "Coverage Note",
+            "type": "string"
+          },
+          "demo_clock_available": {
+            "title": "Demo Clock Available",
+            "type": "boolean"
+          },
+          "demo_offset_days": {
+            "title": "Demo Offset Days",
+            "type": "integer"
+          },
+          "due_soon": {
+            "items": {
+              "$ref": "#/components/schemas/ClinicPetRowOut"
+            },
+            "title": "Due Soon",
+            "type": "array"
+          },
+          "due_this_week": {
+            "items": {
+              "$ref": "#/components/schemas/ClinicPetRowOut"
+            },
+            "title": "Due This Week",
+            "type": "array"
+          },
+          "no_verified_record": {
+            "title": "No Verified Record",
+            "type": "integer"
+          },
+          "overdue": {
+            "items": {
+              "$ref": "#/components/schemas/ClinicPetRowOut"
+            },
+            "title": "Overdue",
+            "type": "array"
+          },
+          "pets": {
+            "items": {
+              "$ref": "#/components/schemas/ClinicPetRowOut"
+            },
+            "title": "Pets",
+            "type": "array"
+          },
+          "pets_total": {
+            "title": "Pets Total",
+            "type": "integer"
+          },
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ProductOptionOut"
+            },
+            "title": "Products",
+            "type": "array"
+          },
+          "today": {
+            "format": "date",
+            "title": "Today",
+            "type": "string"
+          },
+          "unverified_only": {
+            "title": "Unverified Only",
+            "type": "integer"
+          },
+          "up_to_date": {
+            "title": "Up To Date",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "today",
+          "demo_offset_days",
+          "demo_clock_available",
+          "pets_total",
+          "up_to_date",
+          "due_this_week",
+          "due_soon",
+          "overdue",
+          "awaiting_verification",
+          "no_verified_record",
+          "unverified_only",
+          "pets",
+          "products",
+          "coverage_note"
+        ],
+        "title": "ClinicDashboardOut",
+        "type": "object"
+      },
       "ClinicOut": {
         "properties": {
           "is_member": {
@@ -1454,6 +1613,90 @@
           "is_member"
         ],
         "title": "ClinicOut",
+        "type": "object"
+      },
+      "ClinicPetRowOut": {
+        "properties": {
+          "owner_linked": {
+            "title": "Owner Linked",
+            "type": "boolean"
+          },
+          "pet_id": {
+            "format": "uuid",
+            "title": "Pet Id",
+            "type": "string"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "reference_code": {
+            "title": "Reference Code",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PetStatusOut"
+          }
+        },
+        "required": [
+          "pet_id",
+          "pet_name",
+          "reference_code",
+          "status",
+          "owner_linked"
+        ],
+        "title": "ClinicPetRowOut",
+        "type": "object"
+      },
+      "ClinicVaccinationIn": {
+        "additionalProperties": false,
+        "properties": {
+          "administered_on": {
+            "format": "date",
+            "title": "Administered On",
+            "type": "string"
+          },
+          "animal_id": {
+            "format": "uuid",
+            "title": "Animal Id",
+            "type": "string"
+          },
+          "lot_text": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Text"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "product_id": {
+            "format": "uuid",
+            "title": "Product Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "animal_id",
+          "product_id",
+          "administered_on"
+        ],
+        "title": "ClinicVaccinationIn",
         "type": "object"
       },
       "DemoAccountOut": {
@@ -2903,6 +3146,10 @@
             "title": "Org Name",
             "type": "string"
           },
+          "org_type": {
+            "title": "Org Type",
+            "type": "string"
+          },
           "professional_scopes": {
             "items": {
               "type": "string"
@@ -2924,6 +3171,7 @@
           "org_id",
           "org_name",
           "org_is_demo",
+          "org_type",
           "timezone",
           "role",
           "capabilities",
@@ -9589,6 +9837,93 @@
         ]
       }
     },
+    "/api/v1/clinic/dashboard": {
+      "get": {
+        "description": "Permission: ``animal.read``. This clinic's registered pets only: due this week, overdue, awaiting\nverification. Counts describe pets registered in this app, not population coverage.",
+        "operationId": "clinic_get_dashboard",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicDashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Clinic pet vaccination dashboard",
+        "tags": [
+          "clinic"
+        ]
+      }
+    },
     "/api/v1/clinic/demo-clock": {
       "get": {
         "description": "Permission: clinic staff (``animal.read`` or ``vaccination.review``).",
@@ -9766,6 +10101,103 @@
           }
         },
         "summary": "Move the demo date (demo organisations only)",
+        "tags": [
+          "clinic"
+        ]
+      }
+    },
+    "/api/v1/clinic/vaccinations": {
+      "post": {
+        "description": "Permission: ``vaccination.review`` with an approved ``veterinary_review`` authority and a live session.\nStored as verified (the vet's own record) with the vet's next due date, or the demo template if none.",
+        "operationId": "clinic_record_vaccination",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClinicVaccinationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicDashboardOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Record a vaccination given at the clinic (vet)",
         "tags": [
           "clinic"
         ]

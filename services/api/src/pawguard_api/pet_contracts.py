@@ -162,11 +162,13 @@ class AwaitingRowOut(Out):
     vaccine: str
     administered_on: date | None
     submitted_at: datetime | None
+    entered_by_owner: bool
 
 
 class ClinicDashboardOut(Out):
     today: date
     demo_offset_days: int
+    demo_clock_available: bool
     pets_total: int
     up_to_date: int
     due_this_week: list[ClinicPetRowOut]
@@ -174,6 +176,9 @@ class ClinicDashboardOut(Out):
     overdue: list[ClinicPetRowOut]
     awaiting_verification: list[AwaitingRowOut]
     no_verified_record: int
+    unverified_only: int
+    pets: list[ClinicPetRowOut]
+    products: list[ProductOptionOut]
     coverage_note: str = "Based on pets registered in this app — not population coverage."
 
 

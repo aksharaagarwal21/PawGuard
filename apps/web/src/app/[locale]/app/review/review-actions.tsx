@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { Button, Dialog, Field, Textarea } from "@pawguard/ui";
+import { Button, Dialog, Field, TextInput, Textarea } from "@pawguard/ui";
 
 import { useRouter } from "@/i18n/navigation";
 import { browserApi, parseApiError } from "@/lib/api-browser";
@@ -17,6 +17,7 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
   const router = useRouter();
   const [outcome, setOutcome] = useState<Outcome | null>(null);
   const [reason, setReason] = useState("");
+  const [nextDue, setNextDue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -26,7 +27,12 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
     setBusy(true);
     const { error: apiError } = await browserApi.POST("/api/v1/vaccination-events/{event_id}/reviews", {
       params: { path: { event_id: eventId } },
-      body: { outcome, reason: reason.trim() || null, row_version: rowVersion },
+      body: {
+        outcome,
+        reason: reason.trim() || null,
+        row_version: rowVersion,
+        next_due_on: outcome === "verified" && nextDue ? nextDue : null,
+      },
     });
     setBusy(false);
     if (apiError) {
@@ -36,7 +42,7 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
         router.refresh();
         return;
       }
-      return setError(p.fields.reason || p.message || tc("tryAgainLater"));
+      return setError(p.fields.reason || p.fields.next_due_on || p.message || tc("tryAgainLater"));
     }
     setOutcome(null);
     router.push(nextId ? `/app/review?id=${nextId}&done=${outcome}` : `/app/review?done=${outcome}`);
@@ -50,7 +56,7 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
   };
   return (
     <div className="sticky bottom-20 flex flex-wrap gap-3 rounded-card border border-divider bg-surface p-4 shadow-card md:bottom-4">
-      <Button onClick={() => { setError(null); setReason(""); setOutcome("verified"); }}>{t("verify")}</Button>
+      <Button onClick={() => { setError(null); setReason(""); setNextDue(""); setOutcome("verified"); }}>{t("verify")}</Button>
       <Button variant="secondary" onClick={() => { setError(null); setReason(""); setOutcome("needs_correction"); }}>
         {t("requestCorrection")}
       </Button>
@@ -78,11 +84,18 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
           <Field id="review-reason" label={t("reasonLabel")} error={error ?? undefined}>
             {(aria) => <Textarea {...aria} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} />}
           </Field>
-        ) : error ? (
-          <p role="alert" className="font-semibold text-urgent">
-            {error}
-          </p>
-        ) : null}
+        ) : (
+          <>
+            <Field id="review-next-due" label={t("nextDueLabel")} hint={t("nextDueHint")} marker={tc("optional")}>
+              {(aria) => <TextInput {...aria} type="date" value={nextDue} onChange={(e) => setNextDue(e.target.value)} />}
+            </Field>
+            {error ? (
+              <p role="alert" className="font-semibold text-urgent">
+                {error}
+              </p>
+            ) : null}
+          </>
+        )}
       </Dialog>
     </div>
   );

@@ -350,6 +350,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/clinic/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Clinic pet vaccination dashboard
+         * @description Permission: ``animal.read``. This clinic's registered pets only: due this week, overdue, awaiting
+         *     verification. Counts describe pets registered in this app, not population coverage.
+         */
+        get: operations["clinic_get_dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/clinic/demo-clock": {
         parameters: {
             query?: never;
@@ -369,6 +390,27 @@ export interface paths {
          */
         put: operations["clinic_put_demo_clock"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clinic/vaccinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a vaccination given at the clinic (vet)
+         * @description Permission: ``vaccination.review`` with an approved ``veterinary_review`` authority and a live session.
+         *     Stored as verified (the vet's own record) with the vet's next due date, or the demo template if none.
+         */
+        post: operations["clinic_record_vaccination"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1902,6 +1944,29 @@ export interface components {
             /** Target Type */
             target_type: string | null;
         };
+        /** AwaitingRowOut */
+        AwaitingRowOut: {
+            /** Administered On */
+            administered_on: string | null;
+            /** Entered By Owner */
+            entered_by_owner: boolean;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /**
+             * Pet Id
+             * Format: uuid
+             */
+            pet_id: string;
+            /** Pet Name */
+            pet_name: string;
+            /** Submitted At */
+            submitted_at: string | null;
+            /** Vaccine */
+            vaccine: string;
+        };
         /**
          * BoxIn
          * @description Pixel box in the oriented original image (as returned by the analysis endpoint).
@@ -2060,6 +2125,43 @@ export interface components {
             /** Url Path */
             url_path: string;
         };
+        /** ClinicDashboardOut */
+        ClinicDashboardOut: {
+            /** Awaiting Verification */
+            awaiting_verification: components["schemas"]["AwaitingRowOut"][];
+            /**
+             * Coverage Note
+             * @default Based on pets registered in this app — not population coverage.
+             */
+            coverage_note: string;
+            /** Demo Clock Available */
+            demo_clock_available: boolean;
+            /** Demo Offset Days */
+            demo_offset_days: number;
+            /** Due Soon */
+            due_soon: components["schemas"]["ClinicPetRowOut"][];
+            /** Due This Week */
+            due_this_week: components["schemas"]["ClinicPetRowOut"][];
+            /** No Verified Record */
+            no_verified_record: number;
+            /** Overdue */
+            overdue: components["schemas"]["ClinicPetRowOut"][];
+            /** Pets */
+            pets: components["schemas"]["ClinicPetRowOut"][];
+            /** Pets Total */
+            pets_total: number;
+            /** Products */
+            products: components["schemas"]["ProductOptionOut"][];
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
+            /** Unverified Only */
+            unverified_only: number;
+            /** Up To Date */
+            up_to_date: number;
+        };
         /** ClinicOut */
         ClinicOut: {
             /** Is Member */
@@ -2071,6 +2173,43 @@ export interface components {
              * Format: uuid
              */
             org_id: string;
+        };
+        /** ClinicPetRowOut */
+        ClinicPetRowOut: {
+            /** Owner Linked */
+            owner_linked: boolean;
+            /**
+             * Pet Id
+             * Format: uuid
+             */
+            pet_id: string;
+            /** Pet Name */
+            pet_name: string;
+            /** Reference Code */
+            reference_code: string;
+            status: components["schemas"]["PetStatusOut"];
+        };
+        /** ClinicVaccinationIn */
+        ClinicVaccinationIn: {
+            /**
+             * Administered On
+             * Format: date
+             */
+            administered_on: string;
+            /**
+             * Animal Id
+             * Format: uuid
+             */
+            animal_id: string;
+            /** Lot Text */
+            lot_text?: string | null;
+            /** Next Due On */
+            next_due_on?: string | null;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
         };
         /** DemoAccountOut */
         DemoAccountOut: {
@@ -2620,6 +2759,8 @@ export interface components {
             org_is_demo: boolean;
             /** Org Name */
             org_name: string;
+            /** Org Type */
+            org_type: string;
             /** Professional Scopes */
             professional_scopes: string[];
             /** Role */
@@ -5180,6 +5321,56 @@ export interface operations {
             };
         };
     };
+    clinic_get_dashboard: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicDashboardOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     clinic_get_demo_clock: {
         parameters: {
             query?: never;
@@ -5253,6 +5444,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DemoClockOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    clinic_record_vaccination: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ClinicVaccinationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicDashboardOut"];
                 };
             };
             /** @description Unauthorized */

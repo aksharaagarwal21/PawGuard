@@ -12,6 +12,7 @@ class MembershipOut(Out):
     org_id: UUID
     org_name: str
     org_is_demo: bool
+    org_type: str
     timezone: str
     role: str
     capabilities: list[str]

@@ -529,7 +529,9 @@
       "certificate_upload": "Certificate",
       "partner_record": "Partner record",
       "import": "Import",
-      "sync": "Offline sync"
+      "sync": "Offline sync",
+      "owner_entry": "Entered by the pet owner (unverified)",
+      "clinic_record": "Recorded at the clinic by the vet"
     }
   },
   "review": {
@@ -557,7 +559,9 @@
     "conflict": "Conflicting evidence",
     "backToQueue": "Back to queue",
     "notAuthorised": "Reviewing needs an approved veterinary authority in this organisation.",
-    "staleRow": "Someone else reviewed or changed this record. The queue has been refreshed."
+    "staleRow": "Someone else reviewed or changed this record. The queue has been refreshed.",
+    "nextDueLabel": "Next due date",
+    "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a demo schedule template, that date is used and labelled “Demo template — confirm with your vet”."
   },
   "tasks": {
     "title": "Tasks",
@@ -1286,5 +1290,41 @@
     "verifiedOnly": "Only vaccinations verified by the clinic's vet are listed. Ask the clinic if you need confirmation.",
     "notFoundTitle": "This card is not available",
     "notFoundBody": "The QR code may have been replaced or turned off by the pet's owner."
+  },
+  "clinic": {
+    "title": "Clinic dashboard",
+    "intro": "Vaccinations due for pets registered with this clinic.",
+    "upToDate": "{up} of {total} registered pets up to date",
+    "coverageNote": "Based on pets registered in this app — not population coverage.",
+    "noVerified": "{count, plural, one {# pet has} other {# pets have}} no verified record",
+    "unverifiedOnly": "{count, plural, one {# pet has} other {# pets have}} only owner-entered (unverified) records",
+    "dueThisWeek": "Due this week",
+    "overdue": "Overdue",
+    "dueSoon": "Due in 8–14 days",
+    "awaiting": "Awaiting verification",
+    "noneDueThisWeek": "Nothing due this week.",
+    "noneOverdue": "No overdue pets.",
+    "noneDueSoon": "Nothing due in 8–14 days.",
+    "noneAwaiting": "Nothing waiting for verification.",
+    "enteredByOwner": "Entered by owner",
+    "openReview": "Review",
+    "noOwner": "No owner linked",
+    "record": {
+      "title": "Record a vaccination given at the clinic",
+      "intro": "Saved as verified by you. Reminders for the owner are updated at once.",
+      "pet": "Pet",
+      "vaccine": "Vaccine",
+      "date": "Date given",
+      "nextDue": "Next due date",
+      "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a demo schedule template, that date is used and labelled “Demo template — confirm with your vet”.",
+      "lot": "Batch / lot",
+      "save": "Save vaccination",
+      "saving": "Saving…",
+      "saved": "Saved and verified.",
+      "dateRequired": "Enter the date the vaccine was given.",
+      "dateFuture": "The date cannot be in the future.",
+      "dueAfter": "The next due date must be after the vaccination date.",
+      "templateOption": "{name} (demo template: {days} days)"
+    }
   }
 }

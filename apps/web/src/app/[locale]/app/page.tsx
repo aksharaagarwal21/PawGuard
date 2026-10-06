@@ -4,14 +4,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Button, EmptyState, Notice } from "@pawguard/ui";
 
 import { PageBody } from "@/components/page-header";
-import { DemoClockControl } from "@/components/pets/demo-clock";
 import { VaccinationStateChip } from "@/components/prevention/evidence";
 import { TaskCard } from "@/components/prevention/task-card";
 import { Link, redirect } from "@/i18n/navigation";
 import { formatPartialDate } from "@/lib/format";
 import { STAFF_CAPS } from "@/lib/nav";
 import { pageContext } from "@/lib/page-context";
-import { serverEnv } from "@/lib/server-env";
 
 export default async function TodayPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -39,11 +37,6 @@ export default async function TodayPage({ params }: { params: Promise<{ locale: 
       ? ctx.api.GET("/api/v1/vaccination-review-queue", { params: { query: { limit: 100 } } })
       : Promise.resolve({ data: undefined }),
   ]);
-  // Demo organisations only: staff can move "today" to show how pet vaccination reminders progress.
-  const clockRes =
-    serverEnv().demoMode && ctx.active.org_is_demo && (ctx.can("vaccination.review") || ctx.can("report.aggregate"))
-      ? await ctx.api.GET("/api/v1/clinic/demo-clock")
-      : { data: undefined };
   const mergesRes = ctx.can("animal.merge")
     ? await ctx.api.GET("/api/v1/animal-merges", { params: { query: { state: "proposed" } } })
     : { data: undefined };
@@ -81,8 +74,6 @@ export default async function TodayPage({ params }: { params: Promise<{ locale: 
           ) : null}
         </div>
       ) : null}
-
-      {clockRes.data ? <DemoClockControl offsetDays={clockRes.data.offset_days} today={clockRes.data.today} /> : null}
 
       {waiting > 0 ? (
         <Notice tone="pending" title={t("reviewWaiting", { count: waiting })}>
