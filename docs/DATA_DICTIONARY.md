@@ -24,7 +24,7 @@ enabled **and forced**; tenant tables use the policy `org_id = app.current_org_i
 | `field_tasks.task_type` | `animal_followup`, `evidence_correction`, `identity_review` form the view `animal_followup_tasks` (ADR 0007) |
 
 
-_Schema revision: `0011`._
+_Schema revision: `0012`._
 
 
 ## ER diagram (core Prevention tables)
@@ -276,7 +276,7 @@ RLS enabled + forced.
 - `animal_vaccination_events_lot_text_check`: `CHECK ((char_length(lot_text) <= 40))`
 - `animal_vaccination_events_org_id_client_operation_id_key`: `UNIQUE (org_id, client_operation_id)`
 - `animal_vaccination_events_product_text_check`: `CHECK ((char_length(product_text) <= 200))`
-- `animal_vaccination_events_source_type_check`: `CHECK ((source_type = ANY (ARRAY['field_entry'::text, 'certificate_upload'::text, 'import'::text, 'partner_record'::text, 'sync'::text])))`
+- `animal_vaccination_events_source_type_check`: `CHECK ((source_type = ANY (ARRAY['field_entry'::text, 'certificate_upload'::text, 'import'::text, 'partner_record'::text, 'sync'::text, 'owner_entry'::text, 'clinic_record'::text])))`
 - `animal_vaccination_events_state_check`: `CHECK ((state = ANY (ARRAY['draft'::text, 'submitted'::text, 'verified'::text, 'rejected'::text, 'needs_correction'::text, 'superseded'::text])))`
 - `animal_vaccination_events_submitter_note_check`: `CHECK ((char_length(submitter_note) <= 1000))`
 
@@ -315,6 +315,7 @@ RLS enabled + forced.
 | `created_by` | uuid | yes |  |
 | `updated_at` | timestamp with time zone | no | now() |
 | `row_version` | integer | no | 1 |
+| `date_of_birth` | date | yes |  |
 
 <details><summary>Constraints</summary>
 
@@ -323,6 +324,7 @@ RLS enabled + forced.
 - `animals_check`: `CHECK (((profile_state = 'merged_alias'::text) = (merged_into_id IS NOT NULL)))`
 - `animals_check1`: `CHECK (((merged_into_id IS NULL) OR (merged_into_id <> id)))`
 - `animals_coat_description_check`: `CHECK ((char_length(coat_description) <= 300))`
+- `animals_date_of_birth_check`: `CHECK (((date_of_birth IS NULL) OR (date_of_birth <= CURRENT_DATE)))`
 - `animals_id_org_id_key`: `UNIQUE (id, org_id)`
 - `animals_identifying_marks_check`: `CHECK ((char_length(identifying_marks) <= 500))`
 - `animals_nickname_check`: `CHECK ((char_length(nickname) <= 80))`
@@ -761,6 +763,25 @@ RLS enabled + forced.
 
 Policies: `dataset_versions_read` (select, permissive, roles pawguard_api,pawguard_worker)
 
+### `app.demo_clock`
+
+RLS enabled + forced.
+
+| Column | Type | Null | Default |
+|---|---|---|---|
+| `org_id` | uuid | no |  |
+| `offset_days` | integer | no | 0 |
+| `set_by` | uuid | yes |  |
+| `updated_at` | timestamp with time zone | no | now() |
+
+<details><summary>Constraints</summary>
+
+- `demo_clock_offset_days_check`: `CHECK (((offset_days >= '-60'::integer) AND (offset_days <= 400)))`
+
+</details>
+
+Policies: `demo_clock_tenant` (all, permissive)
+
 ### `app.detection_results`
 
 RLS enabled + forced.
@@ -1103,7 +1124,7 @@ RLS enabled + forced.
 
 <details><summary>Constraints</summary>
 
-- `memberships_capabilities_check`: `CHECK ((capabilities <@ ARRAY['animal.read'::text, 'animal.write'::text, 'animal.merge'::text, 'animal.location.exact'::text, 'caregiver.read'::text, 'caregiver.write'::text, 'observation.write'::text, 'media.upload'::text, 'identity.search'::text, 'identity.decide'::text, 'vaccination.submit'::text, 'vaccination.review'::text, 'task.work'::text, 'task.manage'::text, 'campaign.manage'::text, 'survey.write'::text, 'report.aggregate'::text, 'member.manage'::text, 'professional.approve'::text, 'audit.read'::text, 'system.view'::text, 'data.import'::text, 'model.manage'::text]))`
+- `memberships_capabilities_check`: `CHECK ((capabilities <@ ARRAY['animal.read'::text, 'animal.write'::text, 'animal.merge'::text, 'animal.location.exact'::text, 'caregiver.read'::text, 'caregiver.write'::text, 'observation.write'::text, 'media.upload'::text, 'identity.search'::text, 'identity.decide'::text, 'vaccination.submit'::text, 'vaccination.review'::text, 'task.work'::text, 'task.manage'::text, 'campaign.manage'::text, 'survey.write'::text, 'report.aggregate'::text, 'member.manage'::text, 'professional.approve'::text, 'audit.read'::text, 'system.view'::text, 'data.import'::text, 'model.manage'::text, 'pet.own'::text]))`
 - `memberships_check`: `CHECK (((valid_until IS NULL) OR (valid_until > valid_from)))`
 - `memberships_check1`: `CHECK (((status = 'revoked'::text) = (revoked_at IS NOT NULL)))`
 - `memberships_id_org_id_key`: `UNIQUE (id, org_id)`
@@ -1250,6 +1271,29 @@ RLS enabled + forced.
 </details>
 
 Policies: `outbox_dispatcher` (all, permissive, roles pawguard_worker); `outbox_events_tenant` (all, permissive)
+
+### `app.pet_cards`
+
+RLS enabled + forced.
+
+| Column | Type | Null | Default |
+|---|---|---|---|
+| `id` | uuid | no | extensions.gen_random_uuid() |
+| `org_id` | uuid | no |  |
+| `animal_id` | uuid | no |  |
+| `token` | text | no |  |
+| `created_by` | uuid | no |  |
+| `created_at` | timestamp with time zone | no | now() |
+| `revoked_at` | timestamp with time zone | yes |  |
+
+<details><summary>Constraints</summary>
+
+- `pet_cards_token_check`: `CHECK ((char_length(token) >= 32))`
+- `pet_cards_token_key`: `UNIQUE (token)`
+
+</details>
+
+Policies: `pet_cards_tenant` (all, permissive)
 
 ### `app.privacy_requests`
 
@@ -1558,6 +1602,39 @@ RLS enabled + forced.
 
 Policies: `vaccination_evidence_tenant` (all, permissive)
 
+### `app.vaccination_reminders`
+
+RLS enabled + forced.
+
+| Column | Type | Null | Default |
+|---|---|---|---|
+| `id` | uuid | no | extensions.gen_random_uuid() |
+| `org_id` | uuid | no |  |
+| `animal_id` | uuid | no |  |
+| `owner_user_id` | uuid | no |  |
+| `source_event_id` | uuid | no |  |
+| `vaccine_name` | text | no |  |
+| `due_on` | date | no |  |
+| `kind` | text | no |  |
+| `show_on` | date | no |  |
+| `state` | text | no | 'pending'::text |
+| `snoozed_until` | date | yes |  |
+| `done_event_id` | uuid | yes |  |
+| `is_demo` | boolean | no | false |
+| `created_at` | timestamp with time zone | no | now() |
+| `updated_at` | timestamp with time zone | no | now() |
+| `row_version` | integer | no | 1 |
+
+<details><summary>Constraints</summary>
+
+- `vaccination_reminders_id_org_id_key`: `UNIQUE (id, org_id)`
+- `vaccination_reminders_kind_check`: `CHECK ((kind = ANY (ARRAY['due_in_14'::text, 'due_in_7'::text, 'due_in_1'::text, 'overdue'::text])))`
+- `vaccination_reminders_state_check`: `CHECK ((state = ANY (ARRAY['pending'::text, 'done'::text, 'cancelled'::text])))`
+
+</details>
+
+Policies: `reminders_tenant` (all, permissive)
+
 ### `app.vaccination_reviews`
 
 RLS enabled + forced.
@@ -1635,6 +1712,8 @@ RLS enabled + forced.
 | `created_by` | uuid | yes |  |
 | `updated_at` | timestamp with time zone | no | now() |
 | `row_version` | integer | no | 1 |
+| `template_interval_days` | integer | yes |  |
+| `template_label` | text | yes |  |
 
 <details><summary>Constraints</summary>
 
@@ -1642,6 +1721,8 @@ RLS enabled + forced.
 - `vaccine_products_name_check`: `CHECK (((char_length(name) >= 1) AND (char_length(name) <= 200)))`
 - `vaccine_products_org_id_name_key`: `UNIQUE (org_id, name)`
 - `vaccine_products_review_state_check`: `CHECK ((review_state = ANY (ARRAY['unreviewed'::text, 'reviewed'::text])))`
+- `vaccine_products_template_interval_days_check`: `CHECK (((template_interval_days IS NULL) OR ((template_interval_days >= 7) AND (template_interval_days <= 1100))))`
+- `vaccine_products_template_label_check`: `CHECK ((char_length(template_label) <= 120))`
 - `vaccine_products_unit_check`: `CHECK ((unit = ANY (ARRAY['dose'::text, 'vial'::text, 'ml'::text])))`
 
 </details>

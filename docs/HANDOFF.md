@@ -1,6 +1,6 @@
 # Handoff
 
-**Last updated:** 2026-10-06 · **Current phase:** 9 complete — demonstration build; Phases 10–14 paused by request
+**Last updated:** 2026-10-06 · **Current phase:** hackathon topic (pet vaccination tracking and reminders) built on Phases 0–9; Phases 10–14 paused by request
 **Completed:** Phases 0–9 (Phase 7 capability is research-only; see IMPLEMENTATION_STATUS) (see `IMPLEMENTATION_STATUS.md` for evidence)
 
 ## Resume checklist
@@ -12,7 +12,7 @@
 3. Verify: `bash scripts/check.sh --no-e2e`.
 
 ## Demo day
-`bash scripts/demo_up.sh --reset`, then follow `docs/DEMO_GUIDE.md`. Backup: `bash scripts/make_demo_backup.sh`
+`bash scripts/demo_up.sh --reset`, then follow `docs/DEMO_GUIDE.md` (§3a is the pet-vaccination walkthrough). Backup: `bash scripts/make_demo_backup.sh`
 (restore steps in `docs/BACKUP_RESTORE.md`). Recorded journey: `cd tests && pnpm exec playwright test
 e2e/demo-journey.spec.ts --project=desktop` (needs a prepared demo; re-run `demo-reset` + `demo_prepare.py` afterwards).
 
@@ -33,8 +33,8 @@ e2e/demo-journey.spec.ts --project=desktop` (needs a prepared demo; re-run `demo
 - ML tooling is a separate uv project: `cd ml && uv run pawid --help`; tests `uv run --group dev pytest tests`.
 
 ## State
-- Local git commits authorised (no push). Pre-audit checkpoint `2c1bb08`; see `git log` for the reviewed build.
-- Migration head: `0011`. Dataset `dogfacenet-224` v1 registered frozen (raw data under `data/raw/` is gitignored;
+- Pushed to `origin` (github.com/aksharaagarwal21/PawGuard) as the user; tag `pre-pet-topic` marks the state before the pet topic.
+- Migration head: `0012` (pet care). Dataset `dogfacenet-224` v1 registered frozen (raw data under `data/raw/` is gitignored;
   re-download per `DATA_SOURCES.md` S05, then `pawid dataset-prepare` with seed 20261006 is expected to reproduce manifest
   sha256 10a6554b… — reproducibility not yet verified by a second run).
 - Identity model `dinov2_small_arcface_head` / `ed25f3a3-resize224-head-v1` is registered **staged** with

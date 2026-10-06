@@ -8,6 +8,7 @@ for (const [label, viewport] of [
   ["desktop", { width: 1440, height: 900 }],
 ] as const) {
   test(`owner screens render without horizontal scroll (${label})`, async ({ page }) => {
+    test.setTimeout(90_000); // three pages with accessibility scans
     await page.setViewportSize(viewport);
     await signIn(page, DEMO.owner.email);
     await expect(page).toHaveURL(/\/en\/app\/pets$/);

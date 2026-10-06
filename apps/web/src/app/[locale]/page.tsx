@@ -1,4 +1,4 @@
-import { ClipboardCheck, Search, ShieldQuestion } from "lucide-react";
+import { BellRing, ClipboardCheck, FilePlus2, QrCode, Search, ShieldQuestion } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Button } from "@pawguard/ui";
@@ -10,6 +10,11 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("landing");
+  const petSteps = [
+    { key: "one", Icon: FilePlus2, bg: "bg-sage" },
+    { key: "two", Icon: BellRing, bg: "bg-sand" },
+    { key: "three", Icon: QrCode, bg: "bg-sky" },
+  ] as const;
   const steps = [
     { key: "one", Icon: Search, bg: "bg-sage" },
     { key: "two", Icon: ClipboardCheck, bg: "bg-sky" },
@@ -22,18 +27,42 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
           <h1 className="text-3xl md:text-[2.875rem] md:leading-[1.12]">{t("headline")}</h1>
           <p className="prose-pg mt-5 text-lg text-ink-2">{t("subheading")}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Button asChild variant="urgent">
-              <Link href="/help">{t("primaryAction")}</Link>
+            <Button asChild size="lg">
+              <Link href="/sign-in">{t("primaryAction")}</Link>
             </Button>
             <Button asChild variant="secondary" size="lg">
-              <a href="#prevention">{t("secondaryAction")}</a>
+              <a href="#pets">{t("secondaryAction")}</a>
+            </Button>
+            <Button asChild variant="urgent">
+              <Link href="/help">{t("bitesAction")}</Link>
             </Button>
           </div>
         </div>
         <HeroIllustration />
       </section>
 
-      <section id="prevention" className="bg-surface py-14">
+      <section id="pets" className="bg-surface py-14">
+        <div className="container-pg">
+          <h2 className="text-2xl">{t("petHowTitle")}</h2>
+          <ol className="mt-8 grid gap-6 md:grid-cols-3">
+            {petSteps.map(({ key, Icon, bg }, i) => (
+              <li key={key} className="rounded-card border border-divider p-6">
+                <span className={`flex size-11 items-center justify-center rounded-full ${bg} text-primary`}>
+                  <Icon aria-hidden className="size-5" />
+                </span>
+                <h3 className="mt-4 text-lg">
+                  <span className="text-ink-2">{i + 1}. </span>
+                  {t(`petSteps.${key}.title`)}
+                </h3>
+                <p className="mt-2 text-ink-2">{t(`petSteps.${key}.body`)}</p>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-6 text-ink-2">{t("clinicNote")}</p>
+        </div>
+      </section>
+
+      <section id="prevention" className="py-14">
         <div className="container-pg">
           <h2 className="text-2xl">{t("howTitle")}</h2>
           <ol className="mt-8 grid gap-6 md:grid-cols-3">
@@ -61,6 +90,7 @@ export default async function LandingPage({ params }: { params: Promise<{ locale
             <li>{t("transparency.one")}</li>
             <li>{t("transparency.two")}</li>
             <li>{t("transparency.three")}</li>
+            <li>{t("transparency.four")}</li>
           </ul>
         </div>
       </section>

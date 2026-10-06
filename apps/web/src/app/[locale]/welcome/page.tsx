@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { serverEnv } from "@/lib/server-env";
 
 const STEPS = ["one", "two", "three", "four"] as const;
+const PET_STEPS = ["one", "two", "three", "four", "five"] as const;
 
 /**
  * Demo welcome: how to try the demonstration, then "Let's start" → sign-in. Shown only while demo mode is on
@@ -29,6 +30,23 @@ export default async function WelcomePage({ params }: { params: Promise<{ locale
         <Notice tone="info" title={t("fictionalTitle")}>
           <p>{t("fictionalBody")}</p>
         </Notice>
+
+        <section aria-labelledby="pet-how" className="space-y-4">
+          <h2 id="pet-how" className="text-xl">{t("petHowTitle")}</h2>
+          <ol className="space-y-3">
+            {PET_STEPS.map((k, i) => (
+              <li key={k} className="flex gap-4 rounded-card border border-divider bg-surface p-4">
+                <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-full bg-primary font-display font-bold text-white">
+                  {i + 1}
+                </span>
+                <div>
+                  <p className="font-display font-semibold">{t(`petSteps.${k}.title`)}</p>
+                  <p className="text-ink-2">{t(`petSteps.${k}.body`)}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
 
         <section aria-labelledby="how" className="space-y-4">
           <h2 id="how" className="text-xl">{t("howTitle")}</h2>
@@ -64,6 +82,7 @@ export default async function WelcomePage({ params }: { params: Promise<{ locale
 
         <Notice tone="pending" title={t("limitsTitle")}>
           <ul className="list-disc space-y-1 pl-5">
+            <li>{t("limits.reminders")}</li>
             <li>{t("limits.matching")}</li>
             <li>{t("limits.offline")}</li>
             <li>{t("limits.language")}</li>

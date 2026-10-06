@@ -10,6 +10,8 @@ import { DEMO, signIn } from "./helpers";
  * with a next due date → the owner sees "Up to date" and the reminder is gone → the vet moves the demo date and the
  * clinic dashboard shows Misty due this week.
  */
+test.skip(({ isMobile }) => isMobile, "journey changes demo data, so it runs once (desktop project; it covers 390 px itself)");
+
 const CERT = path.resolve(import.meta.dirname, "../fixtures/synthetic-certificate.jpg");
 
 function inDays(days: number): string {

@@ -18,6 +18,7 @@ Legend: ✅ done and checked · 🟡 partly done · ⛔ blocked (external) · �
 | 7 PawID train/eval | ✅ integration built and tested | DogFaceNet research benchmark only; ⛔ permissioned field identity data | — | ⛔ release gate not met → research preview in demo orgs only | See Phase 7 log |
 | 8 Offline + planning | ✅ | demo data only; ⛔ no real travel-time matrix | — | ⛔ not field-tested on real devices/connectivity | See Phase 8 log |
 | 9 Prevention release audit | ✅ demo-ready | fictional demo data only | ⛔ vet/clinical review of wording | ⛔ no field or real-phone testing | See Phase 9 log and RELEASE_REPORT_PREVENTION.md |
+| Pet topic | ✅ demo-ready | fictional demo data only | ⛔ wording and templates not vet-reviewed; ta draft | ⛔ no owner/clinic testing | Hackathon topic: pet vaccination tracking and reminders (below) |
 | 10–15 | ⬜ | | | | Not started; Prevention first |
 
 ## Phase 0 — Investigate, resolve dependencies, plan (2026-10-05) ✅
@@ -382,6 +383,32 @@ tabs hidden at 360 px; `crypto.randomUUID` failing outside secure contexts; ESLi
 skipped (full run) and 13 / 0 / 11 on the demo-critical re-run after the final fixes; gate script exit 0.
 
 **Not done:** real-phone and poor-network testing; clinical review; translation review; field identity data.
+
+## Hackathon topic — Pet vaccination tracking and reminders (2026-10-06) ✅ (demo-ready; fictional data)
+
+Built on the existing ledger, workbench, row security, outbox and design system (migration `0012_pet_care`).
+Safety tag before the work: `pre-pet-topic`.
+
+**Built:** pet owner role (`resident` → `pet.own`; no registry-wide read) and *My pets* (add pet with photo, status,
+timeline with "verified by vet" / "entered by owner (unverified)" / "no verified record"); owner-entered records with
+certificate go to the vet workbench; reminders 14/7/1 days before and overdue, idempotent and rescheduled in the
+vet's review transaction, snooze 1/3 days, mark done with certificate (rejection brings it back), bell, real `.ics`,
+notification preview (nothing sent); staff-only demo date (demo organisations only); QR card with random revocable
+token, public page (verified only, disclaimer), PDF; clinic dashboard (due this week / 8–14 days / overdue /
+awaiting verification, "X of Y registered pets up to date — not population coverage"); vet clinic record with next
+due date; next due date in the existing review dialog; landing/welcome reframed; Tamil labels (draft, pending
+review); seed: 2 fictional clinics, 1 owner with 3 pets, 1 vet, 2 clinic managers, 1 owner upload awaiting
+verification (`demo_prepare.py`), included in demo reset.
+
+**Fixed on the way:** the ignore rule `models/` had kept the API's ORM package and the model manifests out of Git
+(commit `70d63c9`).
+
+**Tests:** see the final report in the session log; pytest `tests/test_petcare.py` covers status boundaries,
+reminder idempotency/rescheduling, owner/vet/clinic permissions, demo clock and cards; Playwright `pet-journey`,
+`pet-card`, `pets-screens` (390 px and desktop, axe).
+
+**Not done / demo-only:** no real messages; schedule templates are demo data; Tamil labels unreviewed; PDF Latin
+font only; no testing with real owners or clinics.
 
 ## Backlog mapped to phases
 

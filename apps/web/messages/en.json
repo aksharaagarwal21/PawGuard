@@ -86,11 +86,11 @@
     "remindersBellCount": "{count, plural, one {# reminder} other {# reminders}} today"
   },
   "landing": {
-    "headline": "Care for people. Protect community animals.",
-    "subheading": "PawGuard helps community programmes keep trustworthy animal vaccination records and coordinate field work — and helps anyone bitten by an animal find what to do next.",
-    "primaryAction": "Get help after a bite",
-    "secondaryAction": "Explore prevention",
-    "howTitle": "How prevention work fits together",
+    "headline": "Never miss your pet's next vaccination.",
+    "subheading": "PawGuard keeps your pet's vaccination records in one place, reminds you before each due date and lets your clinic's vet verify every record. Clinics see which registered pets are due or overdue.",
+    "primaryAction": "Sign in to My pets",
+    "secondaryAction": "How it works",
+    "howTitle": "Also in PawGuard: community animal programmes",
     "steps": {
       "one": {
         "title": "Find or register the animal",
@@ -109,9 +109,27 @@
     "transparency": {
       "one": "PawGuard does not diagnose rabies and cannot tell whether an animal is safe.",
       "two": "A vaccination record shows that a vaccine was recorded as given. It is not a guarantee about the animal.",
-      "three": "Health guidance on this site is starter content until a qualified local reviewer approves it. Each page shows its source and review status."
+      "three": "Health guidance on this site is starter content until a qualified local reviewer approves it. Each page shows its source and review status.",
+      "four": "PawGuard only reminds. Next due dates come from your vet, or from a demo schedule template labelled “confirm with your vet”. It never decides treatment."
     },
-    "releaseNote": "This release covers prevention record-keeping. Learning resources and a facility directory are planned for later releases."
+    "releaseNote": "Community programmes use the same verified vaccination records. Learning resources and a facility directory are planned for later releases.",
+    "bitesAction": "Get help after a bite",
+    "petHowTitle": "How pet vaccination tracking works",
+    "petSteps": {
+      "one": {
+        "title": "Add your pet and past vaccinations",
+        "body": "Upload the certificate. Your entry stays marked “entered by owner (unverified)” until the clinic's vet checks it."
+      },
+      "two": {
+        "title": "Get reminders before each due date",
+        "body": "In the app 14, 7 and 1 day before, and again if overdue. Snooze, mark as done or add the date to your calendar."
+      },
+      "three": {
+        "title": "Show a QR vaccination card",
+        "body": "Verified vaccinations only. Replace or turn off the QR code at any time."
+      }
+    },
+    "clinicNote": "For clinics: a dashboard of registered pets due this week, overdue or awaiting verification, and a workbench where an approved vet verifies owner uploads and sets the next due date."
   },
   "help": {
     "title": "Bitten or scratched by an animal?",
@@ -1051,10 +1069,10 @@
   },
   "welcome": {
     "title": "Welcome to the PawGuard 360 demo",
-    "intro": "PawGuard helps community rabies programmes keep trustworthy animal vaccination records: field volunteers record animals and evidence, and an approved veterinary reviewer verifies it.",
+    "intro": "PawGuard helps pet owners keep vaccination records and get reminders before each due date, with every record verified by the clinic's vet. It also supports community rabies programmes.",
     "fictionalTitle": "Everything here is fictional",
     "fictionalBody": "The organisations, people and animals are demo data. Sign in with the one-click demo accounts on the next page — no password needed. Please don't upload photos of people or private places.",
-    "howTitle": "Try it in four steps (about 3 minutes)",
+    "howTitle": "Community dog programmes: try it in four steps (about 3 minutes)",
     "steps": {
       "one": {
         "title": "Sign in as Priya (field volunteer)",
@@ -1084,10 +1102,34 @@
       "matching": "Photo matching is a research preview: tested only on a set of pet-dog face photos, not on community dogs, and it does not pass our own accuracy bar. Suggestions are never automatic — a person decides.",
       "offline": "Offline mode covers tasks and sightings only; photos and vaccination evidence need a connection.",
       "language": "Tamil and Hindi are partial drafts; some screens appear in English.",
-      "reset": "Demo data may be reset at any time."
+      "reset": "Demo data may be reset at any time.",
+      "reminders": "Reminders are in-app only: email and SMS texts are previews, nothing is sent. Seeded due dates are fictional; the app only reminds and never decides treatment."
     },
     "start": "Let's start",
-    "aboutLink": "About PawGuard"
+    "aboutLink": "About PawGuard",
+    "petHowTitle": "Pet vaccination reminders: try it in five steps (about 2 minutes)",
+    "petSteps": {
+      "one": {
+        "title": "Sign in as Neha (pet owner)",
+        "body": "Click “Let's start”, then “Sign in as Neha”. Three demo pets: Bruno is up to date, Misty is due soon, Coco is overdue."
+      },
+      "two": {
+        "title": "Act on a reminder",
+        "body": "Open “Reminders”. Open “Notification preview” (nothing is sent) or “Add to calendar”. On Coco's reminder choose “Mark as done”, add the sample certificate below and save."
+      },
+      "three": {
+        "title": "Verify as the clinic vet",
+        "body": "Sign out, choose “Sign in as Dr Kiran”, open “Clinic”. Under “Awaiting verification” choose “Review” for Coco, then “Verify” with a next due date."
+      },
+      "four": {
+        "title": "Move the demo date",
+        "body": "On the clinic dashboard choose “+7 days”: Misty moves to “Due this week”. Choose “Back to the real date” when done."
+      },
+      "five": {
+        "title": "Show the QR card",
+        "body": "Sign in as Neha again: Coco is up to date. Open Coco → “Vaccination card (QR)” to see the QR code, the public card and the PDF."
+      }
+    }
   },
   "modelEvidence": {
     "title": "Model evidence: photo matching",

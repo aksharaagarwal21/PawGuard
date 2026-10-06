@@ -72,6 +72,10 @@ password is documented in `README.md` for development use only.
 | Volunteer | **Sign in as Priya** | Demo — Riverside Animal Welfare Trust |
 | Veterinary reviewer | **Sign in as Dr Arun** | Riverside (approved reviewer) |
 | Coordinator | **Sign in as Meena** | Riverside coordinator (also a volunteer at Hillview — choose Riverside under **More → Switch organisation** if needed) |
+| Pet owner | **Sign in as Neha** | Demo — Lotus Pet Clinic (fictional): Bruno (up to date), Misty (due soon), Coco (overdue) |
+| Clinic vet | **Sign in as Dr Kiran** | Lotus (approved veterinary reviewer) |
+| Clinic manager | **Sign in as Asha** | Lotus (dashboard and counts; cannot verify) |
+| Another clinic | **Sign in as Vikram** | Demo — Banyan Veterinary Centre (fictional): sees none of Lotus's pets |
 
 Tip: open Priya in a normal window and Dr Arun in a private window so you don't have to sign out between steps.
 
@@ -80,7 +84,22 @@ Tip: open Priya in a normal window and Dr Arun in a private window so you don't 
   (a licence-filtered COCO photo; the same picture was enrolled for animal **PG-MGZ2-GBBN** by `demo_prepare.py`)
 - Certificate: `C:\PawGuard\tests\fixtures\synthetic-certificate.jpg`
 
-## 3. Three-minute walkthrough
+## 3a. Pet vaccination reminders — two-minute walkthrough (the hackathon topic)
+
+Prepare with `bash scripts/demo_up.sh --reset` (seeds the three pets and submits one owner upload for Bruno).
+Certificate to upload: `C:\PawGuard\tests\fixtures\synthetic-certificate.jpg` (also on the welcome page).
+
+| # | Do | You should see | Say |
+|---|---|---|---|
+| 1 | **Sign in as Neha** | *My pets*: Bruno **Up to date**, Misty **Due soon**, Coco **Overdue**; bell shows **2** | "An owner sees one clear status per pet. Every date comes from the vet." |
+| 2 | **Reminders** → on Coco open **Notification preview** | Email and SMS text, "Preview only — no message is actually sent." | "Reminders appear 14, 7 and 1 day before and when overdue. In the demo nothing is sent." |
+| 3 | Coco → **Add to calendar (.ics)** (optional) → **Mark as done** → certificate → **Mark as done** | "Saved. The clinic's vet will check the certificate." Coco is still **Overdue**, "1 record is waiting…" | "An owner's entry never counts until a vet verifies it." |
+| 4 | Sign out → **Sign in as Dr Kiran** → **Clinic** | "2 of 3 registered pets up to date — Based on pets registered in this app — not population coverage."; *Awaiting verification*: Bruno and Coco (**Entered by owner**) | "The clinic sees who is due this week, overdue or waiting." |
+| 5 | Coco → **Review** → **Verify** → **Next due date** one year ahead → **Verify** | Record verified | "Only an approved vet verifies; the vet sets the next due date." |
+| 6 | **Clinic** → **+7 days** | Misty moves to **Due this week**; then **Back to the real date** | "A demo-only clock shows how reminders progress; stored dates never change." |
+| 7 | Sign in as Neha → Coco → **Vaccination card (QR)** → open the link | Coco **Up to date**, verified vaccinations only, "This card shows recorded vaccinations. It is not a health guarantee." | "A groomer or boarding kennel can scan it. The owner can replace or turn off the QR code." |
+
+## 3. Three-minute walkthrough (community dog programmes)
 
 | # | Do (exact clicks and inputs) | You should see | Say |
 |---|---|---|---|
@@ -93,7 +112,7 @@ Tip: open Priya in a normal window and Dr Arun in a private window so you don't 
 | 7 | Switch to Dr Arun's window (or **Sign out** → **Sign in as Dr Arun**) → menu **Review** → click **PG-MGZ2-GBBN** in *Waiting for review* | **Verification workbench** with the record and the certificate | "Only an approved veterinary reviewer, who didn't submit it, can verify." |
 | 8 | **Verify** → read the dialog → **Verify** | Dialog text: verifying "does not certify that the animal cannot carry or transmit disease"; then **Record verified.** | "We are careful about what a record means." |
 | 9 | Priya's window → open PG-MGZ2-GBBN (Animals → search `PG-MGZ2-GBBN`) → press **F5** | **Last verified vaccination record: <date>** and "It does not mean the animal cannot carry or transmit disease." — still there after refresh | "It's stored server-side with a full audit trail, and another organisation can't see any of it." |
-| 10 (close) | — | — | "Photo matching is research-only: on a pet-dog face benchmark the right dog was among 3 suggestions 89% of the time, but it suggested a dog for 11% of unknown animals — above our 10% limit — and it hasn't been tested on street dogs. Real organisations can't switch it on. Field data and clinical review are next." |
+| 10 (close) | — | — | "Photo matching is research-only: on DogFaceNet pet-dog face photos the right dog was ranked first 94% of the time, but 16% of unknown dogs got a confident match — above our 5% target — and it hasn't been tested on street dogs. Real organisations can't switch it on. Field data and clinical review are next." |
 
 **If matching shows "No confident match — check manually or register a new dog"** (e.g. after a reset without `demo_prepare.py`): say "it found no
 similar animal — that doesn't prove the dog is new", click **Search the registry instead**, open any animal, and
@@ -148,17 +167,21 @@ Not available offline (by design): photos, vaccination evidence, registering ani
 ## 6. Limitations to state honestly
 
 - **Fictional data only**; no real programme, clinician or field team has used it.
-- **Photo matching is research-only.** Evaluated once on a test split of the DogFaceNet face benchmark (pet dogs,
-  aligned face crops, unreviewed labels): 147 enrolled + 63 unknown identities, 479 known + 336 unknown queries;
-  right animal among shown candidates **0.887** (95% CI 0.852–0.920); a suggestion for an unknown animal **0.107**
-  (0.056–0.169) at the threshold 0.538 chosen on validation. Release gate (field photos of community dogs, unknown
-  false suggestions ≤ 0.10) **not met**. Street dogs **not tested**. The demo match uses the same photo that was
-  enrolled, so it shows the workflow, not accuracy.
+- **Photo matching is research-only.** Evaluated with the model frozen on DogFaceNet (close-up face photos of pet
+  dogs), 201 test dogs never used for training: right dog ranked first **0.943** (95% CI 0.914–0.970), in the top 3
+  **0.990**; unknown dogs given a confident match **0.160** (0.068–0.252) at the threshold 0.513 chosen on validation
+  dogs — the 5% target was **not met**. Street dogs **not tested**. Details: **Model evidence** page. The demo match
+  uses the same photo that was enrolled, so it shows the workflow, not accuracy.
 - **Offline**: tasks and sightings only; no offline photos or vaccination evidence; not yet tested on real phones.
 - **Tamil and Hindi** are partial drafts: many screens fall back to English with a "draft translation" notice.
 - **Planning** uses straight-line travel estimates and estimates from single street counts or registry records —
   not population or coverage.
 - Health and first-aid wording has **not** been reviewed by clinicians.
+- **Pet reminders are in-app only.** Email/SMS texts are previews; nothing is sent. The `.ics` file is real.
+  Seeded pets, clinics, products and due dates are fictional; product schedule templates are demo data labelled
+  "Demo template — confirm with your vet" — the app only reminds and never decides treatment.
+- The clinic count describes **pets registered in this app**, not population coverage.
+- The PDF card uses a built-in Latin font: names in Tamil script print as "?" in the PDF (the web card is fine).
 
 ## 7. Making the backup video yourself (checklist)
 
