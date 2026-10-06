@@ -104,8 +104,8 @@ def get_storage() -> StorageBackend:
     s = get_settings()
     if s.supabase_secret_key is None:
         raise ServiceUnavailable("File storage is not configured.", code="storage_not_configured")
-    return SupabaseStorage(s.supabase_url, s.supabase_public_url or s.supabase_url,
-                           s.supabase_secret_key.get_secret_value(), s.storage_bucket)
+    public = "" if s.storage_same_origin else (s.supabase_public_url or s.supabase_url)
+    return SupabaseStorage(s.supabase_url, public, s.supabase_secret_key.get_secret_value(), s.storage_bucket)
 
 
 def quarantine_key(org_id: object, media_id: object) -> str:

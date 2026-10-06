@@ -39,6 +39,17 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   transpilePackages: ["@pawguard/ui", "@pawguard/api-client"],
   outputFileTracingRoot: path.resolve(import.meta.dirname, "../.."),
+  // Same-origin access to *signed* storage links only, used when the API hands out relative links
+  // (PAWGUARD_STORAGE_SAME_ORIGIN=true, e.g. behind a public tunnel). Auth, database and other Supabase
+  // endpoints are never forwarded; the signed token in each link still controls access.
+  async rewrites() {
+    const supabase = (process.env.PAWGUARD_SUPABASE_URL ?? "").replace(/\/$/, "");
+    if (!supabase) return [];
+    return [
+      { source: "/storage/v1/object/sign/:path*", destination: `${supabase}/storage/v1/object/sign/:path*` },
+      { source: "/storage/v1/object/upload/sign/:path*", destination: `${supabase}/storage/v1/object/upload/sign/:path*` },
+    ];
+  },
   async headers() {
     return [
       {

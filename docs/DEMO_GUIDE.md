@@ -39,6 +39,26 @@ Get-NetTCPConnection -LocalPort 3000 -State Listen | ForEach-Object { Stop-Proce
 npx --yes supabase@2.119.0 stop --workdir infra    # optional: stops the database containers
 ```
 
+## 1b. Temporary public link (for judges' phones)
+
+The app can be reached from any device through a temporary HTTPS address (Cloudflare Quick Tunnel, no account).
+It runs **from this laptop**: it stops if the laptop sleeps, loses internet, or the services stop, and the address
+changes every time it is started. Anyone with the link can use the fictional demo accounts — stop it after the
+event.
+
+```powershell
+.\scripts\public_link.ps1          # prints PUBLIC LINK: https://<random>.trycloudflare.com/en/sign-in
+.\scripts\public_link.ps1 --stop   # stops the public address (local app keeps running)
+```
+
+What it does: downloads the official `cloudflared` into `.tools\` (first time), starts the tunnel, adds the address to
+`PAWGUARD_EXTRA_WEB_ORIGINS` and sets `PAWGUARD_STORAGE_SAME_ORIGIN=true` in `.env` (photos are then served through
+the web app's signed-link paths only), restarts the API and web, and checks the public page answers. Because it is
+HTTPS, phones can also try the offline field kit through it.
+
+Verified on 6 October through a public link: the full §3 journey (sign-in, photo upload, possible match,
+confirmation, evidence, verification, refresh) passed, and photos loaded remotely.
+
 ## 2. Demo accounts
 
 On the sign-in page, under **Demo accounts (development only)**, click **Sign in as …** — no password needs to be
@@ -103,7 +123,8 @@ Backups and full restoration: `docs/BACKUP_RESTORE.md`.
 ## 5. Real-phone check (Android Chrome recommended)
 
 Offline mode needs a **secure context**: `https://…` or `http://localhost`. On plain `http://<laptop-ip>:3000` the
-offline page cannot be stored (forms still work).
+offline page cannot be stored (forms still work). Easiest: use the public HTTPS link (§1b) on the phone; or the
+USB port-forwarding steps below.
 
 1. Phone: Settings → Developer options → **USB debugging** on; connect by USB.
 2. Laptop Chrome: `chrome://inspect` → **Port forwarding…** → add `3000` → `localhost:3000`, tick *Enable*.

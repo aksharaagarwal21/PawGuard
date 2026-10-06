@@ -15,6 +15,8 @@ const schema = z.object({
     .transform((v) => v === "true"),
   PAWGUARD_API_INTERNAL_URL: z.string().url(),
   PAWGUARD_WEB_ORIGIN: z.string().url(),
+  /** Comma-separated extra origins the app is also served from (e.g. a temporary public tunnel). */
+  PAWGUARD_EXTRA_WEB_ORIGINS: z.string().optional(),
   PAWGUARD_SUPABASE_URL: z.string().url(),
   PAWGUARD_SUPABASE_PUBLIC_URL: z.string().url().optional(),
   PAWGUARD_SUPABASE_PUBLISHABLE_KEY: z.string().min(10),

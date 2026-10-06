@@ -74,7 +74,10 @@ def main() -> None:
     data = photo.read_bytes()
     intent = api.post("/api/v1/media/upload-intents", json={"purpose": "animal_photo", "content_type": "image/jpeg",
                                                              "byte_size": len(data)}).json()
-    httpx.put(intent["upload_url"], content=data, headers=intent["headers"], timeout=30).raise_for_status()
+    upload_url = intent["upload_url"]
+    if upload_url.startswith("/"):  # same-origin storage links (public-link mode): go to local Supabase directly
+        upload_url = s.supabase_url.rstrip("/") + upload_url
+    httpx.put(upload_url, content=data, headers=intent["headers"], timeout=30).raise_for_status()
     mid = intent["media_id"]
     api.post(f"/api/v1/media/{mid}/complete").raise_for_status()
     wait(lambda: api.get(f"/api/v1/media/{mid}").json()["state"] == "approved", "photo validation")

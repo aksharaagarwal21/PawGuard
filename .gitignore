@@ -54,3 +54,6 @@ data/derived/
 
 # Local database backups (contain demo accounts and data; never commit)
 backups/
+
+# Downloaded helper tools (e.g. cloudflared for the temporary public link)
+.tools/

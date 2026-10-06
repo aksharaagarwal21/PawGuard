@@ -35,6 +35,7 @@ def _with_db(url: str) -> str:
 
 os.environ["PAWGUARD_ENV"] = "test"
 os.environ["PAWGUARD_DEMO_MODE"] = "false"
+os.environ["PAWGUARD_STORAGE_SAME_ORIGIN"] = "false"  # tests fetch signed links directly
 os.environ["PAWGUARD_DATABASE_URL"] = _with_db(os.environ["PAWGUARD_DATABASE_URL"])
 os.environ["PAWGUARD_WORKER_DATABASE_URL"] = _with_db(os.environ["PAWGUARD_WORKER_DATABASE_URL"])
 os.environ["PAWGUARD_MIGRATE_DATABASE_URL"] = _with_db(os.environ["PAWGUARD_MIGRATE_DATABASE_URL"])

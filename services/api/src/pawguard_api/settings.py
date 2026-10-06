@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     # Supabase: internal URL used by the API/worker; public URL is what browsers can reach.
     supabase_url: str
     supabase_public_url: str | None = None
+    # True: hand browsers same-origin storage links (/storage/v1/object/...), which the web app forwards to Supabase.
+    # Used when the app is reached through a public address (e.g. a tunnel) that cannot reach Supabase directly.
+    storage_same_origin: bool = False
     supabase_secret_key: SecretStr | None = None
     storage_bucket: str = "pawguard-media"
 

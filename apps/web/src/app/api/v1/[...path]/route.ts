@@ -29,10 +29,13 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
 
   if (!SAFE.has(request.method)) {
     const origin = request.headers.get("origin");
-    const expected = new URL(env.PAWGUARD_WEB_ORIGIN).origin;
+    const allowed = [env.PAWGUARD_WEB_ORIGIN, ...(env.PAWGUARD_EXTRA_WEB_ORIGINS ?? "").split(",")]
+      .map((o) => o.trim())
+      .filter(Boolean)
+      .map((o) => new URL(o).origin);
     const store = await cookies();
     const csrfCookie = store.get(CSRF_COOKIE)?.value;
-    if (origin !== expected || !csrfCookie || request.headers.get(CSRF_HEADER) !== csrfCookie) {
+    if (!origin || !allowed.includes(origin) || !csrfCookie || request.headers.get(CSRF_HEADER) !== csrfCookie) {
       return errorJson(403, "csrf_failed", "This request could not be verified. Reload the page and try again.");
     }
   }
