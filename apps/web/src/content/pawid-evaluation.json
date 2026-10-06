@@ -1,0 +1,204 @@
+{
+ "title": "PawID evaluation on DogFaceNet (pet dog face photos)",
+ "caveat": "DogFaceNet: aligned face crops of pet dogs (web photos). Not full-body photos of Indian community dogs in the field; no capture-session information, so same-session look-alike photos cannot be fully ruled out; small sample. Not evidence of street-dog accuracy.",
+ "created_at": "2026-10-06T12:38:00+00:00",
+ "seed": 20261007,
+ "commit": "2cee3a614f820d4f6f086e01b5d306cb0cd35924",
+ "command": "cd ml && uv run pawid dfn-clean && uv run pawid dfn-split && uv run pawid dfn-eval",
+ "model": {
+  "name": "dinov2_small_arcface_head",
+  "version_label": "ed25f3a3-resize224-head-v1",
+  "artifact_sha256": "ec0c294f1a555521df474e18df6cdf2e51e2b614b0f2f402f07ba9dc065113ea",
+  "frozen": true,
+  "detector": "skipped — DogFaceNet images are already face crops",
+  "embedding": "384-d, L2-normalised (DINOv2 ViT-S/14 + projection head trained on DogFaceNet v1 train identities, which are excluded here)"
+ },
+ "dataset": {
+  "source": "Zenodo 12578449, DogFaceNet_224resized (CC BY 4.0)",
+  "split_sha256": "90dd880956fe5fd701179dadb88461e2f12d8a7e75545e1294ddbcd53f948575",
+  "split_manifest": "ml/eval/dogfacenet/split_manifest.json",
+  "counts": {
+   "validation": {
+    "known_identities": 68,
+    "gallery_images": 136,
+    "known_queries": 274,
+    "known_query_identities": 68,
+    "unknown_identities": 22,
+    "unknown_queries": 133
+   },
+   "test": {
+    "known_identities": 151,
+    "gallery_images": 302,
+    "known_queries": 577,
+    "known_query_identities": 151,
+    "unknown_identities": 50,
+    "unknown_queries": 300
+   }
+  }
+ },
+ "selection_on_validation": {
+  "criterion": "max known-dog top-1 correct-and-confident rate with unknown-dog false-match rate ≤ 5%; tie-break top-1",
+  "candidates": [
+   {
+    "aggregation": "max",
+    "tau": 0.50836,
+    "val_unknown_false_match": 0.0451,
+    "val_known_correct_accepted": 0.8285,
+    "val_top1": 0.938
+   },
+   {
+    "aggregation": "centroid",
+    "tau": 0.51254,
+    "val_unknown_false_match": 0.0451,
+    "val_known_correct_accepted": 0.8358,
+    "val_top1": 0.9453
+   }
+  ],
+  "chosen_aggregation": "centroid",
+  "threshold": 0.51254
+ },
+ "test": {
+  "pawid_dinov2s_head": {
+   "top1": {
+    "value": 0.9428,
+    "ci95": [
+     0.9136,
+     0.9699
+    ]
+   },
+   "top3": {
+    "value": 0.9896,
+    "ci95": [
+     0.9793,
+     0.9982
+    ]
+   },
+   "map_image": {
+    "value": 0.9072,
+    "ci95": [
+     0.8637,
+     0.9437
+    ]
+   },
+   "fpir": {
+    "value": 0.16,
+    "ci95": [
+     0.0678,
+     0.2515
+    ]
+   },
+   "known_top1_correct_accepted": {
+    "value": 0.8527,
+    "ci95": [
+     0.7816,
+     0.9216
+    ]
+   },
+   "false_rejection": {
+    "value": 0.1231,
+    "ci95": [
+     0.0596,
+     0.1922
+    ]
+   },
+   "known_top1_wrong_accepted": {
+    "value": 0.0243,
+    "ci95": [
+     0.0071,
+     0.0456
+    ]
+   }
+  },
+  "dinov2s_backbone_cls": {
+   "top1": {
+    "value": 0.9168,
+    "ci95": [
+     0.8715,
+     0.9592
+    ]
+   },
+   "top3": {
+    "value": 0.974,
+    "ci95": [
+     0.9515,
+     0.9907
+    ]
+   },
+   "map_image": {
+    "value": 0.8665,
+    "ci95": [
+     0.8137,
+     0.912
+    ]
+   }
+  },
+  "color_histogram": {
+   "top1": {
+    "value": 0.3726,
+    "ci95": [
+     0.3018,
+     0.4515
+    ]
+   },
+   "top3": {
+    "value": 0.4905,
+    "ci95": [
+     0.4165,
+     0.5729
+    ]
+   },
+   "map_image": {
+    "value": 0.3667,
+    "ci95": [
+     0.3074,
+     0.4381
+    ]
+   }
+  },
+  "random": {
+   "top1": {
+    "value": 0.0035,
+    "ci95": [
+     0.0,
+     0.0093
+    ]
+   },
+   "top3": {
+    "value": 0.0173,
+    "ci95": [
+     0.0078,
+     0.0282
+    ]
+   },
+   "map_image": {
+    "value": 0.0248,
+    "ci95": [
+     0.0208,
+     0.0294
+    ]
+   }
+  }
+ },
+ "metric_definitions": {
+  "top1/top3": "known-dog queries whose correct dog is ranked 1st / within the first 3 (closed set)",
+  "map_image": "mean average precision over gallery images (2 relevant images per known query)",
+  "fpir": "unknown-dog queries wrongly given a confident match (best score ≥ threshold)",
+  "known_top1_correct_accepted": "known-dog queries whose top-1 is the correct dog AND above the threshold",
+  "false_rejection": "known-dog queries answered 'no confident match' (best score < threshold)",
+  "known_top1_wrong_accepted": "known-dog queries confidently matched to the WRONG dog",
+  "ci95": "percentile bootstrap over identities, 1,000 resamples (known and unknown dogs resampled separately)"
+ },
+ "timing": {
+  "images": 1722,
+  "batched_total_s": 125.1,
+  "batched_ms_per_image": 72.6,
+  "single_image_ms_median": 101.8,
+  "single_image_ms_mean": 105.1,
+  "single_image_n": 50,
+  "single_image_includes": "JPEG decode + preprocessing + ONNX inference, 4 threads",
+  "search_ms_per_query": 0.005,
+  "search": "exact cosine over 302 test gallery images, numpy",
+  "machine": "this laptop (Intel i7-1255U, CPU only)"
+ },
+ "source": "ml/eval/dogfacenet/results.json"
+}

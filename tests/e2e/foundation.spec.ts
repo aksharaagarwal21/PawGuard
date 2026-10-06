@@ -5,7 +5,8 @@ import { DEMO, expectNoAxeViolations, signIn } from "./helpers";
 test.describe("public access (no account)", () => {
   test("a visitor reaches urgent guidance and phone numbers without signing in", async ({ page }) => {
     await page.goto("/");
-    await expect(page).toHaveURL(/\/en$/);
+    // Demo builds open on the instructions page; real deployments on the landing page. Both offer urgent help.
+    await expect(page).toHaveURL(/\/en(\/welcome)?$/);
     await page.getByRole("link", { name: "Get help after a bite" }).first().click();
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Bitten or scratched by an animal?");
     await expect(page.getByText("for at least 15 minutes")).toBeVisible();

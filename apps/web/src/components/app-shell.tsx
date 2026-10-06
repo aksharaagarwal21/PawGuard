@@ -1,4 +1,4 @@
-import { Activity, Backpack, CalendarRange, Camera, ClipboardCheck, FileSpreadsheet, House, ListChecks, Map, Menu, PawPrint } from "lucide-react";
+import { Activity, Backpack, CalendarRange, Camera, FlaskConical, ClipboardCheck, FileSpreadsheet, House, ListChecks, Map, Menu, PawPrint } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { StatusChip } from "@pawguard/ui";
@@ -26,6 +26,7 @@ const ICONS: Record<NavItem["icon"], React.ComponentType<{ className?: string; "
   imports: FileSpreadsheet,
   field: Backpack,
   campaigns: CalendarRange,
+  modelEvidence: FlaskConical,
   system: Activity,
 };
 

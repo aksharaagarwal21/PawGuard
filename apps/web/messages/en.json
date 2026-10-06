@@ -78,7 +78,8 @@
     "registerAnimal": "Register an animal",
     "imports": "Data imports",
     "field": "Offline field kit",
-    "campaigns": "Campaign planning"
+    "campaigns": "Campaign planning",
+    "modelEvidence": "Model evidence"
   },
   "landing": {
     "headline": "Care for people. Protect community animals.",
@@ -802,8 +803,8 @@
     "confirmAction": "Yes, same animal",
     "completedTitle": "Compare carefully before deciding",
     "completedBody": "These are animals whose photos look similar. They are suggestions, not identifications — similar-looking dogs are common. If none is clearly the same animal, choose \"None of these\" or \"Not sure\".",
-    "noCandidateTitle": "No similar animals found",
-    "noCandidateBody": "No photo among the {n} animals with photos on record looked similar enough. This does not prove the animal is new — search the registry by description before registering.",
+    "noCandidateTitle": "No confident match — check manually or register a new dog",
+    "noCandidateBody": "None of the {n} animals with photos on record reached the confidence threshold, so no suggestion is shown. This does not prove the dog is new: search the registry by description, or register it if you are sure.",
     "staleTitle": "Results may be incomplete",
     "staleBody": "Some recent photos have not been added to the comparison yet, so a matching animal could be missing. Search the registry as well.",
     "qualityTitle": "The chosen area is too small to compare",
@@ -1079,5 +1080,54 @@
     },
     "start": "Let's start",
     "aboutLink": "About PawGuard"
+  },
+  "modelEvidence": {
+    "title": "Model evidence: photo matching",
+    "intro": "What we measured about the photo-matching research preview, on a public dataset, with the model frozen.",
+    "caveatTitle": "Read this first",
+    "caveatLine": "Evaluated on DogFaceNet pet face photos; not yet validated on street dogs.",
+    "caveatBody": "DogFaceNet is a public set of close-up face photos of pet dogs. Our field photos are full-body photos of community dogs, taken outdoors in very different conditions, so these numbers do not tell us how well matching works in the field.",
+    "statusChip": "Research preview",
+    "status": "Offered only in demo organisations, always with a person deciding. Our release bar is not met, so real organisations cannot use it.",
+    "whatTitle": "What was tested",
+    "what": "{known} known dogs had {gallery} photos on record (2 each); {knownQ} other photos of them were searched. {unknown} more dogs were never put on record; their {unknownQ} photos should get no confident match. None of these dogs were used to build the model, and the settings were chosen beforehand on {valDogs} separate validation dogs.",
+    "threshold": "Confidence threshold {tau} (similarity to the average of a dog's photos on record), chosen on the validation dogs to keep false matches for unknown dogs at or below 5 %.",
+    "closedTitle": "Is the right dog ranked first? (known dogs only)",
+    "colMethod": "Method",
+    "colTop1": "Right dog first",
+    "colTop3": "Right dog in top 3",
+    "colMap": "mAP",
+    "methods": {
+      "pawid": "PawID (our model)",
+      "backbone": "Base model without our training",
+      "histogram": "Colour histogram (simple baseline)",
+      "random": "Random guess (chance)"
+    },
+    "closedNote": "{q} searches for {d} known dogs. Brackets: 95 % confidence interval (bootstrap over dogs, 1,000 resamples).",
+    "openTitle": "With the confidence threshold {tau}",
+    "open": {
+      "fpir": "Unknown dog wrongly given a confident match",
+      "correct": "Known dog: right dog, confident",
+      "rejected": "Known dog: “no confident match”",
+      "wrong": "Known dog: wrong dog, confident",
+      "unknownCount": "{q} photos of {d} unknown dogs",
+      "knownCount": "{q} photos of {d} known dogs"
+    },
+    "openReading": "On the validation dogs this threshold allowed {val} false matches; on the test dogs it allowed {test}. The 5 % target was not met on test, so the threshold is not reliable yet.",
+    "chartsTitle": "Charts",
+    "chart1Alt": "Bar chart: right dog first and in top 3, PawID compared with the base model, a colour histogram and random guessing, with 95% confidence intervals.",
+    "chart2Alt": "Line chart: false matches for unknown dogs against correct confident matches for known dogs as the threshold changes, with the chosen threshold marked.",
+    "limitsTitle": "What these numbers do not show",
+    "limits": {
+      "pet": "Pet dog face close-ups, not full-body street-dog photos from the field.",
+      "session": "The dataset has no record of when photos were taken, so photos from the same moment may look alike and make matching easier.",
+      "small": "A small sample: {dogs} test dogs, so the ranges above are wide.",
+      "threshold": "The threshold chosen on validation did not hold on the test dogs (more false matches than intended).",
+      "human": "A person always compares the photos and decides; nothing is linked automatically."
+    },
+    "reproTitle": "Reproducibility",
+    "reproModel": "Model {name} · {version} (frozen; the face detector was skipped because the photos are already face crops).",
+    "reproSplit": "Split manifest sha256 {hash}… · seed {seed} · code commit {commit}",
+    "reproTiming": "On the demo laptop's CPU: {ms} ms per photo to compute a match signature; {search} ms per search."
   }
 }

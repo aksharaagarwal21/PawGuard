@@ -85,7 +85,7 @@ test("hackathon demo journey (recorded)", async ({ browser }) => {
     log.push("Confirmed: sighting recorded on the animal's profile");
   } else {
     // No candidate: the honest result, then the manual path
-    log.push(`No candidate shown: ${(await main.innerText()).match(/No similar animals found|Results may be incomplete/)?.[0]}`);
+    log.push(`No candidate shown: ${(await main.innerText()).match(/No confident match — check manually or register a new dog|Results may be incomplete/)?.[0]}`);
     await page.getByRole("link", { name: "Search the registry instead" }).click();
     await page.locator("main ul li a").first().click();
     await page.waitForURL(/\/app\/animals\/[0-9a-f-]{36}/);

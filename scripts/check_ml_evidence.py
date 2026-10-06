@@ -66,7 +66,13 @@ def main() -> int:
     base_tau, head_tau = sel["selected"]["tau"], train["best_val_tau"]
     print(f"  frozen baseline τ = {base_tau} (validation FPIR ≤ {sel['selected']['fpir_target']}); "
           f"adapted head τ = {head_tau}; candidate list = {model['thresholds']['candidate_list_size']}")
-    check(model["thresholds"]["similarity_tau"] == head_tau, "deployed threshold = threshold chosen on validation")
+    ev = model["thresholds"].get("evidence")
+    if ev:  # threshold re-chosen on validation in a later evaluation (e.g. ml/eval/dogfacenet/results.json)
+        chosen = json.loads((ROOT / ev).read_text(encoding="utf-8"))["selection_on_validation"]["threshold"]
+        print(f"  deployed τ = {model['thresholds']['similarity_tau']} from {ev} (previous {head_tau})")
+        check(model["thresholds"]["similarity_tau"] == chosen, f"deployed threshold = validation choice in {ev}")
+    else:
+        check(model["thresholds"]["similarity_tau"] == head_tau, "deployed threshold = threshold chosen on validation")
     check(test["results"]["adapted_head"]["tau_from_val"] == head_tau, "test used the validation threshold (head)")
     check(test["results"]["frozen_baseline"]["tau_from_val"] == base_tau, "test used the validation threshold (baseline)")
     check(model["release_gate"]["passed"] is False, "release gate recorded as NOT passed")

@@ -3,7 +3,7 @@
  * membership has one of the listed capabilities (and, for review, the approved professional scope). The API
  * enforces the same rules on every request regardless of what the menu shows.
  */
-export type NavIcon = "today" | "animals" | "capture" | "review" | "tasks" | "map" | "campaigns" | "field" | "imports" | "system";
+export type NavIcon = "today" | "animals" | "capture" | "review" | "tasks" | "map" | "campaigns" | "field" | "imports" | "modelEvidence" | "system";
 
 export type NavItem = {
   key: string;
@@ -33,6 +33,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "campaigns", href: "/app/campaigns", labelKey: "campaigns", icon: "campaigns", anyOf: ["campaign.manage"], mobile: false },
   { key: "field", href: "/field", labelKey: "field", icon: "field", anyOf: ["task.work"], mobile: false },
   { key: "imports", href: "/app/imports", labelKey: "imports", icon: "imports", anyOf: ["data.import"], mobile: false },
+  { key: "modelEvidence", href: "/app/model-evidence", labelKey: "modelEvidence", icon: "modelEvidence", anyOf: ["animal.read"], mobile: false },
   { key: "system", href: "/app/system", labelKey: "system", icon: "system", anyOf: ["system.view"], mobile: false },
 ];
 

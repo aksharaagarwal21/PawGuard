@@ -95,11 +95,13 @@ Tip: open Priya in a normal window and Dr Arun in a private window so you don't 
 | 9 | Priya's window → open PG-MGZ2-GBBN (Animals → search `PG-MGZ2-GBBN`) → press **F5** | **Last verified vaccination record: <date>** and "It does not mean the animal cannot carry or transmit disease." — still there after refresh | "It's stored server-side with a full audit trail, and another organisation can't see any of it." |
 | 10 (close) | — | — | "Photo matching is research-only: on a pet-dog face benchmark the right dog was among 3 suggestions 89% of the time, but it suggested a dog for 11% of unknown animals — above our 10% limit — and it hasn't been tested on street dogs. Real organisations can't switch it on. Field data and clinical review are next." |
 
-**If matching shows "No similar animals found"** (e.g. after a reset without `demo_prepare.py`): say "it found no
+**If matching shows "No confident match — check manually or register a new dog"** (e.g. after a reset without `demo_prepare.py`): say "it found no
 similar animal — that doesn't prove the dog is new", click **Search the registry instead**, open any animal, and
 continue from step 6. To restore the prepared match: `.venv\Scripts\python.exe scripts\demo_prepare.py`.
 
 **Optional extras if asked (30 s each)**
+- *Model evidence:* menu **Model evidence** → the measured DogFaceNet results (pet dog face photos; not validated on
+  street dogs), both charts, and why the threshold is not yet reliable.
 - *Offline:* as Priya open **Offline field kit** → **Use this device for field work** (once) → browser DevTools →
   Network → **Offline** → reload → **Start** a task → "Not sent yet" → set back to **No throttling** → "Sent: 1 applied…".
 - *Planning:* as Meena → **Campaign planning** → **Demo October vaccination round** → **Make plan** → point at

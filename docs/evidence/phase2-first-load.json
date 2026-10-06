@@ -1,36 +1,36 @@
 {
-  "measured_at": "2026-10-06T07:33:54.038Z",
+  "measured_at": "2026-10-06T12:51:48.894Z",
   "profile": "Pixel 7 emulation, 360px, no throttling, local next start",
   "results": [
     {
       "path": "/en",
-      "ttfb_ms": 9,
-      "dom_content_loaded_ms": 80,
-      "load_ms": 129,
-      "lcp_ms": 84,
+      "ttfb_ms": 11,
+      "dom_content_loaded_ms": 92,
+      "load_ms": 170,
+      "lcp_ms": 108,
       "cls": 0,
       "requests": 27,
-      "transferred_kb": 563
+      "transferred_kb": 569
     },
     {
       "path": "/en/help",
-      "ttfb_ms": 13,
+      "ttfb_ms": 11,
       "dom_content_loaded_ms": 39,
       "load_ms": 46,
-      "lcp_ms": 60,
+      "lcp_ms": 56,
       "cls": 0,
       "requests": 27,
-      "transferred_kb": 82
+      "transferred_kb": 87
     },
     {
       "path": "/en/sign-in",
-      "ttfb_ms": 13,
-      "dom_content_loaded_ms": 38,
-      "load_ms": 46,
-      "lcp_ms": 44,
+      "ttfb_ms": 11,
+      "dom_content_loaded_ms": 33,
+      "load_ms": 51,
+      "lcp_ms": 48,
       "cls": 0,
       "requests": 28,
-      "transferred_kb": 117
+      "transferred_kb": 37
     }
   ]
 }

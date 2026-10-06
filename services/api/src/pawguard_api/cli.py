@@ -391,6 +391,45 @@ def runs_register(report: Path = typer.Argument(..., help="docs/evidence/*.json 
     typer.echo(f"recorded run {rid}" if rid else "already recorded")
 
 
+@models_app.command("set-threshold")
+def models_set_threshold(
+    name: str, version_label: str,
+    evidence: Path = typer.Option(..., help="Evaluation results JSON whose validation-chosen threshold to apply"),
+    reason: str = typer.Option(..., help="Why the operating threshold changes"),
+) -> None:
+    """Apply the similarity threshold chosen on VALIDATION in an evaluation report to a model version (registry and
+    manifest). Never activates a model or changes its release gate; the previous value is kept in the record."""
+    import json
+
+    r = json.loads(evidence.read_text(encoding="utf-8"))
+    sel = r["selection_on_validation"]
+    tau, agg = float(sel["threshold"]), sel["chosen_aggregation"]
+    rel = evidence.resolve().relative_to(REPO).as_posix()
+    with owner_conn() as c:
+        m = c.execute(text("select id, thresholds from app.model_versions where name = :n and version_label = :v"),
+                      {"n": name, "v": version_label}).one_or_none()
+        if m is None:
+            raise typer.BadParameter("unknown model")
+        old = dict(m.thresholds or {})
+        new = {**old, "similarity_tau": tau, "aggregation": agg,
+               "chosen_on": f"validation ({sel['criterion']})", "evidence": rel,
+               "previous": {k: old.get(k) for k in ("similarity_tau", "aggregation", "chosen_on")}}
+        c.execute(text("update app.model_versions set thresholds = cast(:t as jsonb) where id = :id"),
+                  {"t": json.dumps(new), "id": m.id})
+        c.execute(text("insert into app.audit_events (actor_kind, action, target_type, target_id, reason, "
+                       "change_summary) values ('cli', 'model.threshold_changed', 'model_version', :id, :r, "
+                       "cast(:s as jsonb))"),
+                  {"id": m.id, "r": reason, "s": json.dumps({"from": old.get("similarity_tau"), "to": tau,
+                                                             "evidence": rel})})
+    for mp in (REPO / "data/manifests/models").glob("*.json"):
+        doc = json.loads(mp.read_text(encoding="utf-8"))
+        if doc.get("name") == name and doc.get("version_label") == version_label:
+            doc["thresholds"] = new
+            mp.write_bytes((json.dumps(doc, indent=2) + "\n").encode("utf-8"))
+            typer.echo(f"manifest updated: {mp.relative_to(REPO).as_posix()}")
+    typer.echo(f"threshold {old.get('similarity_tau')} -> {tau} ({agg}) for {name} {version_label}")
+
+
 @models_app.command("list")
 def models_list() -> None:
     with owner_conn() as c:
