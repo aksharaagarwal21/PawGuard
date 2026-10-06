@@ -1767,7 +1767,8 @@
         "token_expired": "Token expired — renew it",
         "rate_limited": "Busy — retrying shortly",
         "cap_reached": "Daily limit reached — waiting",
-        "error": "Problem — see detail"
+        "error": "Problem — see detail",
+        "ready": "Set up — not used yet"
       },
       "delivery": {
         "queued": "Queued",

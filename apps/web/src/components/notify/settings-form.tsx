@@ -77,7 +77,11 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
             <p className="text-sm text-ink-2">{t(`${channel}.body`)}</p>
           </div>
         </div>
-        {s.available[channel] ? (
+        {s.available[channel] && channel === "push" ? (
+          <span className="rounded-full border border-control px-3 py-1 text-sm font-semibold">
+            {s.push_devices > 0 ? t("on") : t("off")}
+          </span>
+        ) : s.available[channel] ? (
           <label className="inline-flex min-h-11 cursor-pointer items-center gap-2 font-semibold">
             <input
               type="checkbox"

@@ -43,7 +43,7 @@ export function MessagesPanel({ data, tz, demo }: { data: Overview; tz: string; 
                 <Icon aria-hidden className={cn("size-4", p.state === "ok" ? "text-primary" : p.state === "not_configured" ? "text-ink-2" : "text-urgent")} />
                 {t(`provider.${p.provider}`)}
               </p>
-              <p className="text-sm">{t(`state.${p.state}`)}</p>
+              <p className="text-sm">{p.state === "ok" && !p.updated_at ? t("state.ready") : t(`state.${p.state}`)}</p>
               {p.detail && p.state !== "ok" ? <p className="text-xs text-ink-2">{p.detail}</p> : null}
             </li>
           );
