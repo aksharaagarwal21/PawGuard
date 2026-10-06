@@ -1,6 +1,6 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import createIntlMiddleware from "next-intl/middleware";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "./i18n/routing";
 import { CSRF_COOKIE } from "./lib/csrf";
@@ -43,7 +43,11 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
-  const response = intl(request);
+  // Demo builds open on the instructions page ("Let's start" → sign-in); real deployments keep the landing page.
+  const isBareRoot = request.nextUrl.pathname === "/";
+  const response = isBareRoot && env.demoMode
+    ? NextResponse.redirect(new URL(`/${routing.defaultLocale}/welcome`, request.url))
+    : intl(request);
   for (const c of pending) response.cookies.set(c.name, c.value, hardenCookie(c.options, env.secureCookies));
   for (const [k, v] of Object.entries(cacheHeaders)) response.headers.set(k, v);
   if (!request.cookies.get(CSRF_COOKIE)) {

@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Card, Notice } from "@pawguard/ui";
 
 import { PublicPage } from "@/components/public-shell";
+import { Link } from "@/i18n/navigation";
 import { demoSignIn } from "@/lib/auth-actions";
 import { serverEnv } from "@/lib/server-env";
 
@@ -60,7 +61,9 @@ export default async function SignInPage({
             <h2 id="demo-accounts" className="text-lg">
               {t("demoTitle")}
             </h2>
-            <p className="mt-1 text-sm">{t("demoIntro")}</p>
+            <p className="mt-1 text-sm">
+              {t("demoIntro")} <Link href="/welcome">{t("howDemoWorks")}</Link>
+            </p>
             <ul className="mt-4 grid gap-2 sm:grid-cols-2">
               {accounts.map((a) => (
                 <li key={a.email}>

@@ -68,6 +68,7 @@ for _ in $(seq 1 30); do
 done
 [ "$code" = "200" ] || { echo "Public address not answering yet (HTTP $code); try again in a minute." >&2; exit 1; }
 echo
-echo "PUBLIC LINK: $URL/en/sign-in"
+echo "PUBLIC LINK: $URL"
+echo "(opens the demo instructions; \"Let's start\" leads to sign-in)"
 echo "Anyone with this link can use the fictional demo accounts while this laptop, the services and the tunnel run."
 echo "Stop it with: .\\scripts\\public_link.ps1 --stop"

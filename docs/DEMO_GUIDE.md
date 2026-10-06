@@ -18,8 +18,10 @@ bash and cannot run these scripts — always use the `.ps1` launcher (it runs Gi
    It ends with a line containing `"status":"ready"`. Without `--reset` it only (re)starts the services and keeps
    the current demo data. If PowerShell refuses to run scripts:
    `Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned` and retry.
-3. **Keep that PowerShell window open** (minimise it) — closing it can stop the services it started.
-4. Open **http://localhost:3000/en/sign-in**.
+3. Opening the bare address (e.g. http://localhost:3000) shows the **demo instructions page** first; its
+   **Let's start** button opens the sign-in page. Sample photo and certificate are downloadable there.
+4. **Keep that PowerShell window open** (minimise it) — closing it can stop the services it started.
+5. Open **http://localhost:3000** (instructions) or go straight to **http://localhost:3000/en/sign-in**.
 
 Quick commands (PowerShell, in `C:\PawGuard`):
 

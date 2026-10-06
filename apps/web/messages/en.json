@@ -172,7 +172,8 @@
     "demoIntro": "These fictional accounts exist only in this demo environment.",
     "demoSignInAs": "Sign in as {name}",
     "expired": "Your session has ended. Please sign in again.",
-    "signedOut": "You have signed out."
+    "signedOut": "You have signed out.",
+    "howDemoWorks": "How this demo works"
   },
   "app": {
     "noOrganisations": "Your account is not an active member of any organisation yet.",
@@ -1038,5 +1039,45 @@
     "suggestedRegistry": "Suggested {n}: registered animals with this home area",
     "estimatesTitle": "How these estimates work",
     "estimatesBody": "A street count is what one person saw on one day: it can miss animals and count some twice. Registry numbers include only registered animals. Only the latest count is used — counts are never added up. These numbers schedule time and doses; they are not population sizes or vaccination coverage."
+  },
+  "welcome": {
+    "title": "Welcome to the PawGuard 360 demo",
+    "intro": "PawGuard helps community rabies programmes keep trustworthy animal vaccination records: field volunteers record animals and evidence, and an approved veterinary reviewer verifies it.",
+    "fictionalTitle": "Everything here is fictional",
+    "fictionalBody": "The organisations, people and animals are demo data. Sign in with the one-click demo accounts on the next page — no password needed. Please don't upload photos of people or private places.",
+    "howTitle": "Try it in four steps (about 3 minutes)",
+    "steps": {
+      "one": {
+        "title": "Sign in as Priya (field volunteer)",
+        "body": "Click “Let's start”, then “Sign in as Priya”."
+      },
+      "two": {
+        "title": "Find a dog from a photo",
+        "body": "Open “Add photo”, choose the sample dog photo below, pick “Dog 1”, then “Look for possible matches”. Compare the photos, then choose “This is the same animal” → “Yes, same animal”."
+      },
+      "three": {
+        "title": "Submit vaccination evidence",
+        "body": "On the animal's page choose “Record vaccination evidence”: yesterday's date, product “DEMO Rabies Vaccine A (fictional)”, lot “DEMO-A-001”, any name, and the sample certificate. Then “Submit for review”."
+      },
+      "four": {
+        "title": "Verify as the vet",
+        "body": "Sign out, choose “Sign in as Dr Arun”, open “Review”, select the record and “Verify”. Sign in as Priya again: the animal now shows its last verified vaccination record."
+      }
+    },
+    "filesTitle": "Sample files",
+    "filesIntro": "Download these to your device to use in the steps above.",
+    "sampleDog": "Sample dog photo (for “Add photo”)",
+    "sampleDogCredit": "Photo: Flickr 3572256424 via the COCO 2017 dataset, CC BY 2.0.",
+    "sampleCertificate": "Sample vaccination certificate (for the evidence step)",
+    "sampleCertificateNote": "A made-up certificate image created for this demo.",
+    "limitsTitle": "Please keep in mind",
+    "limits": {
+      "matching": "Photo matching is a research preview: tested only on a set of pet-dog face photos, not on community dogs, and it does not pass our own accuracy bar. Suggestions are never automatic — a person decides.",
+      "offline": "Offline mode covers tasks and sightings only; photos and vaccination evidence need a connection.",
+      "language": "Tamil and Hindi are partial drafts; some screens appear in English.",
+      "reset": "Demo data may be reset at any time."
+    },
+    "start": "Let's start",
+    "aboutLink": "About PawGuard"
   }
 }
