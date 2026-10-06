@@ -1121,6 +1121,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/pets/{pet_id}/tags.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Printable QR collar tags (PDF)
+         * @description Permission: the caller owns this pet. An A4 sheet of 16 QR tags linking to the public vaccination card.
+         */
+        get: operations["pets_tags_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/pets/{pet_id}/vaccinations": {
         parameters: {
             query?: never;
@@ -8014,6 +8034,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CardOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_tags_pdf: {
+        parameters: {
+            query?: {
+                /** @description Web origin for the QR link, e.g. https://example.org */
+                base_url?: string | null;
+            };
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": unknown;
                 };
             };
             /** @description Unauthorized */

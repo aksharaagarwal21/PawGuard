@@ -129,3 +129,12 @@ def card_pdf(pet_id: UUID, p: CurrentPrincipal, request: Request, base_url: Base
     body = petcards.owner_card_pdf(p, pet_id, base_url, _rid(request))
     return Response(body, media_type="application/pdf",
                     headers={"content-disposition": 'attachment; filename="vaccination-card.pdf"'})
+
+
+@router.get("/pets/{pet_id}/tags.pdf", summary="Printable QR collar tags (PDF)", response_class=Response,
+            responses={200: {"content": {"application/pdf": {}}}})
+def tags_pdf(pet_id: UUID, p: CurrentPrincipal, request: Request, base_url: BaseUrl = None) -> Response:
+    """Permission: the caller owns this pet. An A4 sheet of 16 QR tags linking to the public vaccination card."""
+    body = petcards.owner_tags_pdf(p, pet_id, base_url, _rid(request))
+    return Response(body, media_type="application/pdf",
+                    headers={"content-disposition": 'attachment; filename="collar-tags.pdf"'})

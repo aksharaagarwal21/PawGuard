@@ -176,3 +176,40 @@ def owner_card_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
     pdf.multi_cell(0, 4.5, "Only vaccinations verified by a vet are listed. PawGuard only reminds; your vet decides "
                            "treatment.", new_x="LMARGIN", new_y="NEXT")
     return bytes(pdf.output())
+
+
+def owner_tags_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_id: str | None = None) -> bytes:
+    """Printable QR collar tags: an A4 sheet of 16 tags (45 x 62 mm) to cut out and laminate. Each QR opens the
+    pet's public vaccination card; making a new QR code (or turning the card off) makes printed tags stop working."""
+    card = owner_card(p, animal_id, base_url, request_id=request_id)
+    data = public_card(card.token, with_photo=False)
+    url = _base(base_url) + card.url_path
+    png = io.BytesIO()
+    segno.make(url, error="q").save(png, kind="png", scale=10, border=1)
+    pdf = FPDF(format="A4", orientation="portrait")
+    pdf.set_auto_page_break(auto=False)
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 12)
+    pdf.cell(0, 7, _latin(f"PawGuard collar tags - {data.pet_name}"), new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Helvetica", "", 8)
+    pdf.multi_cell(0, 4, "Print at 100% scale, cut along the dashed lines and laminate. The QR code shows only the "
+                         "pet's name, photo, clinic and vaccinations verified by a vet - never your contact details. "
+                         "Making a new QR code in the app makes these tags stop working."
+                   + ("  DEMO DATA - fictional pet." if data.is_demo else ""), new_x="LMARGIN", new_y="NEXT")
+    top, left, w, h, cols, rows = 30.0, 12.5, 45.0, 62.0, 4, 4
+    pdf.set_draw_color(150, 150, 150)
+    pdf.set_dash_pattern(dash=1.5, gap=1.5)
+    for r in range(rows):
+        for c in range(cols):
+            x, y = left + c * (w + 1.5), top + r * (h + 2.0)
+            pdf.rect(x, y, w, h)
+            png.seek(0)
+            pdf.image(png, x=x + 5.5, y=y + 3, w=34)
+            pdf.set_xy(x, y + 39)
+            pdf.set_font("Helvetica", "B", 10)
+            pdf.cell(w, 5, _latin(data.pet_name)[:22], align="C")
+            pdf.set_xy(x, y + 45)
+            pdf.set_font("Helvetica", "", 7)
+            pdf.multi_cell(w, 3.4, "Scan for this pet's\nvaccination card\nPawGuard 360", align="C")
+    pdf.set_dash_pattern()
+    return bytes(pdf.output())

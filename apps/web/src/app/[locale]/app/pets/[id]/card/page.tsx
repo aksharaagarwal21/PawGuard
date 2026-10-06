@@ -1,4 +1,4 @@
-import { Download, ExternalLink, ShieldCheck } from "lucide-react";
+import { Download, ExternalLink, ShieldCheck, Tags } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
@@ -93,6 +93,13 @@ export default async function PetCardPage({ params }: { params: Promise<{ locale
             {t("downloadPdf")}
           </a>
         </Button>
+        <Button asChild variant="secondary" block>
+          <a href={`/api/v1/my/pets/${id}/tags.pdf?base_url=${encodeURIComponent(origin)}`} download>
+            <Tags aria-hidden className="size-5" />
+            {t("tagsPdf")}
+          </a>
+        </Button>
+        <p className="text-sm text-ink-2">{t("tagsHint")}</p>
         <p className="text-sm text-ink-2">{t("scanHint")}</p>
         <p className="text-sm break-all">
           <a href={publicUrl} target="_blank" rel="noopener noreferrer">

@@ -372,3 +372,11 @@ def test_clinic_dashboard_and_vet_clinic_record_with_isolation(client, clinic, o
                                   {"o": other}).scalar_one()
     r = client.post("/api/v1/clinic/vaccinations", headers=ov, json={**body, "product_id": str(other_product)})
     assert r.status_code == 404
+
+
+def test_collar_tags_pdf_is_owner_only(client, clinic):
+    pet = _pet(client, clinic, name="Tagged")
+    r = client.get(f"/api/v1/my/pets/{pet['id']}/tags.pdf", headers=_h(clinic.tokens["owner_a"]),
+                   params={"base_url": "https://pets.example"})
+    assert r.status_code == 200 and r.content.startswith(b"%PDF") and r.headers["content-type"] == "application/pdf"
+    assert client.get(f"/api/v1/my/pets/{pet['id']}/tags.pdf", headers=_h(clinic.tokens["owner_b"])).status_code == 404

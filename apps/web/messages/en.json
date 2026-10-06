@@ -1445,7 +1445,9 @@
       "failed": "That didn't work. Try again.",
       "walletTitle": "Vaccination card",
       "walletLabel": "Vaccination card for {name}",
-      "verifiedList": "Vaccinations verified by a vet"
+      "verifiedList": "Vaccinations verified by a vet",
+      "tagsPdf": "Print collar tags (PDF)",
+      "tagsHint": "16 small QR tags on one A4 sheet: print at 100%, cut out and laminate. Making a new QR code makes old tags stop working."
     },
     "greeting": {
       "morning": "Good morning, {name}.",

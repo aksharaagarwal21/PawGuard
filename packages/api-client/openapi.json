@@ -14343,6 +14343,101 @@
         ]
       }
     },
+    "/api/v1/my/pets/{pet_id}/tags.pdf": {
+      "get": {
+        "description": "Permission: the caller owns this pet. An A4 sheet of 16 QR tags linking to the public vaccination card.",
+        "operationId": "pets_tags_pdf",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Web origin for the QR link, e.g. https://example.org",
+            "in": "query",
+            "name": "base_url",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Web origin for the QR link, e.g. https://example.org",
+              "title": "Base Url"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {}
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Printable QR collar tags (PDF)",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
     "/api/v1/my/pets/{pet_id}/vaccinations": {
       "post": {
         "description": "Permission: the caller owns this pet. Creates an unverified owner-entered record that goes to the clinic's\nvet workbench. It never counts as verified until a vet verifies it.",
