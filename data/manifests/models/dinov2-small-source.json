@@ -1,0 +1,28 @@
+{
+  "repo": "facebook/dinov2-small",
+  "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+  "licence": "apache-2.0",
+  "last_modified": "2023-09-06T11:24:10.000Z",
+  "files": {
+    "config.json": {
+      "size_bytes": 547,
+      "sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d",
+      "verified_against": "hub git blob id"
+    },
+    "preprocessor_config.json": {
+      "size_bytes": 436,
+      "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828",
+      "verified_against": "hub git blob id"
+    },
+    "model.safetensors": {
+      "size_bytes": 88249960,
+      "sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+      "verified_against": "hub LFS sha256"
+    },
+    "README.md": {
+      "size_bytes": 3033,
+      "sha256": "4c20dca454a8e5c670e8de5c7e6040f512aeca5438516f7623eedc4e3b00599c",
+      "verified_against": "hub git blob id"
+    }
+  }
+}

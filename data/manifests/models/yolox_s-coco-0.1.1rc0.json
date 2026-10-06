@@ -1,0 +1,24 @@
+{
+  "task": "dog_detection",
+  "name": "yolox_s_coco",
+  "family": "YOLOX-S",
+  "version_label": "0.1.1rc0-onnx",
+  "artifact_path": "yolox/yolox_s.onnx",
+  "sha256": "c5c2d13e59ae883e6af3b45daea64af4833a4951c92d116ec270d9ddbe998063",
+  "size_bytes": 35858002,
+  "licence": "Apache-2.0 (YOLOX repository and release artefacts)",
+  "source_url": "https://github.com/Megvii-BaseDetection/YOLOX/releases/download/0.1.1rc0/yolox_s.onnx",
+  "preprocessing": {
+    "input_size": [640, 640],
+    "letterbox": "top-left, aspect preserved, pad value 114",
+    "channel_order": "BGR",
+    "legacy_normalization": false,
+    "dtype": "float32, raw 0-255",
+    "interpolation": "INTER_LINEAR",
+    "verified_by": "pawid detector-verify on the 15-image verification subset (raw pixels: recall 0.789; legacy ImageNet normalisation: recall 0.0)"
+  },
+  "output_spec": {"shape": [1, 8400, 85], "decode": "YOLOX grid decode, strides 8/16/32", "classes_used": {"16": "dog", "0": "person"}},
+  "thresholds": {"score": 0.35, "nms_iou": 0.45},
+  "evaluation_report": "docs/evidence/detector-eval-yolox_s-coco-v1.json",
+  "notes": "Official ONNX export (opset 11, produced by PyTorch 1.7). Parity with the PyTorch checkpoint was not re-verified locally (the YOLOX training code was not installed); behaviour verified on images instead. Detection only: it locates animals and people; it does not identify individuals or assess health."
+}

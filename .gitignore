@@ -34,7 +34,7 @@ data/private/
 ml/artifacts/
 ml/runs/
 mlruns/
-models/
+/models/
 *.onnx
 *.pth
 *.safetensors

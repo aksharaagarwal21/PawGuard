@@ -1,0 +1,136 @@
+{
+  "task": "identity_embedding",
+  "name": "dinov2_small_arcface_head",
+  "family": "DINOv2 ViT-S/14",
+  "version_label": "ed25f3a3-resize224-head-v1",
+  "artifact_path": "dinov2-small/ed25f3a31f01632728cabb09d1542f84ab7b0056/dinov2_small_arcface_head.onnx",
+  "sha256": "ec0c294f1a555521df474e18df6cdf2e51e2b614b0f2f402f07ba9dc065113ea",
+  "size_bytes": 89601565,
+  "embedding_dim": 384,
+  "licence": "Backbone: Apache-2.0 (facebook/dinov2-small). Head: trained by PawGuard on DogFaceNet (CC-BY-4.0 record; research use) \u2014 research only.",
+  "source_url": "https://huggingface.co/facebook/dinov2-small/tree/ed25f3a31f01632728cabb09d1542f84ab7b0056",
+  "source_files": {
+    "config.json": {
+      "size_bytes": 547,
+      "sha256": "1809f83e3bdb1609a501a610ad4a742f4fd8ae44d72ca4aa0df52d1f2ac8628d",
+      "verified_against": "hub git blob id"
+    },
+    "preprocessor_config.json": {
+      "size_bytes": 436,
+      "sha256": "14e780d86fa1861f8751f868d7f45425b5feb55c38ca26f152ca5097ab30f828",
+      "verified_against": "hub git blob id"
+    },
+    "model.safetensors": {
+      "size_bytes": 88249960,
+      "sha256": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1",
+      "verified_against": "hub LFS sha256"
+    },
+    "README.md": {
+      "size_bytes": 3033,
+      "sha256": "4c20dca454a8e5c670e8de5c7e6040f512aeca5438516f7623eedc4e3b00599c",
+      "verified_against": "hub git blob id"
+    }
+  },
+  "head": {
+    "objective": "arcface",
+    "hidden": 0,
+    "artifact": {
+      "path": "data/derived/runs/identity-head-20261006T033609Z/head.safetensors",
+      "sha256": "69cbf211932c0d340e109f531ecbc1688412afd861d2d1a06fa1634892acebe0"
+    },
+    "training_report": "docs/evidence/identity-train-runs-v1.json"
+  },
+  "preprocessing": {
+    "resize_mode": "resize224",
+    "pooling": "head",
+    "crop_margin": 0.1,
+    "channel_order": "RGB",
+    "scale": "1/255",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "interpolation": "bicubic (cv2.INTER_CUBIC)",
+    "input_size": [
+      224,
+      224
+    ],
+    "patch": 14,
+    "verified_by": "pawid identity-export parity on the validation split"
+  },
+  "output_spec": {
+    "outputs": [
+      "cls",
+      "patch_mean",
+      "embedding"
+    ],
+    "dim": 384,
+    "normalised": "L2 (head output)"
+  },
+  "thresholds": {
+    "chosen_on": "validation (max known-dog top-1 correct-and-confident rate with unknown-dog false-match rate \u2264 5%; tie-break top-1)",
+    "aggregation": "centroid",
+    "similarity_tau": 0.51254,
+    "candidate_list_size": 3,
+    "evidence": "ml/eval/dogfacenet/results.json",
+    "previous": {
+      "similarity_tau": 0.53846,
+      "aggregation": "centroid",
+      "chosen_on": "validation (FPIR <= 0.10)"
+    }
+  },
+  "evaluation_report": "docs/evidence/identity-test-dinov2s-v1.json",
+  "release_gate": {
+    "passed": false,
+    "reason": "Evaluated only on a research face benchmark (DogFaceNet), not on permissioned field photos of the target population (ML_PLAN release gate)."
+  },
+  "parity": {
+    "images": 1264,
+    "fixed_sample_n": 50,
+    "reference": "PyTorch backbone (cached) + head",
+    "max_abs_diff_cls_fixed_sample": 2.86102294921875e-05,
+    "max_abs_diff_patch_mean_fixed_sample": 1.2159347534179688e-05,
+    "min_cosine_embedding_all": 1.0,
+    "rank_agreement_all_queries": 1.0,
+    "torch_metrics": {
+      "top1": 0.9563,
+      "top3": 0.9834,
+      "top5": 0.9875,
+      "mrr": 0.9716,
+      "map_image": 0.8941,
+      "fpir": 0.0984,
+      "coverage_at_3": 0.8649,
+      "false_rejection": 0.1247,
+      "mean_candidates_shown": 0.9335
+    },
+    "onnx_metrics": {
+      "top1": 0.9563,
+      "top3": 0.9834,
+      "top5": 0.9875,
+      "mrr": 0.9716,
+      "map_image": 0.8941,
+      "fpir": 0.0984,
+      "coverage_at_3": 0.8649,
+      "false_rejection": 0.1247,
+      "mean_candidates_shown": 0.9335
+    }
+  },
+  "performance": {
+    "single_image_ms_median": 102.6,
+    "single_image_ms_p95": 134.3,
+    "n": 100,
+    "threads": 2,
+    "includes": "decode + preprocess + inference",
+    "cpu": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel",
+    "rss_increase_mb_after_load": 102.4,
+    "rss_increase_mb_after_inference": 521.8,
+    "onnx_size_bytes": 89601565
+  },
+  "notes": "Research only. Exported with torch.onnx (TorchScript exporter, opset 18). Embeddings are for candidate retrieval with human confirmation; never an identification on their own."
+}
