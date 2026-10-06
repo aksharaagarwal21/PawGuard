@@ -25,6 +25,7 @@ from pawguard_api.contracts import (
     VaccinationOut,
 )
 from pawguard_api.deps import OrgContext
+from pawguard_api.domain import reminders
 from pawguard_api.domain.animals import ensure_area, load_animal
 from pawguard_api.domain.common import (
     decode_cursor,
@@ -190,11 +191,17 @@ def review(db: Session, ctx: OrgContext, event_id: UUID, data: ReviewCreate) -> 
                            outcome=data.outcome, reason=reason, event_row_version=event.row_version,
                            evidence_snapshot=snapshot, is_demo=event.is_demo)
     db.add(rv)
+    if (data.outcome == "verified" and data.next_due_on is not None and event.administered_on is not None
+            and data.next_due_on <= event.administered_on):
+        raise Unprocessable("The next due date must be after the vaccination date.",
+                            fields=[FieldError(field="next_due_on", code="due_before_administration",
+                                               message="Next due date is not after the vaccination date.")])
     event.state = data.outcome
     if data.outcome == "verified":
         event.verified_by = ctx.user_id
         event.verified_at = text("now()")
     db.flush()
+    reminders.after_review(db, ctx.org_id, event, data.outcome, data.next_due_on)  # same transaction
     if data.outcome == "needs_correction" and event.submitted_by is not None:
         submitter = db.execute(select(Membership.id).where(Membership.user_id == event.submitted_by,
                                                            Membership.status == "active")).scalar()

@@ -1,4 +1,20 @@
-import { Activity, Backpack, CalendarRange, Camera, FlaskConical, ClipboardCheck, FileSpreadsheet, House, ListChecks, Map, Menu, PawPrint } from "lucide-react";
+import {
+  Activity,
+  Backpack,
+  Bell,
+  CalendarRange,
+  Camera,
+  ClipboardCheck,
+  Dog,
+  FileSpreadsheet,
+  FlaskConical,
+  House,
+  ListChecks,
+  Map,
+  Menu,
+  PawPrint,
+  Stethoscope,
+} from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { StatusChip } from "@pawguard/ui";
@@ -8,7 +24,7 @@ import { TranslationNotice } from "@/components/public-shell";
 import { SignOutForm } from "@/components/sign-out-form";
 import { chooseOrganisation } from "@/lib/auth-actions";
 import { visibleNav, type NavItem } from "@/lib/nav";
-import type { Me, MembershipInfo } from "@/lib/session";
+import { serverApi, type Me, type MembershipInfo } from "@/lib/session";
 
 import { ConnectionStatus } from "./connection-status";
 import { LanguageSwitcher } from "./language-switcher";
@@ -18,6 +34,9 @@ import { Wordmark } from "./wordmark";
 
 const ICONS: Record<NavItem["icon"], React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
   today: House,
+  pets: Dog,
+  reminders: Bell,
+  clinic: Stethoscope,
   animals: PawPrint,
   capture: Camera,
   review: ClipboardCheck,
@@ -46,6 +65,26 @@ export async function AppShell({
   const tr = await getTranslations("roles");
   const items = visibleNav(active.capabilities, active.professional_scopes);
   const mobileItems = items.filter((i) => i.mobile);
+  // Pet owners: count of reminders showing today, for the bell (in-app only; nothing is sent).
+  let reminderCount = 0;
+  if (active.capabilities.includes("pet.own")) {
+    const { data } = await (await serverApi(active.org_id)).GET("/api/v1/my/reminders").catch(() => ({ data: undefined }));
+    reminderCount = data?.length ?? 0;
+  }
+  const bell = active.capabilities.includes("pet.own") ? (
+    <Link
+      href="/app/reminders"
+      className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-control text-ink no-underline hover:bg-sage"
+      aria-label={reminderCount ? t("remindersBellCount", { count: reminderCount }) : t("reminders")}
+    >
+      <Bell aria-hidden className="size-5" />
+      {reminderCount ? (
+        <span aria-hidden className="absolute top-1 right-0.5 min-w-5 rounded-full bg-urgent px-1 text-center text-xs font-bold text-white">
+          {reminderCount}
+        </span>
+      ) : null}
+    </Link>
+  ) : null;
 
   const orgSwitcher =
     me.memberships.length > 1 ? (
@@ -82,10 +121,11 @@ export async function AppShell({
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[17rem_1fr]">
       <aside className="hidden border-r border-divider bg-surface md:flex md:min-h-dvh md:flex-col">
-        <div className="p-5">
+        <div className="flex items-center justify-between gap-2 p-5">
           <Link href="/app" className="no-underline">
             <Wordmark />
           </Link>
+          {bell}
         </div>
         <div className="space-y-3 border-y border-divider px-5 py-4">
           {orgSwitcher}
@@ -126,6 +166,7 @@ export async function AppShell({
             <Wordmark compact />
           </Link>
           <span className="min-w-0 flex-1 truncate font-display text-sm font-semibold">{active.org_name}</span>
+          {bell}
           <ConnectionStatus compact />
         </header>
         <main id="main" tabIndex={-1} className="flex-1 outline-none">

@@ -18,6 +18,7 @@ class Cap(StrEnum):
     CAREGIVER_WRITE = "caregiver.write"
     OBSERVATION_WRITE = "observation.write"
     MEDIA_UPLOAD = "media.upload"
+    PET_OWN = "pet.own"  # self-service for pet owners: only pets linked to them
     IDENTITY_SEARCH = "identity.search"
     IDENTITY_DECIDE = "identity.decide"
     VACCINATION_SUBMIT = "vaccination.submit"
@@ -48,7 +49,8 @@ _FIELD = {Cap.ANIMAL_READ, Cap.ANIMAL_WRITE, Cap.OBSERVATION_WRITE, Cap.MEDIA_UP
           Cap.IDENTITY_DECIDE, Cap.VACCINATION_SUBMIT, Cap.TASK_WORK, Cap.SURVEY_WRITE}
 
 ROLE_TEMPLATES: dict[Role, frozenset[Cap]] = {
-    Role.RESIDENT: frozenset(),
+    # Pet owners: their own pets only (no registry-wide read), plus uploading photos/certificates for them.
+    Role.RESIDENT: frozenset({Cap.PET_OWN, Cap.MEDIA_UPLOAD}),
     Role.FIELD_VOLUNTEER: frozenset(_FIELD),
     Role.VETERINARY_REVIEWER: frozenset(_FIELD | {Cap.VACCINATION_REVIEW, Cap.ANIMAL_MERGE,
                                                   Cap.ANIMAL_LOCATION_EXACT, Cap.CAREGIVER_READ}),

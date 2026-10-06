@@ -13,8 +13,9 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  * - Only a fixed set of headers is forwarded each way.
  */
 const FORWARD_REQUEST_HEADERS = ["content-type", "accept", "if-match", "idempotency-key", "x-request-id"];
-const FORWARD_RESPONSE_HEADERS = ["content-type", "etag", "x-request-id", "location", "retry-after"];
+const FORWARD_RESPONSE_HEADERS = ["content-type", "content-disposition", "etag", "x-request-id", "location", "retry-after"];
 const SAFE = new Set(["GET", "HEAD", "OPTIONS"]);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function errorJson(status: number, code: string, message: string) {
   return NextResponse.json({ error: { code, message, request_id: null, fields: [], details: {} } }, { status });
@@ -53,7 +54,10 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
     if (v) headers.set(name, v);
   }
   if (token) headers.set("authorization", `Bearer ${token}`);
-  let org = (await cookies()).get(ORG_COOKIE)?.value;
+  // A page may name the organisation explicitly (e.g. an owner uploading for a pet at another clinic). It is only
+  // a selection: FastAPI checks the caller's membership in it on every request.
+  const explicit = request.headers.get("x-pawguard-org");
+  let org = explicit && UUID_RE.test(explicit) ? explicit : (await cookies()).get(ORG_COOKIE)?.value;
   let resolvedOrg: string | undefined;
   const principalOnly = path.length === 1 && path[0] === "me"; // /me is about the person, not an organisation
   if (!org && token && !principalOnly) {

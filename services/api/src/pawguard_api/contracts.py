@@ -217,7 +217,8 @@ class VaccinationCreate(StrictModel):
     administered_by_registration: str | None = Field(default=None, max_length=100)
     area_id: UUID | None = None
     location: LocationIn | None = None
-    source_type: Literal["field_entry", "certificate_upload", "partner_record"] = "field_entry"
+    source_type: Literal["field_entry", "certificate_upload", "partner_record", "owner_entry",
+                         "clinic_record"] = "field_entry"
     source_reference: str | None = Field(default=None, max_length=200)
     submitter_note: str | None = Field(default=None, max_length=1000)
     evidence_media_ids: list[UUID] = Field(default_factory=list, max_length=10)
@@ -256,6 +257,7 @@ class ReviewCreate(StrictModel):
     outcome: ReviewOutcome
     reason: str | None = Field(default=None, max_length=2000)
     row_version: int
+    next_due_on: date | None = Field(default=None, description="Next due date set by the vet when verifying")
 
 
 class ReviewOut(Out):

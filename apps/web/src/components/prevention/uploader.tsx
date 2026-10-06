@@ -2,7 +2,7 @@
 
 import { Camera, FileUp, Loader2, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { browserApi } from "@/lib/api-browser";
 
@@ -27,6 +27,7 @@ export function Uploader({
   onSubjects,
   subjectPurpose = "record",
   idPrefix,
+  orgId,
 }: {
   purpose: "animal_photo" | "vaccination_evidence";
   multiple?: boolean;
@@ -36,7 +37,10 @@ export function Uploader({
   onSubjects?: (choices: SubjectChoice[]) => void;
   subjectPurpose?: "record" | "lookup";
   idPrefix: string;
+  /** Upload into this organisation instead of the active one (the API checks membership). */
+  orgId?: string;
 }) {
+  const orgHeaders = useMemo(() => (orgId ? { "x-pawguard-org": orgId } : undefined), [orgId]);
   const t = useTranslations("upload");
   const [items, setItems] = useState<Item[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -62,11 +66,15 @@ export function Uploader({
     async (id: string) => {
       for (let i = 0; i < 40; i++) {
         await new Promise((r) => setTimeout(r, i < 5 ? 800 : 2000));
-        const { data } = await browserApi.GET("/api/v1/media/{media_id}", { params: { path: { media_id: id } } });
+        const { data } = await browserApi.GET("/api/v1/media/{media_id}", {
+          params: { path: { media_id: id } },
+          headers: orgHeaders,
+        });
         if (!data) continue;
         if (data.state === "approved") {
           const { data: link } = await browserApi.GET("/api/v1/media/{media_id}/url", {
             params: { path: { media_id: id }, query: { variant: "thumb" } },
+            headers: orgHeaders,
           });
           patch(id, { phase: "ready", state: "approved", thumbUrl: link?.url });
           return;
@@ -78,7 +86,7 @@ export function Uploader({
       }
       patch(id, { phase: "pending" }); // worker busy or offline: keep the file, validation will follow
     },
-    [patch],
+    [patch, orgHeaders],
   );
 
   async function upload(file: File) {
@@ -87,6 +95,7 @@ export function Uploader({
     if (file.size > MAX_BYTES) return setError(t("tooLarge"));
     const { data: intent, error: apiError } = await browserApi.POST("/api/v1/media/upload-intents", {
       body: { purpose, content_type: file.type as "image/jpeg", byte_size: file.size },
+      headers: orgHeaders,
     });
     if (!intent) return setError(apiError?.error?.message ?? t("failed"));
     const item: Item = { id: intent.media_id, state: "pending_upload", name: file.name, progress: 0, phase: "uploading" };
@@ -108,6 +117,7 @@ export function Uploader({
     }
     const { data: done } = await browserApi.POST("/api/v1/media/{media_id}/complete", {
       params: { path: { media_id: item.id } },
+      headers: orgHeaders,
     });
     if (!done || done.state === "rejected") {
       patch(item.id, { phase: "rejected", reason: done?.rejection_code ?? "other" });
@@ -120,7 +130,7 @@ export function Uploader({
   async function remove(item: Item) {
     item.xhr?.abort();
     setItems((prev) => prev.filter((i) => i.id !== item.id));
-    await browserApi.DELETE("/api/v1/media/{media_id}", { params: { path: { media_id: item.id } } });
+    await browserApi.DELETE("/api/v1/media/{media_id}", { params: { path: { media_id: item.id } }, headers: orgHeaders });
   }
 
   const accept = types.join(",");

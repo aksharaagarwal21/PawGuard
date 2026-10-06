@@ -15,6 +15,7 @@ from sqlalchemy import text
 from sqlalchemy.engine import Connection
 
 from pawguard_api.seed.accounts import demo_id
+from pawguard_api.seed.pets import seed_pets
 
 NICKNAMES = ["Brownie", "Kutty", "Tiger", "Lakshmi", "Moti", "Raja", "Rani", "Jimmy", "Blacky", "Whitey", "Sheru",
              "Kaalu", "Lucky", "Shadow", "Mani", "Chotu", "Bholu", "Golu", "Sona", "Pinky", "Rocky", "Bruno",
@@ -299,4 +300,5 @@ def seed_domain(c: Connection, users: dict[str, UUID]) -> dict[str, object]:
                                 coordinator="coordinator")
     out["hillview"] = seed_org(c, "hillview", users, n_animals=12, volunteer="hill_volunteer", vet="hill_vet",
                                coordinator=None)
+    out["pet_clinics"] = seed_pets(c, users)
     return out

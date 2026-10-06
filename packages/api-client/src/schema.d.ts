@@ -350,6 +350,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/clinic/demo-clock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Today's date for reminders (with any demo offset)
+         * @description Permission: clinic staff (``animal.read`` or ``vaccination.review``).
+         */
+        get: operations["clinic_get_demo_clock"];
+        /**
+         * Move the demo date (demo organisations only)
+         * @description Permission: clinic staff, in a demo organisation, with demo mode on. Changes only what "today" means for
+         *     status and reminders in this organisation; stored dates are not changed. Audited.
+         */
+        put: operations["clinic_put_demo_clock"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/demo/accounts": {
         parameters: {
             query?: never;
@@ -790,6 +815,192 @@ export interface paths {
          *     on every request); queued offline work is re-checked when it syncs.
          */
         post: operations["reference_revoke_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/clinics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Clinics I am registered with
+         * @description Permission: any signed-in user (empty unless they hold ``pet.own`` somewhere).
+         */
+        get: operations["pets_my_clinics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/pets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My pets with vaccination status
+         * @description Permission: ``pet.own`` in at least one clinic. Only pets linked to the caller as owner.
+         */
+        get: operations["pets_list_pets"];
+        put?: never;
+        /**
+         * Register my pet with a clinic
+         * @description Permission: ``pet.own`` in the chosen clinic. The pet is linked to the caller as owner.
+         */
+        post: operations["pets_create_pet"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/pets/{pet_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My pet: status, timeline and reminders
+         * @description Permission: the caller owns this pet; otherwise 404.
+         */
+        get: operations["pets_get_pet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/pets/{pet_id}/vaccinations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a past vaccination with a certificate (unverified until a vet reviews it)
+         * @description Permission: the caller owns this pet. Creates an unverified owner-entered record that goes to the clinic's
+         *     vet workbench. It never counts as verified until a vet verifies it.
+         */
+        post: operations["pets_add_vaccination"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/pets/{pet_id}/vaccine-options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Vaccines my pet's clinic records
+         * @description Permission: the caller owns this pet.
+         */
+        get: operations["pets_vaccine_options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My vaccination reminders due today
+         * @description Permission: owner. In-app reminders only; ``preview`` shows what an email/SMS would say (nothing is sent).
+         */
+        get: operations["pets_reminders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/reminders/{reminder_id}/calendar.ics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Calendar file for the due date
+         * @description Permission: the reminder's owner. An all-day event on the due date (date only, no time zone shift).
+         */
+        get: operations["pets_calendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/reminders/{reminder_id}/done": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Mark a reminder done with a certificate
+         * @description Permission: the reminder's owner. Records an unverified owner entry (with certificate) for the vet to review
+         *     and stops the reminders for that due date. If the vet rejects it, the reminders come back.
+         */
+        post: operations["pets_done"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/reminders/{reminder_id}/snooze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Snooze a reminder for 1 or 3 days
+         * @description Permission: the reminder's owner.
+         */
+        post: operations["pets_snooze"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1750,6 +1961,18 @@ export interface components {
             /** Reference Code */
             reference_code: string;
         };
+        /** ClinicOut */
+        ClinicOut: {
+            /** Is Member */
+            is_member: boolean;
+            /** Name */
+            name: string;
+            /**
+             * Org Id
+             * Format: uuid
+             */
+            org_id: string;
+        };
         /** DemoAccountOut */
         DemoAccountOut: {
             /** Description */
@@ -1758,6 +1981,26 @@ export interface components {
             email: string;
             /** Name */
             name: string;
+        };
+        /** DemoClockIn */
+        DemoClockIn: {
+            /** Offset Days */
+            offset_days: number;
+        };
+        /** DemoClockOut */
+        DemoClockOut: {
+            /** Offset Days */
+            offset_days: number;
+            /**
+             * Real Today
+             * Format: date
+             */
+            real_today: string;
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
         };
         /** DetectionOut */
         DetectionOut: {
@@ -2525,6 +2768,163 @@ export interface components {
             /** Note */
             note?: string | null;
         };
+        /** OwnerVaccinationIn */
+        OwnerVaccinationIn: {
+            /**
+             * Administered On
+             * Format: date
+             */
+            administered_on: string;
+            /** Certificate Media Ids */
+            certificate_media_ids: string[];
+            /** Given By */
+            given_by?: string | null;
+            /** Product Id */
+            product_id?: string | null;
+            /** Product Text */
+            product_text?: string | null;
+        };
+        /** PetCardOut */
+        PetCardOut: {
+            /** Age Band */
+            age_band: string;
+            /**
+             * Awaiting Verification
+             * @default 0
+             */
+            awaiting_verification: number;
+            /** Clinic Name */
+            clinic_name: string;
+            /**
+             * Clinic Org Id
+             * Format: uuid
+             */
+            clinic_org_id: string;
+            /** Date Of Birth */
+            date_of_birth: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Demo */
+            is_demo: boolean;
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Reference Code */
+            reference_code: string;
+            /** Sex */
+            sex: string;
+            /** Species */
+            species: string;
+            status: components["schemas"]["PetStatusOut"];
+        };
+        /** PetCreate */
+        PetCreate: {
+            /**
+             * Age Band
+             * @default unknown
+             * @enum {string}
+             */
+            age_band?: "puppy" | "young" | "adult" | "senior" | "unknown";
+            /**
+             * Clinic Org Id
+             * Format: uuid
+             */
+            clinic_org_id: string;
+            /** Date Of Birth */
+            date_of_birth?: string | null;
+            /** Name */
+            name: string;
+            /** Photo Media Id */
+            photo_media_id?: string | null;
+            /**
+             * Sex
+             * @default unknown
+             * @enum {string}
+             */
+            sex?: "female" | "male" | "unknown";
+            /**
+             * Species
+             * @enum {string}
+             */
+            species: "dog" | "cat";
+        };
+        /** PetDetailOut */
+        PetDetailOut: {
+            /** Age Band */
+            age_band: string;
+            /**
+             * Awaiting Verification
+             * @default 0
+             */
+            awaiting_verification: number;
+            /** Clinic Name */
+            clinic_name: string;
+            /**
+             * Clinic Org Id
+             * Format: uuid
+             */
+            clinic_org_id: string;
+            /** Date Of Birth */
+            date_of_birth: string | null;
+            /**
+             * Demo Offset Days
+             * @default 0
+             */
+            demo_offset_days: number;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Demo */
+            is_demo: boolean;
+            /** Name */
+            name: string;
+            /** Photo Url */
+            photo_url: string | null;
+            /** Reference Code */
+            reference_code: string;
+            /**
+             * Reminders
+             * @default []
+             */
+            reminders: components["schemas"]["ReminderOut"][];
+            /** Sex */
+            sex: string;
+            /** Species */
+            species: string;
+            status: components["schemas"]["PetStatusOut"];
+            /**
+             * Timeline
+             * @default []
+             */
+            timeline: components["schemas"]["TimelineEntryOut"][];
+            /**
+             * Today
+             * Format: date
+             */
+            today: string;
+        };
+        /** PetStatusOut */
+        PetStatusOut: {
+            /** Days Until Due */
+            days_until_due: number | null;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Next Due Source */
+            next_due_source: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "up_to_date" | "due_soon" | "overdue" | "unverified_record" | "no_verified_record";
+            /** Vaccine */
+            vaccine: string | null;
+        };
         /** PhotoRef */
         PhotoRef: {
             /**
@@ -2650,6 +3050,20 @@ export interface components {
              */
             unit?: string;
         };
+        /** ProductOptionOut */
+        ProductOptionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Template Interval Days */
+            template_interval_days: number | null;
+            /** Template Label */
+            template_label: string | null;
+        };
         /** ProductOut */
         ProductOut: {
             /** Active */
@@ -2733,8 +3147,66 @@ export interface components {
             /** Warnings */
             warnings: string[];
         };
+        /** ReminderOut */
+        ReminderOut: {
+            /** Clinic Name */
+            clinic_name: string;
+            /**
+             * Clinic Org Id
+             * Format: uuid
+             */
+            clinic_org_id: string;
+            /** Days Until Due */
+            days_until_due: number;
+            /**
+             * Due On
+             * Format: date
+             */
+            due_on: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "due_in_14" | "due_in_7" | "due_in_1" | "overdue";
+            /**
+             * Pet Id
+             * Format: uuid
+             */
+            pet_id: string;
+            /** Pet Name */
+            pet_name: string;
+            preview: components["schemas"]["ReminderPreviewOut"];
+            /** Snoozed Until */
+            snoozed_until: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "pending" | "done" | "cancelled";
+            /** Vaccine */
+            vaccine: string;
+        };
+        /** ReminderPreviewOut */
+        ReminderPreviewOut: {
+            /** Email Body */
+            email_body: string;
+            /** Email Subject */
+            email_subject: string;
+            /** Sms */
+            sms: string;
+        };
         /** ReviewCreate */
         ReviewCreate: {
+            /**
+             * Next Due On
+             * @description Next due date set by the vet when verifying
+             */
+            next_due_on?: string | null;
             /**
              * Outcome
              * @enum {string}
@@ -2778,6 +3250,14 @@ export interface components {
             expires_in_seconds: number;
             /** Url */
             url: string;
+        };
+        /** SnoozeIn */
+        SnoozeIn: {
+            /**
+             * Days
+             * @enum {integer}
+             */
+            days: 1 | 3;
         };
         /** SubjectIn */
         SubjectIn: {
@@ -3106,6 +3586,38 @@ export interface components {
             /** Start Area Id */
             start_area_id: string | null;
         };
+        /** TimelineEntryOut */
+        TimelineEntryOut: {
+            /** Administered On */
+            administered_on: string | null;
+            /**
+             * Certificates
+             * @default 0
+             */
+            certificates: number;
+            /** Clinic Name */
+            clinic_name: string;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Given By */
+            given_by: string | null;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Next Due Source */
+            next_due_source: string | null;
+            /** Note */
+            note: string | null;
+            /** Vaccine */
+            vaccine: string;
+            /**
+             * Verification
+             * @enum {string}
+             */
+            verification: "verified_by_vet" | "entered_by_owner_unverified" | "submitted_unverified" | "needs_correction" | "rejected" | "superseded";
+        };
         /** UploadIntentCreate */
         UploadIntentCreate: {
             /** Byte Size */
@@ -3207,7 +3719,7 @@ export interface components {
              * @default field_entry
              * @enum {string}
              */
-            source_type?: "field_entry" | "certificate_upload" | "partner_record";
+            source_type?: "field_entry" | "certificate_upload" | "partner_record" | "owner_entry" | "clinic_record";
             /** Submitter Note */
             submitter_note?: string | null;
         };
@@ -3258,7 +3770,7 @@ export interface components {
              * @default field_entry
              * @enum {string}
              */
-            source_type?: "field_entry" | "certificate_upload" | "partner_record";
+            source_type?: "field_entry" | "certificate_upload" | "partner_record" | "owner_entry" | "clinic_record";
             /** Submitter Note */
             submitter_note?: string | null;
         };
@@ -4539,6 +5051,110 @@ export interface operations {
             };
         };
     };
+    clinic_get_demo_clock: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoClockOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    clinic_put_demo_clock: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemoClockIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoClockOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     demo_demo_accounts: {
         parameters: {
             query?: never;
@@ -5751,6 +6367,522 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["MembershipRevoke"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_my_clinics: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_list_pets: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PetCardOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_create_pet: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PetCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PetDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_get_pet: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PetDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_add_vaccination: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OwnerVaccinationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PetDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_vaccine_options: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductOptionOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_reminders: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReminderOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_calendar: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                reminder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/calendar": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_done: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                reminder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OwnerVaccinationIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PetDetailOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    pets_snooze: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                reminder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SnoozeIn"];
             };
         };
         responses: {

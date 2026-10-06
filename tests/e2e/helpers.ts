@@ -7,6 +7,9 @@ export const DEMO = {
   vet: { email: "vet.arun@example.org", name: "Dr Arun" },
   coordinator: { email: "coordinator.meena@example.org", name: "Meena" },
   hillVolunteer: { email: "volunteer.ravi@example.org", name: "Ravi" },
+  owner: { email: "owner.neha@example.org", name: "Neha" },
+  clinicVet: { email: "vet.kiran@example.org", name: "Dr Kiran" },
+  clinicManager: { email: "clinic.asha@example.org", name: "Asha" },
 } as const;
 
 export const DEMO_PASSWORD = "PawGuard-demo-2026";
@@ -16,7 +19,7 @@ export async function signIn(page: Page, email: string, locale = "en") {
   await page.locator("#email").fill(email);
   await page.locator("#password").fill(DEMO_PASSWORD);
   await page.locator('form button[type="submit"]').first().click();
-  await page.waitForURL(`**/${locale}/app`);
+  await page.waitForURL(new RegExp(`/${locale}/app(/pets)?$`)); // pet owners land on "My pets"
 }
 
 /** WCAG 2.2 A/AA automated checks. Supplements, not replaces, manual keyboard/screen-reader review. */

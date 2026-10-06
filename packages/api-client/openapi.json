@@ -1403,6 +1403,30 @@
         "title": "CandidateAnimalOut",
         "type": "object"
       },
+      "ClinicOut": {
+        "properties": {
+          "is_member": {
+            "title": "Is Member",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "org_id": {
+            "format": "uuid",
+            "title": "Org Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "org_id",
+          "name",
+          "is_member"
+        ],
+        "title": "ClinicOut",
+        "type": "object"
+      },
       "DemoAccountOut": {
         "properties": {
           "description": {
@@ -1424,6 +1448,47 @@
           "description"
         ],
         "title": "DemoAccountOut",
+        "type": "object"
+      },
+      "DemoClockIn": {
+        "additionalProperties": false,
+        "properties": {
+          "offset_days": {
+            "maximum": 400.0,
+            "minimum": -60.0,
+            "title": "Offset Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "offset_days"
+        ],
+        "title": "DemoClockIn",
+        "type": "object"
+      },
+      "DemoClockOut": {
+        "properties": {
+          "offset_days": {
+            "title": "Offset Days",
+            "type": "integer"
+          },
+          "real_today": {
+            "format": "date",
+            "title": "Real Today",
+            "type": "string"
+          },
+          "today": {
+            "format": "date",
+            "title": "Today",
+            "type": "string"
+          }
+        },
+        "required": [
+          "offset_days",
+          "today",
+          "real_today"
+        ],
+        "title": "DemoClockOut",
         "type": "object"
       },
       "DetectionOut": {
@@ -3582,6 +3647,424 @@
         "title": "OfflineTaskPayload",
         "type": "object"
       },
+      "OwnerVaccinationIn": {
+        "additionalProperties": false,
+        "properties": {
+          "administered_on": {
+            "format": "date",
+            "title": "Administered On",
+            "type": "string"
+          },
+          "certificate_media_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 5,
+            "minItems": 1,
+            "title": "Certificate Media Ids",
+            "type": "array"
+          },
+          "given_by": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Given By"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          },
+          "product_text": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Text"
+          }
+        },
+        "required": [
+          "administered_on",
+          "certificate_media_ids"
+        ],
+        "title": "OwnerVaccinationIn",
+        "type": "object"
+      },
+      "PetCardOut": {
+        "properties": {
+          "age_band": {
+            "title": "Age Band",
+            "type": "string"
+          },
+          "awaiting_verification": {
+            "default": 0,
+            "title": "Awaiting Verification",
+            "type": "integer"
+          },
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "clinic_org_id": {
+            "format": "uuid",
+            "title": "Clinic Org Id",
+            "type": "string"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "reference_code": {
+            "title": "Reference Code",
+            "type": "string"
+          },
+          "sex": {
+            "title": "Sex",
+            "type": "string"
+          },
+          "species": {
+            "title": "Species",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PetStatusOut"
+          }
+        },
+        "required": [
+          "id",
+          "reference_code",
+          "name",
+          "species",
+          "sex",
+          "date_of_birth",
+          "age_band",
+          "clinic_org_id",
+          "clinic_name",
+          "photo_url",
+          "status",
+          "awaiting_verification",
+          "is_demo"
+        ],
+        "title": "PetCardOut",
+        "type": "object"
+      },
+      "PetCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "age_band": {
+            "default": "unknown",
+            "enum": [
+              "puppy",
+              "young",
+              "adult",
+              "senior",
+              "unknown"
+            ],
+            "title": "Age Band",
+            "type": "string"
+          },
+          "clinic_org_id": {
+            "format": "uuid",
+            "title": "Clinic Org Id",
+            "type": "string"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_media_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Media Id"
+          },
+          "sex": {
+            "default": "unknown",
+            "enum": [
+              "female",
+              "male",
+              "unknown"
+            ],
+            "title": "Sex",
+            "type": "string"
+          },
+          "species": {
+            "enum": [
+              "dog",
+              "cat"
+            ],
+            "title": "Species",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clinic_org_id",
+          "name",
+          "species"
+        ],
+        "title": "PetCreate",
+        "type": "object"
+      },
+      "PetDetailOut": {
+        "properties": {
+          "age_band": {
+            "title": "Age Band",
+            "type": "string"
+          },
+          "awaiting_verification": {
+            "default": 0,
+            "title": "Awaiting Verification",
+            "type": "integer"
+          },
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "clinic_org_id": {
+            "format": "uuid",
+            "title": "Clinic Org Id",
+            "type": "string"
+          },
+          "date_of_birth": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Of Birth"
+          },
+          "demo_offset_days": {
+            "default": 0,
+            "title": "Demo Offset Days",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "reference_code": {
+            "title": "Reference Code",
+            "type": "string"
+          },
+          "reminders": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ReminderOut"
+            },
+            "title": "Reminders",
+            "type": "array"
+          },
+          "sex": {
+            "title": "Sex",
+            "type": "string"
+          },
+          "species": {
+            "title": "Species",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/PetStatusOut"
+          },
+          "timeline": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/TimelineEntryOut"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "today": {
+            "format": "date",
+            "title": "Today",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "reference_code",
+          "name",
+          "species",
+          "sex",
+          "date_of_birth",
+          "age_band",
+          "clinic_org_id",
+          "clinic_name",
+          "photo_url",
+          "status",
+          "awaiting_verification",
+          "is_demo",
+          "today",
+          "demo_offset_days",
+          "timeline",
+          "reminders"
+        ],
+        "title": "PetDetailOut",
+        "type": "object"
+      },
+      "PetStatusOut": {
+        "properties": {
+          "days_until_due": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Days Until Due"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "next_due_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due Source"
+          },
+          "status": {
+            "enum": [
+              "up_to_date",
+              "due_soon",
+              "overdue",
+              "unverified_record",
+              "no_verified_record"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "vaccine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vaccine"
+          }
+        },
+        "required": [
+          "status",
+          "next_due_on",
+          "next_due_source",
+          "vaccine",
+          "days_until_due"
+        ],
+        "title": "PetStatusOut",
+        "type": "object"
+      },
       "PhotoRef": {
         "properties": {
           "media_id": {
@@ -3918,6 +4401,49 @@
         "title": "ProductCreate",
         "type": "object"
       },
+      "ProductOptionOut": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "template_interval_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Interval Days"
+          },
+          "template_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template Label"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "template_interval_days",
+          "template_label"
+        ],
+        "title": "ProductOptionOut",
+        "type": "object"
+      },
       "ProductOut": {
         "properties": {
           "active": {
@@ -4148,9 +4674,135 @@
         "title": "QualityOut",
         "type": "object"
       },
+      "ReminderOut": {
+        "properties": {
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "clinic_org_id": {
+            "format": "uuid",
+            "title": "Clinic Org Id",
+            "type": "string"
+          },
+          "days_until_due": {
+            "title": "Days Until Due",
+            "type": "integer"
+          },
+          "due_on": {
+            "format": "date",
+            "title": "Due On",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "due_in_14",
+              "due_in_7",
+              "due_in_1",
+              "overdue"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "pet_id": {
+            "format": "uuid",
+            "title": "Pet Id",
+            "type": "string"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "preview": {
+            "$ref": "#/components/schemas/ReminderPreviewOut"
+          },
+          "snoozed_until": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snoozed Until"
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "done",
+              "cancelled"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "vaccine": {
+            "title": "Vaccine",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pet_id",
+          "pet_name",
+          "clinic_org_id",
+          "clinic_name",
+          "vaccine",
+          "due_on",
+          "kind",
+          "days_until_due",
+          "state",
+          "snoozed_until",
+          "preview"
+        ],
+        "title": "ReminderOut",
+        "type": "object"
+      },
+      "ReminderPreviewOut": {
+        "properties": {
+          "email_body": {
+            "title": "Email Body",
+            "type": "string"
+          },
+          "email_subject": {
+            "title": "Email Subject",
+            "type": "string"
+          },
+          "sms": {
+            "title": "Sms",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email_subject",
+          "email_body",
+          "sms"
+        ],
+        "title": "ReminderPreviewOut",
+        "type": "object"
+      },
       "ReviewCreate": {
         "additionalProperties": false,
         "properties": {
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Next due date set by the vet when verifying",
+            "title": "Next Due On"
+          },
           "outcome": {
             "enum": [
               "verified",
@@ -4260,6 +4912,24 @@
           "expires_in_seconds"
         ],
         "title": "SignedUrlOut",
+        "type": "object"
+      },
+      "SnoozeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "days": {
+            "enum": [
+              1,
+              3
+            ],
+            "title": "Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "days"
+        ],
+        "title": "SnoozeIn",
         "type": "object"
       },
       "SubjectIn": {
@@ -5334,6 +6004,111 @@
         "title": "TeamOut",
         "type": "object"
       },
+      "TimelineEntryOut": {
+        "properties": {
+          "administered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Administered On"
+          },
+          "certificates": {
+            "default": 0,
+            "title": "Certificates",
+            "type": "integer"
+          },
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "given_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Given By"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "next_due_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due Source"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "vaccine": {
+            "title": "Vaccine",
+            "type": "string"
+          },
+          "verification": {
+            "enum": [
+              "verified_by_vet",
+              "entered_by_owner_unverified",
+              "submitted_unverified",
+              "needs_correction",
+              "rejected",
+              "superseded"
+            ],
+            "title": "Verification",
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "vaccine",
+          "administered_on",
+          "clinic_name",
+          "given_by",
+          "verification",
+          "next_due_on",
+          "next_due_source",
+          "certificates",
+          "note"
+        ],
+        "title": "TimelineEntryOut",
+        "type": "object"
+      },
       "UploadIntentCreate": {
         "additionalProperties": false,
         "properties": {
@@ -5615,7 +6390,9 @@
             "enum": [
               "field_entry",
               "certificate_upload",
-              "partner_record"
+              "partner_record",
+              "owner_entry",
+              "clinic_record"
             ],
             "title": "Source Type",
             "type": "string"
@@ -5821,7 +6598,9 @@
             "enum": [
               "field_entry",
               "certificate_upload",
-              "partner_record"
+              "partner_record",
+              "owner_entry",
+              "clinic_record"
             ],
             "title": "Source Type",
             "type": "string"
@@ -8684,6 +9463,188 @@
         ]
       }
     },
+    "/api/v1/clinic/demo-clock": {
+      "get": {
+        "description": "Permission: clinic staff (``animal.read`` or ``vaccination.review``).",
+        "operationId": "clinic_get_demo_clock",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoClockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Today's date for reminders (with any demo offset)",
+        "tags": [
+          "clinic"
+        ]
+      },
+      "put": {
+        "description": "Permission: clinic staff, in a demo organisation, with demo mode on. Changes only what \"today\" means for\nstatus and reminders in this organisation; stored dates are not changed. Audited.",
+        "operationId": "clinic_put_demo_clock",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DemoClockIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoClockOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Move the demo date (demo organisations only)",
+        "tags": [
+          "clinic"
+        ]
+      }
+    },
     "/api/v1/demo/accounts": {
       "get": {
         "description": "Permission: public, but only exists when ``PAWGUARD_DEMO_MODE=true`` outside production. Lists the fictional\nseed accounts (no passwords) for the development sign-in shortcuts.",
@@ -10909,6 +11870,809 @@
         "summary": "Revoke a membership",
         "tags": [
           "reference"
+        ]
+      }
+    },
+    "/api/v1/my/clinics": {
+      "get": {
+        "description": "Permission: any signed-in user (empty unless they hold ``pet.own`` somewhere).",
+        "operationId": "pets_my_clinics",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClinicOut"
+                  },
+                  "title": "Response Pets My Clinics",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Clinics I am registered with",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/pets": {
+      "get": {
+        "description": "Permission: ``pet.own`` in at least one clinic. Only pets linked to the caller as owner.",
+        "operationId": "pets_list_pets",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PetCardOut"
+                  },
+                  "title": "Response Pets List Pets",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "My pets with vaccination status",
+        "tags": [
+          "pets"
+        ]
+      },
+      "post": {
+        "description": "Permission: ``pet.own`` in the chosen clinic. The pet is linked to the caller as owner.",
+        "operationId": "pets_create_pet",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PetCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Register my pet with a clinic",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/pets/{pet_id}": {
+      "get": {
+        "description": "Permission: the caller owns this pet; otherwise 404.",
+        "operationId": "pets_get_pet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "My pet: status, timeline and reminders",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/pets/{pet_id}/vaccinations": {
+      "post": {
+        "description": "Permission: the caller owns this pet. Creates an unverified owner-entered record that goes to the clinic's\nvet workbench. It never counts as verified until a vet verifies it.",
+        "operationId": "pets_add_vaccination",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnerVaccinationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Add a past vaccination with a certificate (unverified until a vet reviews it)",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/pets/{pet_id}/vaccine-options": {
+      "get": {
+        "description": "Permission: the caller owns this pet.",
+        "operationId": "pets_vaccine_options",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ProductOptionOut"
+                  },
+                  "title": "Response Pets Vaccine Options",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Vaccines my pet's clinic records",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/reminders": {
+      "get": {
+        "description": "Permission: owner. In-app reminders only; ``preview`` shows what an email/SMS would say (nothing is sent).",
+        "operationId": "pets_reminders",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderOut"
+                  },
+                  "title": "Response Pets Reminders",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "My vaccination reminders due today",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/reminders/{reminder_id}/calendar.ics": {
+      "get": {
+        "description": "Permission: the reminder's owner. An all-day event on the due date (date only, no time zone shift).",
+        "operationId": "pets_calendar",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reminder_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reminder Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/calendar": {}
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Calendar file for the due date",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/reminders/{reminder_id}/done": {
+      "post": {
+        "description": "Permission: the reminder's owner. Records an unverified owner entry (with certificate) for the vet to review\nand stops the reminders for that due date. If the vet rejects it, the reminders come back.",
+        "operationId": "pets_done",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reminder_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reminder Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OwnerVaccinationIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetDetailOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Mark a reminder done with a certificate",
+        "tags": [
+          "pets"
+        ]
+      }
+    },
+    "/api/v1/my/reminders/{reminder_id}/snooze": {
+      "post": {
+        "description": "Permission: the reminder's owner.",
+        "operationId": "pets_snooze",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "reminder_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Reminder Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SnoozeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Snooze a reminder for 1 or 3 days",
+        "tags": [
+          "pets"
         ]
       }
     },

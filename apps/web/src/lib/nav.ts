@@ -3,7 +3,24 @@
  * membership has one of the listed capabilities (and, for review, the approved professional scope). The API
  * enforces the same rules on every request regardless of what the menu shows.
  */
-export type NavIcon = "today" | "animals" | "capture" | "review" | "tasks" | "map" | "campaigns" | "field" | "imports" | "modelEvidence" | "system";
+export type NavIcon =
+  | "today"
+  | "pets"
+  | "reminders"
+  | "clinic"
+  | "animals"
+  | "capture"
+  | "review"
+  | "tasks"
+  | "map"
+  | "campaigns"
+  | "field"
+  | "imports"
+  | "modelEvidence"
+  | "system";
+
+/** Capabilities that make someone organisation staff (pet owners hold only `pet.own` and `media.upload`). */
+export const STAFF_CAPS = ["animal.read", "task.work", "task.manage", "vaccination.submit", "member.manage", "system.view"];
 
 export type NavItem = {
   key: string;
@@ -16,9 +33,11 @@ export type NavItem = {
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { key: "today", href: "/app", labelKey: "today", icon: "today", mobile: true },
+  { key: "today", href: "/app", labelKey: "today", icon: "today", anyOf: STAFF_CAPS, mobile: true },
+  { key: "pets", href: "/app/pets", labelKey: "pets", icon: "pets", anyOf: ["pet.own"], mobile: true },
+  { key: "reminders", href: "/app/reminders", labelKey: "reminders", icon: "reminders", anyOf: ["pet.own"], mobile: true },
   { key: "animals", href: "/app/animals", labelKey: "animals", icon: "animals", anyOf: ["animal.read"], mobile: true },
-  { key: "capture", href: "/app/capture", labelKey: "capture", icon: "capture", anyOf: ["media.upload"], mobile: true },
+  { key: "capture", href: "/app/capture", labelKey: "capture", icon: "capture", anyOf: ["observation.write"], mobile: true },
   {
     key: "review",
     href: "/app/review",

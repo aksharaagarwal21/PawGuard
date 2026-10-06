@@ -13,6 +13,7 @@ from pawguard_api.logging import configure_logging, get_logger
 from pawguard_api.routers import (
     animals,
     campaigns,
+    clinic,
     demo,
     health,
     identity,
@@ -20,6 +21,7 @@ from pawguard_api.routers import (
     me,
     media,
     merges,
+    pets,
     programme,
     reference,
     sync,
@@ -76,7 +78,8 @@ def create_app() -> FastAPI:
     app.include_router(me.router)
     app.include_router(system.router)
     app.include_router(demo.router)
-    for r in (animals, vaccinations, media, tasks, merges, reference, programme, imports, identity, sync, campaigns):
+    for r in (animals, vaccinations, media, tasks, merges, reference, programme, imports, identity, sync, campaigns,
+              pets, clinic):
         app.include_router(r.router)
     return app
 

@@ -108,15 +108,22 @@ def media_out(db: Session, media: MediaAsset) -> MediaOut:
                     job_state=job_state)
 
 
+def _require_read(ctx: OrgContext, media: MediaAsset) -> None:
+    """Registry readers see any file in their organisation; uploaders (e.g. pet owners) see their own uploads."""
+    if not (media.uploader_user_id == ctx.user_id and ctx.can(Cap.MEDIA_UPLOAD)):
+        ctx.require(Cap.ANIMAL_READ)
+
+
 def get_media(db: Session, ctx: OrgContext, media_id: UUID) -> MediaOut:
-    ctx.require(Cap.ANIMAL_READ)
-    return media_out(db, _load(db, media_id))
+    media = _load(db, media_id)
+    _require_read(ctx, media)
+    return media_out(db, media)
 
 
 def signed_url(db: Session, ctx: OrgContext, media_id: UUID, variant: str) -> SignedUrlOut:
     """Only approved files, only derivatives (metadata-stripped) — never the quarantined original."""
-    ctx.require(Cap.ANIMAL_READ)
     media = _load(db, media_id)
+    _require_read(ctx, media)
     if media.state != "approved":
         raise Conflict("This file is not available yet.", code="media_not_approved", details={"state": media.state})
     key = (media.derivatives or {}).get(variant)
