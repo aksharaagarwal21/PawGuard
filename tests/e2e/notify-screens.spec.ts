@@ -32,3 +32,12 @@ for (const [label, viewport] of [
     });
   });
 }
+
+test("assistant page explains when it is not set up, and owners find it in the menu", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await signIn(page, DEMO.owner.email);
+  await page.getByRole("link", { name: "Ask PawGuard" }).first().click();
+  await expect(page.getByRole("heading", { level: 1, name: "Ask PawGuard" })).toBeVisible();
+  await expect(page.getByText("The assistant isn't set up")).toBeVisible();
+  await expectNoAxeViolations(page);
+});

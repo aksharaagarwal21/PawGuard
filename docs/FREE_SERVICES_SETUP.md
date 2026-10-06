@@ -67,8 +67,11 @@ at `PAWGUARD_EMAIL_DAILY_CAP` (default 100/day) and holds the rest until the nex
 9. **Optional — a token that doesn't expire daily:** Business settings → Users → System users → Add (admin) → assign
    the app and the WhatsApp account → Generate token with `whatsapp_business_messaging` and
    `whatsapp_business_management`. Replace `PAWGUARD_WHATSAPP_TOKEN` with it.
-10. **Webhook (only for delivery status and replies)** needs a public HTTPS address. The free tunnel address changes
-    on every restart, so you'll re-enter it in Meta's dashboard each time; the app shows the exact URL to paste.
+10. **Webhook (optional — marks undelivered messages as failed)** needs a public HTTPS address. Start the public link,
+    open the clinic dashboard as a vet → **Messages**: it shows the exact webhook address. In Meta: WhatsApp →
+    Configuration → Webhook → Edit → paste that address as the callback URL and your `PAWGUARD_WHATSAPP_VERIFY_TOKEN`
+    as the verify token → Verify and save → subscribe to the **messages** field. The free tunnel address changes on
+    every restart, so repeat this after restarting the public link.
 
 **What the docs say:** test numbers "have relaxed messaging limits and don't require a payment method on file in
 order to send template messages"; the temporary token "expires in less than 24 hours"; non-template messages are
@@ -94,6 +97,16 @@ service must not be part of an app "directed towards or … likely to be accesse
 **Ollama (alternative, nothing leaves your laptop; needs about 16 GB RAM)**
 1. Install from <https://ollama.com>, then run `ollama pull qwen2.5:3b`.
 2. `.env`: `PAWGUARD_LLM_PROVIDER=ollama` (and `PAWGUARD_OLLAMA_MODEL` if you pulled a different model).
+
+## After you've added the values: test each channel (5 minutes)
+
+1. Restart the services so they read the new `.env` (API, worker and dispatcher).
+2. Sign in as **Neha** → menu **Notifications** → turn on Email / WhatsApp, or **Turn on notifications on this
+   device** for push → **Send me a test** on each. A test arrives within about 15 seconds.
+3. Sign in as **Dr Kiran** → **Clinic** → **Messages** shows each channel as Working / Not set up / "Token expired —
+   renew it" / "Daily limit reached — waiting", and the recent sends. **Send due reminders now** (demo only) sends
+   today's reminders without waiting for the 10-minute scan.
+4. Assistant: as Neha open **Ask PawGuard** and tap a suggested question.
 
 ## Later parts (steps will be added when built)
 - Twilio trial (optional real calls to verified numbers only), Brevo (optional email alternative), Oracle Cloud
