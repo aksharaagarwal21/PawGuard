@@ -86,6 +86,72 @@ sessions (same-session photos of a dog may still sit on both the gallery and que
 dogs, so results do not transfer to full-body field photos of community dogs; labels have not been reviewed by
 knowledgeable annotators. The pipeline mechanics are covered by `ml/tests/test_datasets.py` on a synthetic fixture.
 
+## Real-data evaluation on DogFaceNet (6 Oct 2026) — frozen model, held-out identities
+
+**What this is:** an evaluation (no training, no tuning on test) of the deployed PawID model
+(`dinov2_small_arcface_head` / `ed25f3a3-resize224-head-v1`, DINOv2-S + projection head) on the public DogFaceNet dataset
+(Zenodo 12578449, CC BY 4.0). **Caveat: DogFaceNet contains aligned face crops of pet dogs — not full-body photos of
+Indian community dogs in the field. There is no capture-session information, so same-session look-alike photos cannot
+be fully ruled out, and the sample is small. This is not evidence of street-dog or field accuracy.**
+
+**Data and split** (`ml/eval/dogfacenet/clean_summary.json`, `split_manifest.json`, sha256 `90dd880956fe5fd7…`,
+seed 20261007): 1,393 identities / 8,363 images → 0 unreadable, 0 exact duplicates → 25 images excluded as
+near-duplicates shared by two identities → 1,333 identities / 8,219 images with ≥ 3 images. Only identities the
+deployed head never trained on are eligible (935 training identities excluded): validation group = 90 identities
+from the earlier validation identities, test group = 201 identities from the earlier test identities (fewer than the
+300 planned because only 201 eligible test identities exist). In each group 75 % known dogs (2 gallery images, the rest
+queries; near-duplicates of gallery images dropped as queries — 2 in validation, 5 in test) and 25 % unknown dogs (all
+images are queries). Automated leakage check: passed (0 problems). The dog detector is skipped: images are already face
+crops.
+
+| Group | Known dogs | Gallery images | Known queries | Unknown dogs | Unknown queries |
+|---|---|---|---|---|---|
+| Validation | 68 | 136 | 274 | 22 | 133 |
+| Test | 151 | 302 | 577 | 50 | 300 |
+
+**Chosen on validation only:** aggregation **centroid** (mean of a dog's gallery embeddings) over max —
+validation known-dog correct-and-confident 0.836 vs
+0.829; threshold **0.5125**, the lowest giving validation
+unknown-dog false matches ≤ 5 % (achieved 0.045).
+
+**Test, once** (95 % CI: identity bootstrap, 1,000 resamples):
+
+| Method | Top-1 | Top-3 | mAP |
+|---|---|---|---|
+| PawID (DINOv2-S + head) | 0.943 [0.914–0.970] | 0.990 [0.979–0.998] | 0.907 [0.864–0.944] |
+| DINOv2-S backbone only (CLS) | 0.917 [0.872–0.959] | 0.974 [0.952–0.991] | 0.867 [0.814–0.912] |
+| Colour histogram | 0.373 [0.302–0.452] | 0.490 [0.416–0.573] | 0.367 [0.307–0.438] |
+| Random (chance) | 0.004 [0.000–0.009] | 0.017 [0.008–0.028] | 0.025 [0.021–0.029] |
+
+| Open set at threshold 0.5125 (PawID) | Test |
+|---|---|
+| Unknown dogs wrongly given a confident match | 0.160 [0.068–0.252] (300 queries, 50 dogs) |
+| Known dogs: correct top-1 **and** confident | 0.853 [0.782–0.922] (577 queries, 151 dogs) |
+| Known dogs: "no confident match" (wrongly rejected) | 0.123 [0.060–0.192] |
+| Known dogs: confident but wrong dog | 0.024 [0.007–0.046] |
+
+**Reading:** the model ranks the right pet dog first for 94 % of known-dog face photos, far above a colour histogram
+(37 %) and chance (0.3 %), and the trained head adds a little over the backbone (91.7 % top-1). But the threshold chosen
+to keep validation false matches at 4.5 % gave **16 % false matches on test** — with only 22 unknown validation dogs the
+threshold estimate is unstable. The 5 % target is **not** met on test; the release gate is not met.
+
+**Cost on this laptop (CPU):** 101.8 ms per image (median, decode + preprocessing + ONNX,
+single image), 72.6 ms per image batched; exact search 0.005 ms per
+query over 302 gallery images.
+
+**Artefacts:** `ml/eval/dogfacenet/results.json` (every metric, CI, count, threshold, model, split hash, seed, commit
+`2cee3a6`, command), `chart_top1_top3.png`, `chart_threshold_tradeoff.png`; local-only error gallery
+`data/derived/eval/dogfacenet/error-gallery/` (not committed, not in the app).
+
+**Reproduce** (needs `data/raw/dogfacenet/after_4_bis` from Zenodo 12578449 and the model files):
+```bash
+cd ml
+uv run pawid dfn-clean      # → clean_manifest.csv, clean_summary.json
+uv run pawid dfn-split      # → split_manifest.json (+ leakage check)
+uv run pawid dfn-eval --smoke   # bounded check, 10 + 10 identities
+uv run pawid dfn-eval       # → results.json, charts, local error gallery
+```
+
 ## Identity retrieval (Phase 7) — DINOv2-S on DogFaceNet 224 v1 (research benchmark)
 
 **What was measured.** Open-set *identification* against an enrolled gallery (not pairwise verification). Per

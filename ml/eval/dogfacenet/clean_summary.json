@@ -1,0 +1,43 @@
+{
+ "source": "Zenodo 12578449 DogFaceNet_224resized.zip (md5 010c207e202bb499039452aa7363b015)",
+ "steps": [
+  {
+   "step": "all files",
+   "identities": 1393,
+   "images": 8363
+  },
+  {
+   "step": "after dropping unreadable / too small",
+   "identities": 1393,
+   "images": 8363
+  },
+  {
+   "step": "after removing exact duplicates (SHA-256)",
+   "identities": 1393,
+   "images": 8363
+  },
+  {
+   "step": "after excluding near-duplicates shared by two identities",
+   "identities": 1393,
+   "images": 8338
+  },
+  {
+   "step": "after keeping identities with \u2265 3 images",
+   "identities": 1333,
+   "images": 8219
+  }
+ ],
+ "near_duplicate_stats": {
+  "exact_duplicate_files": 0,
+  "near_duplicate_pairs": 119,
+  "pairs_le_4": 58,
+  "pairs_le_6": 119,
+  "pairs_le_10": 437
+ },
+ "excluded_by_reason": {
+  "near_duplicate_shared_by_two_identities": 25,
+  "identity_has_fewer_than_3_images": 119
+ },
+ "manifest": "ml/eval/dogfacenet/clean_manifest.csv",
+ "manifest_sha256": "b215c1d892a0b9c10dd43ee772d9790e4f8dada966d4dce66c183da2e0efbf8a"
+}
