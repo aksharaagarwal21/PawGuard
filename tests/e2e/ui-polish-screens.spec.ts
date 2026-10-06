@@ -41,3 +41,15 @@ for (const [label, viewport] of WIDTHS) {
     await check(page, `get-started-${label}`);
   });
 }
+
+for (const [label, viewport] of WIDTHS) {
+  test(`sign-in page (${label})`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize(viewport);
+    await page.goto("/en/sign-in");
+    await expect(page.getByRole("heading", { name: "Signing in takes 3 steps" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pet vaccination reminders" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Sign in as Neha/ })).toBeVisible();
+    await check(page, `sign-in-${label}`);
+  });
+}

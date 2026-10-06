@@ -218,8 +218,8 @@
     }
   },
   "signIn": {
-    "title": "Team sign in",
-    "intro": "For trained volunteers, veterinary reviewers and programme staff. Accounts are created by your organisation's administrator.",
+    "title": "Sign in",
+    "intro": "For pet owners, clinic staff and programme volunteers. Accounts are created by a clinic or programme administrator.",
     "email": "Email address",
     "password": "Password",
     "submit": "Sign in",
@@ -230,12 +230,31 @@
       "unavailable": "Sign-in is not available right now. Please try again shortly.",
       "rateLimited": "Too many attempts. Wait a few minutes and try again."
     },
-    "demoTitle": "Demo accounts (development only)",
-    "demoIntro": "These fictional accounts exist only in this demo environment.",
+    "demoTitle": "Demo accounts",
+    "demoIntro": "Fictional accounts that exist only in this demo. One click signs you in.",
     "demoSignInAs": "Sign in as {name}",
     "expired": "Your session has ended. Please sign in again.",
     "signedOut": "You have signed out.",
-    "howDemoWorks": "How this demo works"
+    "howDemoWorks": "How this demo works",
+    "stepsTitle": "Signing in takes 3 steps",
+    "steps": {
+      "one": {
+        "title": "Pick your account",
+        "body": "In this demo, choose one of the demo accounts below."
+      },
+      "two": {
+        "title": "Land on your home page",
+        "body": "Pet owners see My pets; clinic staff see the clinic dashboard."
+      },
+      "three": {
+        "title": "Follow the “Next step” box",
+        "body": "It always shows the most useful thing to do now."
+      }
+    },
+    "demoGroups": {
+      "pets": "Pet vaccination reminders",
+      "community": "Community dog programmes"
+    }
   },
   "app": {
     "noOrganisations": "Your account is not an active member of any organisation yet.",
