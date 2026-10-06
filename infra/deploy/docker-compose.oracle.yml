@@ -1,0 +1,34 @@
+# Oracle Cloud Always Free (single Arm VM) — adds Caddy for HTTPS in front of the web app.
+# Usage (from the repository root, after `supabase start` and filling .env — see docs/DEPLOYMENT_FREE.md):
+#   docker compose -f infra/docker-compose.yml -f infra/deploy/docker-compose.oracle.yml --profile app up -d --build
+name: pawguard
+
+services:
+  web:
+    ports: !reset []  # not published: only Caddy talks to it
+    environment:
+      PAWGUARD_API_INTERNAL_URL: http://api:8000
+      PAWGUARD_SUPABASE_URL: http://host.docker.internal:54321
+    restart: unless-stopped
+  api:
+    restart: unless-stopped
+  worker:
+    restart: unless-stopped
+  dispatcher:
+    restart: unless-stopped
+  caddy:
+    profiles: ["app"]
+    image: caddy:2.10-alpine
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      PAWGUARD_DOMAIN: ${PAWGUARD_DOMAIN:?set PAWGUARD_DOMAIN to your DuckDNS name, e.g. pawguard.duckdns.org}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [web]
+    restart: unless-stopped
+
+volumes:
+  caddy-data:
+  caddy-config:

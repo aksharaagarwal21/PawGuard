@@ -1,0 +1,12 @@
+# Public HTTPS for PawGuard on a single VM. Caddy gets and renews a free certificate automatically (Let's Encrypt)
+# for the domain in PAWGUARD_DOMAIN (e.g. yourname.duckdns.org). Only ports 80 and 443 need to be open.
+{$PAWGUARD_DOMAIN} {
+	encode zstd gzip
+	# Everything goes to the web app; it forwards /api/v1 to the API and storage links to Supabase itself
+	# (PAWGUARD_STORAGE_SAME_ORIGIN=true), so no other service is exposed.
+	reverse_proxy web:3000
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}

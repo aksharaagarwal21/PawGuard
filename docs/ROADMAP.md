@@ -4,16 +4,16 @@ Free-tier plan (see `FREE_SERVICES_SETUP.md`). Status as of 7 October 2026, bran
 
 | Part | Status |
 |---|---|
-| Email (Gmail SMTP / Brevo), daily cap and deferral | Built; needs your Gmail app password |
-| Web Push (VAPID) | Built; keys generated; needs `PAWGUARD_VAPID_CONTACT` |
+| Email (Gmail SMTP / Brevo), daily cap, deferral, confirm-your-email step | Built and working (Gmail) |
+| Web Push (VAPID) | Built and configured |
 | WhatsApp Cloud API test number, webhook receipts | Built; needs your Meta test number values |
 | Ask PawGuard assistant (Gemini free tier / Ollama) | Built; needs a Gemini key or Ollama |
 | Certificate OCR (Tesseract / PaddleOCR, eng/hin/tam; optional Gemini vision) — draft only, vet verifies | Next |
-| In-browser voice assistant (Web Speech API, en-IN / hi-IN / ta-IN, text fallback) | Next |
+| In-browser voice assistant (Web Speech API, en-IN / hi-IN / ta-IN, text fallback) | Built (needs the assistant configured) |
 | Twilio trial calls to verified numbers (optional) | Next |
 | Lost pet finder with in-app private messages (no phone masking) | Next |
-| Printable QR collar tags (PDF) | Next |
-| Deployment docs: Oracle Cloud Always Free (Docker Compose, Let's Encrypt, DuckDNS); Vercel + Supabase free tier | Next |
+| Printable QR collar tags (PDF) | Built |
+| Deployment docs: Oracle Cloud Always Free (Docker Compose, Caddy/Let's Encrypt, DuckDNS); Vercel + Supabase free tier | Written (`DEPLOYMENT_FREE.md`), not yet tried on a real VM |
 
 ## Not possible for free (not built)
 - **SMS to Indian numbers** needs a paid, DLT-registered SMS provider (sender ID and template registration). Use
