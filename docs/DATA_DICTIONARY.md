@@ -24,7 +24,7 @@ enabled **and forced**; tenant tables use the policy `org_id = app.current_org_i
 | `field_tasks.task_type` | `animal_followup`, `evidence_correction`, `identity_review` form the view `animal_followup_tasks` (ADR 0007) |
 
 
-_Schema revision: `0010`._
+_Schema revision: `0011`._
 
 
 ## ER diagram (core Prevention tables)

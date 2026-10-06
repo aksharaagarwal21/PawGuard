@@ -1681,6 +1681,8 @@ export interface components {
             service_minutes_per_animal: number;
             /** Suggested Animals */
             suggested_animals: number | null;
+            /** Suggested Observed On */
+            suggested_observed_on: string | null;
             /** Suggested Source */
             suggested_source: string | null;
         };
@@ -2982,6 +2984,11 @@ export interface components {
             /** Animal Reference */
             animal_reference: string | null;
             area: components["schemas"]["AreaRef"] | null;
+            /**
+             * Assigned To Me
+             * @default false
+             */
+            assigned_to_me: boolean;
             /** Assignee Membership Id */
             assignee_membership_id: string | null;
             /** Assignee Name */
@@ -3036,6 +3043,10 @@ export interface components {
              * @enum {string}
              */
             task_type: "vaccination_round" | "survey" | "animal_followup" | "evidence_correction" | "identity_review" | "other";
+            /** Team Id */
+            team_id: string | null;
+            /** Team Name */
+            team_name: string | null;
             /** Title */
             title: string;
         };

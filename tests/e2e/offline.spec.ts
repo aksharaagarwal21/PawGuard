@@ -7,8 +7,9 @@ import { DEMO, ORGS, expectNoAxeViolations, signIn, switchOrg } from "./helpers"
 /**
  * Phase 8 — offline field work on a trusted device: opt in, lose the connection, keep working from the field kit,
  * reconnect and replay; a re-sent operation is a duplicate (applied once); a change the server made meanwhile is
- * a conflict the person resolves; signing out with unsent changes warns and then wipes the device.
- * (Replay with revoked permissions is covered in services/api/tests/test_sync.py.)
+ * a conflict the person resolves; refused access keeps changes on the device with an explanation; signing out
+ * with unsent changes warns and then wipes the device. (Server-side replay with revoked permissions is covered in
+ * services/api/tests/test_sync.py.)
  */
 test.describe.configure({ mode: "serial" });
 test.skip(({ isMobile }) => isMobile, "runs once on desktop");
@@ -98,6 +99,21 @@ test("offline field work: opt in, work offline, replay, duplicate, conflict, sig
   const dup = await apiPost(vol, "/api/v1/sync/operations", { device_id: "e2e-device-replay", operations: ops });
   expect(dup.status).toBe(200);
   expect(dup.json.results.every((r: { duplicate: boolean; state: string }) => r.duplicate && r.state === "accepted")).toBe(true);
+
+  // Access changed while offline (simulated server answer — real revocation is covered in test_sync.py):
+  // the change is kept on the device and the person is told why it was not sent.
+  await vol.context().setOffline(true);
+  await card.getByRole("button", { name: "Record a sighting" }).click();
+  await vol.getByRole("dialog").getByRole("button", { name: "Save" }).click();
+  await vol.route("**/api/v1/sync/operations", (route) =>
+    route.fulfill({ status: 403, contentType: "application/json", body: JSON.stringify({ error: { code: "forbidden", message: "Not a member", fields: [], details: {} } }) }),
+  );
+  await vol.context().setOffline(false);
+  await expect(vol.getByText("Your access to this organisation has changed", { exact: false })).toBeVisible({ timeout: 30_000 });
+  await expect(card.getByText("Not sent yet")).toBeVisible();
+  await vol.unroute("**/api/v1/sync/operations");
+  await vol.getByRole("button", { name: "Send changes now (1)" }).click();
+  await expect(vol.getByText("Sent: 1 applied, 0 need a decision, 0 not accepted.")).toBeVisible({ timeout: 30_000 });
 
   // Conflict: the coordinator cancels the task while the volunteer completes it offline
   await vol.context().setOffline(true);

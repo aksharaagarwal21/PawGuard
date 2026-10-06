@@ -21,7 +21,8 @@ test("coordinator plans, approves and publishes a field day; revised inputs give
   await page.getByRole("navigation", { name: "App navigation" }).first().getByRole("link", { name: "Campaign planning" }).click();
   await page.getByRole("link", { name: "Demo October vaccination round" }).click();
   await expect(page.getByRole("heading", { name: "Demo October vaccination round" })).toBeVisible();
-  await expect(page.getByText("Suggested 22 (from a street count)")).toBeVisible();
+  await expect(page.getByText(/Suggested 22: one street count on \d{4}-\d{2}-\d{2}/)).toBeVisible();
+  await expect(page.getByText("they are not population sizes or vaccination coverage", { exact: false })).toBeVisible();
   await expectNoAxeViolations(page);
 
   // The coordinator leaves the market ward out; the plan must respect that

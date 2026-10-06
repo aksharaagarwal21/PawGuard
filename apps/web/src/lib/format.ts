@@ -37,15 +37,25 @@ export function formatDateTime(value: string | null | undefined, locale: string,
   }).format(new Date(value));
 }
 
-/** "3 days ago" style for recency, falling back to a date beyond 60 days. */
-export function relativeDays(value: string | null | undefined, locale: string): string | null {
+/** Calendar-day number of an instant as seen in `timeZone` (for comparing dates, not elapsed hours). */
+function dayNumber(d: Date, timeZone: string): number {
+  const [y, m, day] = new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric", month: "2-digit", day: "2-digit" })
+    .format(d)
+    .split("-")
+    .map(Number);
+  return Date.UTC(y!, m! - 1, day!) / 86_400_000;
+}
+
+/**
+ * "today" / "3 days ago" by calendar day in the organisation's timezone (a sighting recorded today at day precision
+ * is stored as local midnight and must not read as "yesterday"), falling back to a date beyond 60 days.
+ */
+export function relativeDays(value: string | null | undefined, locale: string, timeZone = "UTC"): string | null {
   if (!value) return null;
-  const then = new Date(value).getTime();
-  const days = Math.round((then - Date.now()) / 86_400_000);
+  const then = new Date(value);
+  const days = dayNumber(then, timeZone) - dayNumber(new Date(), timeZone);
   if (Math.abs(days) > 60) {
-    return new Intl.DateTimeFormat(localeTag(locale), { day: "numeric", month: "short", year: "numeric" }).format(
-      new Date(value),
-    );
+    return new Intl.DateTimeFormat(localeTag(locale), { day: "numeric", month: "short", year: "numeric", timeZone }).format(then);
   }
   return new Intl.RelativeTimeFormat(localeTag(locale), { numeric: "auto" }).format(days, "day");
 }

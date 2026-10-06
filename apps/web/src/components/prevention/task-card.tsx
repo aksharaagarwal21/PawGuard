@@ -96,7 +96,9 @@ export function TaskCard({
         {task.task_type === "survey" && task.area && !["completed", "cancelled"].includes(s) ? (
           <Link href={`/app/surveys/new?area=${task.area.id}&task=${task.id}${task.campaign_id ? `&campaign=${task.campaign_id}` : ""}`}>{t("recordCount")}</Link>
         ) : null}
-        {canManage ? <span className="text-ink-2">{task.assignee_name ?? t("unassigned")}</span> : null}
+        {canManage || task.team_name ? (
+          <span className="text-ink-2">{task.assignee_name ?? (task.team_name ? t("team", { team: task.team_name }) : t("unassigned"))}</span>
+        ) : null}
       </div>
       {available.length ? (
         <div className="flex flex-wrap gap-2">

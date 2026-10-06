@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { StatusChip } from "@pawguard/ui";
 
 import { Link } from "@/i18n/navigation";
+import { TranslationNotice } from "@/components/public-shell";
 import { SignOutForm } from "@/components/sign-out-form";
 import { chooseOrganisation } from "@/lib/auth-actions";
 import { visibleNav, type NavItem } from "@/lib/nav";
@@ -118,6 +119,7 @@ export async function AppShell({
 
       <div className="flex min-h-dvh flex-col pb-20 md:pb-0">
         <DemoBanner />
+        <TranslationNotice locale={locale} />
         <header className="flex items-center gap-3 border-b border-divider bg-surface px-4 py-2 md:hidden">
           <Link href="/app" className="no-underline">
             <Wordmark compact />

@@ -33,12 +33,14 @@ export const ORGS = {
 
 /** Make `org` the active organisation for a multi-membership account and wait until the server reflects it. */
 export async function switchOrg(page: Page, org: { id: string; label: string }) {
-  const switcher = page.locator('select[name="org_id"]');
+  // The "More" page shows the organisation switcher on every viewport (the sidebar one is desktop-only).
+  await page.goto("/en/app/more");
+  const switcher = page.getByRole("main").locator('select[name="org_id"]');
   if (!(await switcher.count())) return;
   await switcher.first().selectOption({ label: org.label });
-  await page.getByRole("button", { name: "Switch organisation" }).first().click();
+  await page.getByRole("main").getByRole("button", { name: "Switch organisation" }).first().click();
   await expect(async () => {
     await page.reload();
-    await expect(page.locator('select[name="org_id"]').first()).toHaveValue(org.id, { timeout: 1000 });
+    await expect(page.getByRole("main").locator('select[name="org_id"]').first()).toHaveValue(org.id, { timeout: 1000 });
   }).toPass({ timeout: 15_000 });
 }

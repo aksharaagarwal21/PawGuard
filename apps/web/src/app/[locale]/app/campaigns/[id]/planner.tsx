@@ -27,6 +27,9 @@ export function Planner(props: { campaign: Campaign; teams: Team[]; plans: Plan[
       <section aria-labelledby="inputs" className="space-y-2">
         <h2 id="inputs" className="text-lg">{t("inputsTitle")}</h2>
         <p className="text-sm text-ink-2">{t("inputsIntro")}</p>
+        <Notice tone="info" title={t("estimatesTitle")}>
+          <p>{t("estimatesBody")}</p>
+        </Notice>
         <div className="space-y-2">
           {props.campaign.areas.map((a) => (
             <AreaRow key={a.area_id} campaignId={props.campaign.id} area={a} />
@@ -89,7 +92,12 @@ function AreaRow({ campaignId, area }: { campaignId: string; area: Area }) {
     }
   }
 
-  const suggestion = area.suggested_animals != null ? t("suggested", { n: area.suggested_animals, source: t(`source.${area.suggested_source}` as "source.survey") }) : t("noSuggestion");
+  const suggestion =
+    area.suggested_animals == null
+      ? t("noSuggestion")
+      : area.suggested_source === "survey"
+        ? t("suggestedSurvey", { n: area.suggested_animals, date: area.suggested_observed_on ?? "?" })
+        : t("suggestedRegistry", { n: area.suggested_animals });
   return (
     <Card className="space-y-2">
       <div className="flex flex-wrap items-baseline justify-between gap-2">

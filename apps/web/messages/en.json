@@ -605,7 +605,8 @@
     "animal": "Animal {reference}",
     "created": "Task created.",
     "area": "Area",
-    "recordCount": "Record a street count"
+    "recordCount": "Record a street count",
+    "team": "Team: {team}"
   },
   "merge": {
     "title": "Possible duplicate",
@@ -938,7 +939,7 @@
     "needNameAndAreas": "Give the campaign a name and choose at least one area.",
     "plannerIntro": "Set what you know about each area, choose the teams, then make a plan. A plan is a proposal: nothing is sent to teams until you approve and publish it.",
     "inputsTitle": "Areas",
-    "inputsIntro": "Estimates come from the latest street count, else registry records, unless you enter your own.",
+    "inputsIntro": "Enter your own estimate, or use the suggestion: the latest street count for the area, otherwise the number of registered animals there.",
     "estimate": "Animals expected",
     "suggested": "Suggested {n} ({source})",
     "noSuggestion": "No count or records yet",
@@ -992,12 +993,12 @@
     "failedTitle": "The plan could not be made",
     "failedBody": "Check the inputs and try again. Teams can still be assigned tasks by hand.",
     "proposalTitle": "This is a proposal",
-    "proposalBody": "Check it with the teams. Times are estimates; nothing is sent until you approve and publish.",
+    "proposalBody": "Check it with the teams. Times are estimates and animal numbers are planning estimates; nothing is sent until you approve and publish.",
     "areasPlanned": "Areas planned",
-    "animalsPlanned": "Animals covered",
+    "animalsPlanned": "Expected animals within the plan",
     "travel": "Travel (estimate)",
     "baseline": "Simple plan, for comparison",
-    "baselineValue": "{areas} areas, {animals} animals, {minutes} min",
+    "baselineValue": "{areas} areas, {animals} expected animals, {minutes} min",
     "minutes": "{n} min",
     "solverUsed": "Shown: {solver}.",
     "solver": {
@@ -1032,6 +1033,10 @@
     "publishBody": "Each planned stop becomes a task assigned to its team, with the planned times. Tasks from earlier versions stay as they are.",
     "approvedBy": "Approved by {name}",
     "publishedTasks": "{n, plural, one {# task was} other {# tasks were}} created.",
-    "seeTasks": "See tasks"
+    "seeTasks": "See tasks",
+    "suggestedSurvey": "Suggested {n}: one street count on {date}",
+    "suggestedRegistry": "Suggested {n}: registered animals with this home area",
+    "estimatesTitle": "How these estimates work",
+    "estimatesBody": "A street count is what one person saw on one day: it can miss animals and count some twice. Registry numbers include only registered animals. Only the latest count is used — counts are never added up. These numbers schedule time and doses; they are not population sizes or vaccination coverage."
   }
 }

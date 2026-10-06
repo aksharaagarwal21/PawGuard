@@ -162,7 +162,7 @@ export default async function RegistryPage({
                       {[a.coat_description, a.home_area?.name].filter(Boolean).join(" · ") || tc("notRecorded")}
                     </p>
                     <p className="text-sm text-ink-2">
-                      {ta("lastSeen")}: {relativeDays(a.last_observed_at, locale) ?? ta("neverSeen")}
+                      {ta("lastSeen")}: {relativeDays(a.last_observed_at, locale, ctx.tz) ?? ta("neverSeen")}
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       <ProfileStateChip state={a.profile_state} />

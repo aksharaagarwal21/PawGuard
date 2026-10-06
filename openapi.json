@@ -1146,6 +1146,18 @@
             ],
             "title": "Suggested Animals"
           },
+          "suggested_observed_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Observed On"
+          },
           "suggested_source": {
             "anyOf": [
               {
@@ -1167,6 +1179,7 @@
           "est_source",
           "suggested_animals",
           "suggested_source",
+          "suggested_observed_on",
           "service_minutes_per_animal",
           "access_start",
           "access_end",
@@ -4865,6 +4878,11 @@
               }
             ]
           },
+          "assigned_to_me": {
+            "default": false,
+            "title": "Assigned To Me",
+            "type": "boolean"
+          },
           "assignee_membership_id": {
             "anyOf": [
               {
@@ -5072,6 +5090,29 @@
             "title": "Task Type",
             "type": "string"
           },
+          "team_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Id"
+          },
+          "team_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Team Name"
+          },
           "title": {
             "title": "Title",
             "type": "string"
@@ -5090,6 +5131,9 @@
           "animal_reference",
           "assignee_membership_id",
           "assignee_name",
+          "team_id",
+          "team_name",
+          "assigned_to_me",
           "campaign_id",
           "due_on",
           "planned_start",

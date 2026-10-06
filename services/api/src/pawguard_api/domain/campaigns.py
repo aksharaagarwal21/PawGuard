@@ -108,20 +108,21 @@ def create_campaign(db: Session, ctx: OrgContext, data: CampaignIn) -> UUID:
     return cid
 
 
-def _suggestions(db: Session, area_ids: list[UUID]) -> dict[UUID, tuple[int, str]]:
-    """Latest survey count, else the number of active registry records whose home area it is."""
-    out: dict[UUID, tuple[int, str]] = {}
+def _suggestions(db: Session, area_ids: list[UUID]) -> dict[UUID, tuple[int, str, date | None]]:
+    """The latest single street count (never a sum of counts, which would double-count animals seen on several
+    days), else the number of active registry records whose home area it is (registered animals only)."""
+    out: dict[UUID, tuple[int, str, date | None]] = {}
     if not area_ids:
         return out
-    for r in db.execute(text("""select distinct on (area_id) area_id, dogs_counted from app.survey_counts
+    for r in db.execute(text("""select distinct on (area_id) area_id, dogs_counted, observed_on from app.survey_counts
                                 where area_id = any(cast(:a as uuid[])) order by area_id, observed_on desc,
                                 created_at desc"""), {"a": area_ids}):
-        out[r.area_id] = (r.dogs_counted, "survey")
+        out[r.area_id] = (r.dogs_counted, "survey", r.observed_on)
     for r in db.execute(text("""select home_area_id, count(*) as n from app.animals
                                 where home_area_id = any(cast(:a as uuid[]))
                                   and profile_state not in ('merged_alias','archived') group by home_area_id"""),
                         {"a": area_ids}):
-        out.setdefault(r.home_area_id, (r.n, "registry"))
+        out.setdefault(r.home_area_id, (r.n, "registry", None))
     return out
 
 
@@ -137,8 +138,9 @@ def get_campaign(db: Session, ctx: OrgContext, campaign_id: UUID) -> CampaignOut
     sugg = _suggestions(db, [r.area_id for r in rows])
     areas = [CampaignAreaOut(
         area_id=r.area_id, code=r.code, name=r.name, has_location=r.has_location, est_animals=r.est_animals,
-        est_source=r.est_source, suggested_animals=sugg.get(r.area_id, (None, None))[0],
-        suggested_source=sugg.get(r.area_id, (None, None))[1],
+        est_source=r.est_source, suggested_animals=sugg.get(r.area_id, (None, None, None))[0],
+        suggested_source=sugg.get(r.area_id, (None, None, None))[1],
+        suggested_observed_on=sugg.get(r.area_id, (None, None, None))[2],
         service_minutes_per_animal=float(r.service_minutes_per_animal), access_start=_t(r.access_start),
         access_end=_t(r.access_end), accessible=r.accessible, access_note=r.access_note, priority=r.priority,
         row_version=r.row_version) for r in rows]

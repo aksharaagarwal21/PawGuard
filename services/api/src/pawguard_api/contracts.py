@@ -428,6 +428,9 @@ class TaskOut(Out):
     animal_reference: str | None
     assignee_membership_id: UUID | None
     assignee_name: str | None
+    team_id: UUID | None = None
+    team_name: str | None = None
+    assigned_to_me: bool = False
     campaign_id: UUID | None
     due_on: date | None
     planned_start: datetime | None
@@ -698,6 +701,7 @@ class CampaignAreaOut(Out):
     est_source: str | None
     suggested_animals: int | None
     suggested_source: str | None
+    suggested_observed_on: date | None = None  # date of the street count behind a "survey" suggestion
     service_minutes_per_animal: float
     access_start: str | None
     access_end: str | None

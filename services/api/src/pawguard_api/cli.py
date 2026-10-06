@@ -150,6 +150,43 @@ def create_test_db(recreate: bool = typer.Option(True, help="Drop and recreate i
     typer.echo(f"Test database '{name}' is at the latest migration.")
 
 
+@app.command("demo-reset")
+def demo_reset(yes: bool = typer.Option(False, "--yes", help="Actually delete; without it, only report"),
+               keep_media: bool = typer.Option(False, help="Do not delete demo photos from storage")) -> None:
+    """Return the DEMO organisations to their seeded state. Non-demo organisations are never touched: their row
+    counts are checked inside the same transaction and any difference rolls the whole reset back."""
+    s = get_settings()
+    if s.env not in ("development", "test") or not s.demo_mode:
+        typer.echo("Refusing: demo-reset only runs with PAWGUARD_ENV=development|test and PAWGUARD_DEMO_MODE=true.")
+        raise typer.Exit(2)
+    from pawguard_api.seed.reset import demo_media_keys, reset_demo_rows, tenant_tables
+
+    if not yes:
+        with owner_conn() as c:
+            demo = [str(x) for x in c.execute(text("select id from app.organisations where is_demo")).scalars()]
+            for t in tenant_tables(c):
+                n = c.execute(text(f"select count(*) from app.{t} where org_id = any(cast(:d as uuid[]))"),  # noqa: S608
+                              {"d": demo}).scalar_one()
+                if n:
+                    typer.echo(f"  would delete {n:6d} from {t}")
+            typer.echo(f"  would remove {len(demo_media_keys(c, demo))} demo storage objects")
+        typer.echo("Dry run. Re-run with --yes to reset the demo organisations.")
+        return
+    with owner_conn() as c:
+        summary = reset_demo_rows(c)
+    typer.echo(f"deleted {sum(summary['deleted'].values())} demo rows from {len(summary['deleted'])} tables; "
+               f"non-demo rows untouched: {summary.get('non_demo_rows', 0)}")
+    if summary["media_keys"] and not keep_media:
+        from pawguard_api.integrations.storage import get_storage
+
+        keys = summary["media_keys"]
+        for i in range(0, len(keys), 100):
+            get_storage().remove(keys[i:i + 100])
+        typer.echo(f"removed {len(keys)} demo storage objects")
+    seed_demo()
+    typer.echo("demo organisations re-seeded")
+
+
 models_app = typer.Typer(no_args_is_help=True, help="Model registry (staged → active → retired).")
 app.add_typer(models_app, name="models")
 REPO = Path(__file__).resolve().parents[4]

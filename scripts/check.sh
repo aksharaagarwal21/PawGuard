@@ -15,6 +15,7 @@ step "API tests";              uv run pytest -q -W ignore::DeprecationWarning
 step "UI unit tests";          pnpm --filter @pawguard/ui test
 step "Web build";              pnpm --filter @pawguard/web build
 step "Bundle secret scan";     uv run python scripts/check_bundle_secrets.py
+step "ML evidence trace";      PYTHONIOENCODING=utf-8 uv run python scripts/check_ml_evidence.py
 
 if [[ "${1:-}" != "--no-e2e" ]]; then
   step "End-to-end (expects API on :8000 and 'pnpm --filter @pawguard/web start' on :3000)"

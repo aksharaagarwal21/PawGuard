@@ -4,6 +4,14 @@ Community rabies prevention and response platform — **in development**. The cu
 Prevention record-keeping for trained teams; see `docs/IMPLEMENTATION_STATUS.md` for exactly what works,
 what is tested, and what is blocked. Nothing here is clinically validated or endorsed by any programme.
 
+## Demonstration
+
+```bash
+bash scripts/demo_up.sh --reset   # Docker Desktop running; starts everything and resets the fictional demo data
+```
+
+Script, recovery steps, test results and limitations: `docs/RELEASE_REPORT_PREVENTION.md`.
+
 ## Repository map
 
 | Path | What |

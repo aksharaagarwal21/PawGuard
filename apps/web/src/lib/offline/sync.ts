@@ -1,6 +1,6 @@
 "use client";
 
-import { browserApi } from "@/lib/api-browser";
+import { browserApi, uuid4 } from "@/lib/api-browser";
 
 import {
   CACHE_HOURS,
@@ -35,7 +35,7 @@ export async function prepareKit(fieldPath: string): Promise<{ ok: true; meta: F
   if (!tasks.data) return { ok: false, reason: "failed" };
   const now = new Date();
   const meta: FieldMeta = {
-    device_id: previous?.device_id ?? `dev-${crypto.randomUUID()}`,
+    device_id: previous?.device_id ?? `dev-${uuid4()}`,
     user_id: org.data.user_id,
     org_id: org.data.org_id,
     org_name: org.data.org_name,
@@ -82,7 +82,7 @@ async function installShell(fieldPath: string): Promise<void> {
 
 /** Queue a change made on this device and reflect it locally until the server answers. */
 export async function queueChange(op: Omit<QueuedOp, "operation_id" | "client_created_at" | "status">, localTask?: CachedTask): Promise<void> {
-  await putOp({ ...op, operation_id: crypto.randomUUID(), client_created_at: new Date().toISOString(), status: "queued" });
+  await putOp({ ...op, operation_id: uuid4(), client_created_at: new Date().toISOString(), status: "queued" });
   if (localTask) await putTask(localTask);
 }
 

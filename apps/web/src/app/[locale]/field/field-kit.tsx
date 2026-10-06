@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import { Button, Card, Dialog, EmptyState, Field, Notice, StatusChip, Textarea } from "@pawguard/ui";
 
+import { uuid4 } from "@/lib/api-browser";
 import { expireIfStale, getMeta, getOps, getTasks, putOp, wipeOfflineData, type CachedTask, type FieldMeta, type QueuedOp } from "@/lib/offline/store";
 import { discardChange, prepareKit, queueChange, sendQueued, type SyncSummary } from "@/lib/offline/sync";
 
@@ -144,7 +145,7 @@ export function FieldKit({ locale }: { locale: string }) {
 
   async function retryOnLatest(op: QueuedOp) {
     if (!op.server_row_version) return;
-    await putOp({ ...op, operation_id: crypto.randomUUID(), base_row_version: op.server_row_version, status: "queued", result_code: null, message: null, client_created_at: new Date().toISOString() });
+    await putOp({ ...op, operation_id: uuid4(), base_row_version: op.server_row_version, status: "queued", result_code: null, message: null, client_created_at: new Date().toISOString() });
     await discardChange(op, "superseded");
     await reload();
     if (navigator.onLine) await send();

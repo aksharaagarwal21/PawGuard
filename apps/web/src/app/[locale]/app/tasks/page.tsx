@@ -73,7 +73,7 @@ export default async function TasksPage({
         <>
           <ul className="space-y-3">
             {open.map((task) => (
-              <TaskCard key={task.id} task={task} isMine={task.assignee_membership_id === ctx.active.membership_id} canManage={canManage} members={members} />
+              <TaskCard key={task.id} task={task} isMine={task.assigned_to_me} canManage={canManage} members={members} />
             ))}
           </ul>
           {closed.length ? (
@@ -83,7 +83,7 @@ export default async function TasksPage({
               </summary>
               <ul className="mt-2 space-y-3">
                 {closed.map((task) => (
-                  <TaskCard key={task.id} task={task} isMine={task.assignee_membership_id === ctx.active.membership_id} canManage={canManage} members={members} />
+                  <TaskCard key={task.id} task={task} isMine={task.assigned_to_me} canManage={canManage} members={members} />
                 ))}
               </ul>
             </details>

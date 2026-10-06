@@ -17,7 +17,7 @@ Legend: ✅ done and checked · 🟡 partly done · ⛔ blocked (external) · �
 | 6 Data prep & annotation | ✅ | DogFaceNet research benchmark prepared; ⛔ partner identity data | — | ⛔ 12 label-conflict groups await human adjudication | See Phase 6 log |
 | 7 PawID train/eval | ✅ integration built and tested | DogFaceNet research benchmark only; ⛔ permissioned field identity data | — | ⛔ release gate not met → research preview in demo orgs only | See Phase 7 log |
 | 8 Offline + planning | ✅ | demo data only; ⛔ no real travel-time matrix | — | ⛔ not field-tested on real devices/connectivity | See Phase 8 log |
-| 9 Prevention release audit | ⬜ | — | ⛔ vet review of wording | ⛔ user testing | |
+| 9 Prevention release audit | ✅ demo-ready | fictional demo data only | ⛔ vet/clinical review of wording | ⛔ no field or real-phone testing | See Phase 9 log and RELEASE_REPORT_PREVENTION.md |
 | 10–15 | ⬜ | | | | Not started; Prevention first |
 
 ## Phase 0 — Investigate, resolve dependencies, plan (2026-10-05) ✅
@@ -362,6 +362,26 @@ SQL NULL).
   a shift must be split by hand.
 - Stock is "doses carried per team per day" — no inventory ledger yet.
 - Tamil/Hindi strings for these screens fall back to English.
+
+## Phase 9 — Prevention release audit and demonstration preparation (2026-10-06) ✅ (demo-ready; not field-validated)
+
+Full report, test counts, feature matrix, demo script and recovery steps: `docs/RELEASE_REPORT_PREVENTION.md`.
+
+**Done:** pre-audit checkpoint commit `84249ff` + local DB backup; role walkthrough as an e2e spec on desktop and
+360 px (`release-walkthrough.spec.ts`) including forged self-verification (403) and cross-organisation isolation
+(404); research-preview boundary audit (migration 0011 column privileges, `test_boundaries.py`); ML evidence trace
+script (`scripts/check_ml_evidence.py`, in `check.sh`); offline access-change UI test; planning wording and estimate
+provenance; draft-translation notice in the app; demo reset (`pawguard-admin demo-reset`), lookup preparation
+(`scripts/demo_prepare.py`) and one-command startup (`scripts/demo_up.sh`).
+
+**Fixed:** team tasks not actionable by team members; "Last seen" off by a day (timezone); API role could change
+`is_demo`; "Animals covered" wording; estimates without source/date; Tamil/Hindi mixed text without notice; profile
+tabs hidden at 360 px; `crypto.randomUUID` failing outside secure contexts; ESLint noise from vendored files.
+
+**Results:** pytest 89 passed / 0 failed / 0 skipped; ML tests 3 passed; Playwright 57 passed / 0 failed / 29
+skipped (full run) and 13 / 0 / 11 on the demo-critical re-run after the final fixes; gate script exit 0.
+
+**Not done:** real-phone and poor-network testing; clinical review; translation review; field identity data.
 
 ## Backlog mapped to phases
 

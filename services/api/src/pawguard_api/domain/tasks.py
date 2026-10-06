@@ -108,8 +108,11 @@ def transition_task(db: Session, ctx: OrgContext, task_id: UUID, data: TaskTrans
 
 _TASK_SELECT = """
 select t.*, ar.code as area_code, ar.name as area_name, an.reference_code as animal_reference,
-       up.preferred_name as assignee_name
+       up.preferred_name as assignee_name, tt.name as team_name,
+       coalesce(t.assignee_membership_id = :mid, false)
+         or (t.assignee_membership_id is null and t.team_id in (""" + _MY_TEAMS + """)) as assigned_to_me
 from app.field_tasks t
+left join app.teams tt on tt.id = t.team_id
 left join app.areas ar on ar.id = t.area_id
 left join app.animals an on an.id = t.animal_id
 left join app.memberships m on m.id = t.assignee_membership_id
@@ -123,7 +126,9 @@ def _task_out(r: Any) -> TaskOut:
         priority_rationale=r.priority_rationale,
         area=AreaRef(id=r.area_id, code=r.area_code, name=r.area_name) if r.area_id else None,
         animal_id=r.animal_id, animal_reference=r.animal_reference, assignee_membership_id=r.assignee_membership_id,
-        assignee_name=r.assignee_name, campaign_id=r.campaign_id, due_on=r.due_on, planned_start=r.planned_start,
+        assignee_name=r.assignee_name, team_id=r.team_id, team_name=r.team_name,
+        assigned_to_me=bool(r.assigned_to_me), campaign_id=r.campaign_id, due_on=r.due_on,
+        planned_start=r.planned_start,
         planned_end=r.planned_end, outcome_note=r.outcome_note, blocked_reason=r.blocked_reason,
         cancelled_reason=r.cancelled_reason, completed_at=r.completed_at, source_event_type=r.source_event_type,
         source_event_id=r.source_event_id, is_demo=r.is_demo, created_at=r.created_at, row_version=r.row_version)
@@ -132,7 +137,8 @@ def _task_out(r: Any) -> TaskOut:
 def get_task(db: Session, ctx: OrgContext, task_id: UUID) -> TaskOut:
     if not (ctx.can(Cap.TASK_WORK) or ctx.can(Cap.TASK_MANAGE)):
         ctx.require(Cap.TASK_WORK)
-    row = db.execute(text(_TASK_SELECT + " where t.id = :id"), {"id": task_id}).one_or_none()
+    row = db.execute(text(_TASK_SELECT + " where t.id = :id"),
+                     {"id": task_id, "mid": ctx.membership_id}).one_or_none()
     if row is None:
         raise NotFound("Task not found.", code="task_not_found")
     return _task_out(row)
@@ -143,10 +149,10 @@ def list_tasks(db: Session, ctx: OrgContext, *, mine: bool, states: list[str] | 
     if not ctx.can(Cap.TASK_MANAGE):
         ctx.require(Cap.TASK_WORK)
         mine = True if animal_id is None else mine  # field workers see their own list; animal views show context
-    where, params = ["true"], {}
+    where, params = ["true"], {"mid": ctx.membership_id}
     if mine:
-        where.append("(t.assignee_membership_id = :mid or t.team_id in (" + _MY_TEAMS + "))")
-        params["mid"] = ctx.membership_id
+        where.append("(t.assignee_membership_id = :mid or (t.assignee_membership_id is null and t.team_id in ("
+                     + _MY_TEAMS + ")))")
     if states:
         where.append("t.state = any(:states)")
         params["states"] = states

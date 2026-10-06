@@ -1,7 +1,7 @@
 # Handoff
 
-**Last updated:** 2026-10-06 · **Current phase:** 9 (Prevention release audit) — not started
-**Completed:** Phases 0–8 (Phase 7 capability is research-only; see IMPLEMENTATION_STATUS) (see `IMPLEMENTATION_STATUS.md` for evidence)
+**Last updated:** 2026-10-06 · **Current phase:** 9 complete — demonstration build; Phases 10–14 paused by request
+**Completed:** Phases 0–9 (Phase 7 capability is research-only; see IMPLEMENTATION_STATUS) (see `IMPLEMENTATION_STATUS.md` for evidence)
 
 ## Resume checklist
 1. Read `PawGuard360_Claude_Build_Prompt.md` (master brief — ask the user for it if it is not in the repo),
@@ -10,6 +10,9 @@
    regenerate it unless needed (`--force` rotates DB role passwords; re-run `alembic upgrade head` afterwards so
    the roles get the new verifiers — migration 0001 re-sets them).
 3. Verify: `bash scripts/check.sh --no-e2e`.
+
+## Demo day
+`bash scripts/demo_up.sh --reset`, then follow `docs/RELEASE_REPORT_PREVENTION.md` §9–10.
 
 ## Environment notes
 - pnpm is provided by a corepack shim in `~/bin` (user-level; Program Files not writable).
@@ -28,8 +31,8 @@
 - ML tooling is a separate uv project: `cd ml && uv run pawid --help`; tests `uv run --group dev pytest tests`.
 
 ## State
-- No git commits yet (the user has not asked for commits). `git init` done on `main`.
-- Migration head: `0010`. Dataset `dogfacenet-224` v1 registered frozen (raw data under `data/raw/` is gitignored;
+- Local git commits authorised (no push). Pre-audit checkpoint `84249ff`; see `git log` for the reviewed build.
+- Migration head: `0011`. Dataset `dogfacenet-224` v1 registered frozen (raw data under `data/raw/` is gitignored;
   re-download per `DATA_SOURCES.md` S05, then `pawid dataset-prepare` with seed 20261006 is expected to reproduce manifest
   sha256 10a6554b… — reproducibility not yet verified by a second run).
 - Identity model `dinov2_small_arcface_head` / `ed25f3a3-resize224-head-v1` is registered **staged** with
@@ -41,14 +44,7 @@
   `pnpm api-client:generate`, `uv run python scripts/gen_data_dictionary.py`, `uv run python scripts/gen_permissions.py`.
 
 ## Next exact step
-Phase 9 — finish and audit the complete Prevention release (brief §9 Phase 9):
-1. Role walkthrough on desktop and 360 px: assigned task → photo lookup / manual search → uncertain/new identity →
-   record → evidence → vet review → map/task update → offline return → conflict recovery → audited correction.
-   Write it as `tests/e2e/release-walkthrough.spec.ts` with screenshots to `docs/screenshots/phase9/`.
-2. Audit: compare every visible UI claim with backend behaviour; wording audit (forbidden phrases, "possible match",
-   evidence states); empty states; permissions per role (PERMISSIONS.md vs UI); dataset isolation (research data
-   never in product); demo flags; Tamil/Hindi coverage list.
-3. Fix concrete issues found; then write `docs/RELEASE_REPORT_PREVENTION.md` (what works, test results, limits,
-   external validation status, operator guidance, demo script).
-Open items: adjudicate DogFaceNet conflict groups; carry the lookup photo into registration; manual box drawing;
-real devices for offline testing; a travel-time provider for planning.
+Phase 9 is complete; expansion (Phases 10–14) is paused until the user resumes it after the hackathon.
+If resuming: first run the phone checklist in `docs/RELEASE_REPORT_PREVENTION.md` §6 and address the ranked issues
+(§11) that matter for the pilot; then Phase 10 (Awareness content workflow + bounded AI; needs an Anthropic API key
+and qualified content reviewers).

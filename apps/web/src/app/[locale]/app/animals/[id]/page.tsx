@@ -73,7 +73,7 @@ export default async function AnimalProfilePage({
               {animal.is_demo ? <StatusChip kind="demo">Demo</StatusChip> : null}
             </div>
             <p className="text-sm text-ink-2">
-              {ta("lastSeen")}: {relativeDays(animal.last_observed_at, locale) ?? ta("neverSeen")}
+              {ta("lastSeen")}: {relativeDays(animal.last_observed_at, locale, ctx.tz) ?? ta("neverSeen")}
             </p>
             {usable ? (
               <div className="flex flex-wrap gap-2">
@@ -93,8 +93,8 @@ export default async function AnimalProfilePage({
         </div>
       </PageHeader>
 
-      <nav aria-label={t("details")} className="overflow-x-auto border-b border-divider">
-        <ul className="flex min-w-max gap-1">
+      <nav aria-label={t("details")} className="border-b border-divider">
+        <ul className="flex flex-wrap gap-x-1">
           {TABS.map((k) => (
             <li key={k}>
               <Link
