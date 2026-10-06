@@ -103,6 +103,7 @@ export function ReminderCard({
           <OwnerRecordForm
             petId={r.pet_id}
             clinicOrgId={r.clinic_org_id}
+            clinicName={r.clinic_name}
             products={products}
             today={today}
             reminder={{ id: r.id, vaccine: r.vaccine }}

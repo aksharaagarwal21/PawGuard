@@ -32,13 +32,30 @@ export default async function RemindersPage({ params }: { params: Promise<{ loca
           {t("emptyBody")}
         </EmptyState>
       ) : (
-        <ul className="space-y-3">
-          {reminders.map((r) => (
-            <li key={r.id}>
-              <ReminderCard reminder={r} products={products[r.pet_id] ?? []} today={realToday} />
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-8">
+          {(
+            [
+              ["overdue", reminders.filter((r) => r.days_until_due < 0)],
+              ["thisWeek", reminders.filter((r) => r.days_until_due >= 0 && r.days_until_due <= 7)],
+              ["later", reminders.filter((r) => r.days_until_due > 7)],
+            ] as const
+          )
+            .filter(([, list]) => list.length > 0)
+            .map(([key, list]) => (
+              <section key={key} aria-labelledby={`group-${key}`} className="space-y-3">
+                <h2 id={`group-${key}`} className="text-lg">
+                  {t(`groups.${key}`)} <span className="text-ink-2">({list.length})</span>
+                </h2>
+                <ul className="space-y-3">
+                  {list.map((r) => (
+                    <li key={r.id}>
+                      <ReminderCard reminder={r} products={products[r.pet_id] ?? []} today={realToday} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+        </div>
       )}
     </PageBody>
   );

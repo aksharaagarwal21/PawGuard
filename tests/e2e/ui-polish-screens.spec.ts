@@ -53,3 +53,27 @@ for (const [label, viewport] of WIDTHS) {
     await check(page, `sign-in-${label}`);
   });
 }
+
+for (const [label, viewport] of WIDTHS) {
+  test(`owner screens (${label})`, async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize(viewport);
+    await signIn(page, DEMO.owner.email);
+    await expect(page.getByText(/^Good (morning|afternoon|evening), Neha\.$/)).toBeVisible();
+    await expect(page.getByRole("region", { name: "Next step" })).toBeVisible();
+    await check(page, `my-pets-${label}`);
+    await page.getByRole("link", { name: /Bruno/ }).first().click();
+    await expect(page.getByRole("heading", { name: "Vaccination history" })).toBeVisible();
+    await check(page, `pet-detail-${label}`);
+    await page.getByText("Add a past vaccination").last().click();
+    await expect(page.getByText("Step 1 of 3")).toBeVisible();
+    await page.getByRole("link", { name: "Vaccination card (QR)" }).click();
+    await check(page, `card-${label}`);
+    await page.goto("/en/app/reminders");
+    await expect(page.getByRole("heading", { name: /^(Overdue|This week|Later)/ }).first()).toBeVisible();
+    await check(page, `reminders-${label}`);
+    await page.goto("/en/app/pets/new");
+    await expect(page.getByText("Step 1 of 3")).toBeVisible();
+    await check(page, `add-pet-${label}`);
+  });
+}

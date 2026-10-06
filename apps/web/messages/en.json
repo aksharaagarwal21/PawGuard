@@ -521,11 +521,11 @@
       "retries_exhausted": "it could not be processed",
       "other": "it could not be processed"
     },
-    "tooLarge": "File is larger than 15 MB.",
-    "wrongType": "This file type isn't supported.",
+    "tooLarge": "This file is too large — choose one under 15 MB.",
+    "wrongType": "This file type isn't supported — choose a JPEG, PNG or WebP photo (or a PDF for a certificate).",
     "remove": "Remove",
     "chooseAnother": "Choose another file",
-    "failed": "Upload failed. Check your connection and try again.",
+    "failed": "The upload didn't finish — check your connection and try again.",
     "thumbAlt": "Uploaded photo preview"
   },
   "vaccForm": {
@@ -1341,7 +1341,7 @@
     "dueFromVet": "Due date set by the vet.",
     "verification": {
       "verified_by_vet": "Verified by vet",
-      "entered_by_owner_unverified": "Entered by owner (unverified)",
+      "entered_by_owner_unverified": "Waiting for vet (entered by you)",
       "submitted_unverified": "Waiting for verification",
       "needs_correction": "Correction requested",
       "rejected": "Not accepted",
@@ -1378,7 +1378,19 @@
       "photo": "Photo",
       "save": "Add pet",
       "saving": "Saving…",
-      "noClinic": "You are not registered with a clinic yet. Ask your clinic to invite you."
+      "noClinic": "You are not registered with a clinic yet. Ask your clinic to invite you.",
+      "steps": {
+        "about": "About your pet",
+        "clinic": "Clinic and photo",
+        "review": "Check and save"
+      },
+      "nameHint": "The name your clinic knows your pet by.",
+      "sexHint": "Choose “Not sure” if you don't know.",
+      "dobHint": "An approximate date is fine.",
+      "photoHint": "A clear photo helps the clinic recognise your pet. JPEG, PNG or WebP, up to 15 MB.",
+      "reviewIntro": "Check the details, then save. You can add vaccinations next.",
+      "photoAdded": "Photo added",
+      "photoNone": "No photo"
     },
     "record": {
       "unverifiedNote": "This will be saved as entered by you (unverified) and sent to the clinic's vet to check.",
@@ -1396,7 +1408,18 @@
       "submit": "Send for verification",
       "submitDone": "Mark as done",
       "saving": "Saving…",
-      "saved": "Saved. The clinic's vet will check the certificate."
+      "saved": "Saved. The clinic's vet will check the certificate.",
+      "steps": {
+        "details": "Vaccine details",
+        "certificate": "Certificate",
+        "review": "Check and send"
+      },
+      "vaccineHint": "As written on the certificate. Choose “Other” if it isn't listed.",
+      "dateHint": "The date on the certificate.",
+      "givenByHint": "The vet or clinic named on the certificate.",
+      "certificateCount": "{count, plural, =0 {None} one {# file} other {# files}}",
+      "savedNext": "Until a vet at {clinic} checks it, it shows as “Waiting for vet”.",
+      "savedNextGeneric": "Until the clinic's vet checks it, it shows as “Waiting for vet”."
     },
     "card": {
       "open": "Vaccination card (QR)",
@@ -1414,7 +1437,58 @@
       "turnOff": "Turn off the card",
       "turnOffConfirm": "Turn off the public card? The QR code will stop working.",
       "turnedOff": "The public card is turned off.",
-      "failed": "That didn't work. Try again."
+      "failed": "That didn't work. Try again.",
+      "walletTitle": "Vaccination card",
+      "walletLabel": "Vaccination card for {name}",
+      "verifiedList": "Vaccinations verified by a vet"
+    },
+    "greeting": {
+      "morning": "Good morning, {name}.",
+      "afternoon": "Good afternoon, {name}.",
+      "evening": "Good evening, {name}."
+    },
+    "greetingNoName": "Welcome back.",
+    "summary": {
+      "attention": "{count, plural, one {# pet needs attention} other {# pets need attention}}",
+      "soon": "{count} due soon",
+      "upToDate": "{count} up to date",
+      "waiting": "{count} waiting for vet",
+      "none": "{count} with no verified record"
+    },
+    "statusShort": {
+      "up_to_date": "No next due date recorded.",
+      "due_soon": "Due soon.",
+      "overdue": "Overdue.",
+      "unverified_record": "Your vet will check your record.",
+      "no_verified_record": "Add a past vaccination to get started."
+    },
+    "next": {
+      "label": "Next step",
+      "overdueTitle": "{name} is overdue for {vaccine}.",
+      "overdueBody": "Book a visit at {clinic}. If it was already given, mark it as done and add the certificate.",
+      "soonTitle": "{name} is due in {days, plural, one {# day} other {# days}}.",
+      "soonBody": "Book a visit at {clinic}. You can add the date to your calendar from the reminder.",
+      "noneTitle": "Add {name}'s past vaccinations.",
+      "noneBody": "Upload the certificate. Your vet will check it, and reminders start once it's verified.",
+      "waitingTitle": "Your vet will check {name}'s record.",
+      "waitingBody": "{clinic} will verify the certificate you added. Nothing else to do for now.",
+      "doneTitle": "All caught up.",
+      "doneBody": "Every pet is up to date. We'll remind you here before the next due date.",
+      "markDone": "Mark as done",
+      "seeReminder": "See the reminder",
+      "addPast": "Add a past vaccination",
+      "openPet": "Open {name}",
+      "overdueDays": "{count, plural, one {# day overdue} other {# days overdue}}",
+      "dueToday": "due today",
+      "dueInDays": "{count, plural, one {due in # day} other {due in # days}}",
+      "dueInMonths": "{count, plural, one {next dose in # month} other {next dose in # months}}"
+    },
+    "waitingExplain": "You added this record. It counts once the clinic's vet verifies it.",
+    "addedTitle": "{name} is added.",
+    "addedNext": "Next: add a past vaccination with its certificate, so your vet can verify it and reminders can start.",
+    "stepper": {
+      "stepOf": "Step {step} of {total}",
+      "progressLabel": "Progress"
     }
   },
   "reminders": {
@@ -1442,7 +1516,12 @@
     "previewTitle": "Notification preview",
     "previewNote": "Preview only — no message is actually sent.",
     "previewEmail": "Email",
-    "previewSms": "SMS"
+    "previewSms": "SMS",
+    "groups": {
+      "overdue": "Overdue",
+      "thisWeek": "This week",
+      "later": "Later"
+    }
   },
   "demoClock": {
     "title": "Demo date (demo organisation only)",
