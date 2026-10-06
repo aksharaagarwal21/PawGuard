@@ -1,0 +1,16 @@
+packages:
+  - apps/*
+  - packages/*
+  - tests
+# Reproducible installs: exact versions are written to package.json, and the lockfile is authoritative.
+savePrefix: ""
+# pnpm 11 holds back very new releases by default; this one was resolved at install time (2026-10-05).
+minimumReleaseAgeExclude:
+  - postcss@8.5.29
+# Dependency install scripts are denied unless listed as true. These three only verify/download optional
+# native binaries for features PawGuard does not use (next-intl message extraction, file watching,
+# eslint import resolution falls back to JS).
+allowBuilds:
+  "@swc/core": false
+  "@parcel/watcher": false
+  "unrs-resolver": false

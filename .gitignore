@@ -1,0 +1,56 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+dist/
+build/
+*.tsbuildinfo
+.turbo/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Environment and secrets — never commit real values
+.env
+.env.*
+!.env.example
+infra/supabase/signing_keys.json
+
+# Large / private data and model artefacts (tracked via manifests + checksums, not Git)
+data/raw/
+data/staging/
+data/clean/
+data/private/
+ml/artifacts/
+ml/runs/
+mlruns/
+models/
+*.onnx
+*.pth
+*.safetensors
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Copied at build time from node_modules (scripts/copy-maplibre-worker.mjs)
+apps/web/public/vendor/maplibre/
+
+# Derived research artefacts (embeddings, caches) — reproducible from manifests
+data/derived/
+
+# Local database backups (contain demo accounts and data; never commit)
+backups/

@@ -1,0 +1,88 @@
+/*
+ * PawGuard 360 design tokens (docs/DESIGN_SYSTEM.md). Tailwind v4 reads @theme to generate utilities such as
+ * bg-canvas, text-ink, border-control. Contrast values for every pairing are recorded in the design doc.
+ * Pastel surfaces are backgrounds only — never text colours.
+ */
+@theme {
+  --color-canvas: #f7f8f3;
+  --color-surface: #ffffff;
+  --color-ink: #203a34;
+  --color-ink-2: #576e64;
+  --color-primary: #205c4f;
+  --color-primary-hover: #174538;
+  --color-sage: #e8f1e9;
+  --color-sky: #eaf2f8;
+  --color-lavender: #f0edf7;
+  --color-sand: #fbf1de;
+  --color-urgent: #a43e35;
+  --color-urgent-soft: #f8e9e7;
+  --color-divider: #cbd8ce;
+  --color-control: #6f877c;
+  --color-focus: #205c4f;
+
+  --font-display: "Manrope Variable", "Noto Sans Tamil Variable", "Noto Sans Devanagari Variable", ui-sans-serif,
+    system-ui, sans-serif;
+  --font-body: "Source Sans 3 Variable", "Noto Sans Tamil Variable", "Noto Sans Devanagari Variable",
+    ui-sans-serif, system-ui, sans-serif;
+
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 1.875rem;
+  --text-3xl: 2.375rem;
+
+  --radius-control: 9px;
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgb(32 58 52 / 0.06);
+  --ease-calm: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
+  :lang(ta) body,
+  body:lang(ta) {
+    line-height: 1.75;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    line-height: 1.25;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  /* Tailwind's preflight removes link underlines; restore them so links in text are not identified by colour
+     alone (WCAG 1.4.1). Navigation and button-styled links opt out explicitly with `no-underline`. */
+  a {
+    color: var(--color-primary);
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

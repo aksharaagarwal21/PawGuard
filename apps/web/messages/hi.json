@@ -1,0 +1,61 @@
+{
+  "_status": "DRAFT — machine-assisted interface translation, not yet reviewed by a native Hindi speaker. Health guidance (help.*) is intentionally not translated until a qualified reviewer approves it.",
+  "common": {
+    "skipToContent": "मुख्य सामग्री पर जाएँ",
+    "language": "भाषा",
+    "close": "बंद करें",
+    "back": "वापस",
+    "continue": "आगे बढ़ें",
+    "cancel": "रद्द करें",
+    "retry": "फिर से कोशिश करें",
+    "loading": "लोड हो रहा है…",
+    "optional": "(वैकल्पिक)",
+    "required": "(आवश्यक)",
+    "signOut": "साइन आउट",
+    "demoBanner": "डेमो वातावरण — यहाँ के सभी संगठन, लोग और पशु काल्पनिक हैं। कोई भी असली रिकॉर्ड नहीं है।",
+    "translationDraftNotice": "यह अनुवाद एक अधूरा मसौदा है; कुछ पाठ अंग्रेज़ी में दिखेगा। अभी तक किसी हिंदी भाषी समीक्षक ने इसकी जाँच नहीं की है।",
+    "untranslatedNotice": "यह सामग्री अभी आपकी भाषा में उपलब्ध नहीं है। इसे अंग्रेज़ी में दिखाया जा रहा है।"
+  },
+  "nav": {
+    "learn": "सीखें",
+    "findCare": "इलाज खोजें",
+    "about": "परिचय",
+    "sources": "स्रोत",
+    "teamSignIn": "टीम साइन इन",
+    "getHelp": "काटने के बाद मदद पाएँ",
+    "openMenu": "मेनू खोलें",
+    "today": "आज",
+    "system": "सिस्टम स्थिति",
+    "more": "और",
+    "organisation": "संगठन",
+    "switchOrganisation": "संगठन बदलें",
+    "animals": "पशु",
+    "tasks": "कार्य"
+  },
+  "landing": {
+    "headline": "लोगों की देखभाल। सामुदायिक पशुओं की सुरक्षा।",
+    "primaryAction": "काटने के बाद मदद पाएँ",
+    "secondaryAction": "रोकथाम के बारे में जानें"
+  },
+  "signIn": {
+    "title": "टीम साइन इन",
+    "email": "ईमेल पता",
+    "password": "पासवर्ड",
+    "submit": "साइन इन करें"
+  },
+  "app": {
+    "online": "ऑनलाइन",
+    "offline": "ऑफ़लाइन"
+  },
+  "today": {
+    "greeting": "नमस्ते, {name}",
+    "greetingNoName": "नमस्ते",
+    "tasksTitle": "आपके कार्य"
+  },
+  "roles": {
+    "field_volunteer": "फ़ील्ड स्वयंसेवक",
+    "veterinary_reviewer": "पशु-चिकित्सा समीक्षक",
+    "programme_coordinator": "कार्यक्रम समन्वयक",
+    "org_admin": "संगठन व्यवस्थापक"
+  }
+}

@@ -1,0 +1,55 @@
+# uv workspace for the Python services. The ML training project (ml/) is a separate uv project
+# with its own lockfile so PyTorch never enters the API/worker environments or images.
+[project]
+name = "pawguard-workspace"
+version = "0.0.0"
+requires-python = ">=3.12,<3.13"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[tool.uv.workspace]
+members = ["services/api", "services/worker"]
+
+[tool.uv.sources]
+pawguard-api = { workspace = true }
+pawguard-worker = { workspace = true }
+
+[dependency-groups]
+dev = [
+  "pawguard-api",
+  "pawguard-worker",
+  "pytest==9.1.1",
+  "hypothesis==6.168.4",
+  "ruff==0.16.10",
+  "mypy==2.4.0",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+# RUF001-003: typographic characters (em dash, multiplication sign, approx) are intentional in user-facing text.
+ignore = ["S101", "B008", "RUF012", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["pawguard_api", "pawguard_worker", "pawguard_ml"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = ["S105", "S106", "S311", "S608", "SIM117", "E501"]
+"**/seed/**" = ["S105", "E501"]
+"**/migrations/**" = ["E501", "S608"]
+"scripts/**" = ["S602", "S607", "E501"]
+# Seeded sampling for reproducible datasets/evaluation is not a security use of randomness.
+"ml/**" = ["S311", "E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["services/api/tests", "services/worker/tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "db: requires the local PostgreSQL (Supabase) database",
+  "storage: requires the local Supabase Storage service",
+]

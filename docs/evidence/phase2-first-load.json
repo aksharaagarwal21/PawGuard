@@ -1,0 +1,36 @@
+{
+  "measured_at": "2026-10-06T07:03:59.103Z",
+  "profile": "Pixel 7 emulation, 360px, no throttling, local next start",
+  "results": [
+    {
+      "path": "/en",
+      "ttfb_ms": 13,
+      "dom_content_loaded_ms": 97,
+      "load_ms": 168,
+      "lcp_ms": 112,
+      "cls": 0,
+      "requests": 27,
+      "transferred_kb": 562
+    },
+    {
+      "path": "/en/help",
+      "ttfb_ms": 18,
+      "dom_content_loaded_ms": 56,
+      "load_ms": 63,
+      "lcp_ms": 76,
+      "cls": 0,
+      "requests": 27,
+      "transferred_kb": 80
+    },
+    {
+      "path": "/en/sign-in",
+      "ttfb_ms": 16,
+      "dom_content_loaded_ms": 37,
+      "load_ms": 55,
+      "lcp_ms": 52,
+      "cls": 0,
+      "requests": 28,
+      "transferred_kb": 253
+    }
+  ]
+}

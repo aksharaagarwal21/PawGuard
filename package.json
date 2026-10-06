@@ -1,0 +1,17 @@
+{
+  "name": "pawguard360",
+  "private": true,
+  "packageManager": "pnpm@11.28.4",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @pawguard/web dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "api-client:generate": "pnpm --filter @pawguard/api-client generate",
+    "e2e": "pnpm --filter @pawguard/e2e test"
+  }
+}

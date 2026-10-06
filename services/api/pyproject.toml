@@ -1,0 +1,33 @@
+[project]
+name = "pawguard-api"
+version = "0.1.0"
+description = "PawGuard 360 API: business rules, permissions and data access"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "fastapi==0.142.2",
+  "uvicorn[standard]==0.54.0",
+  "pydantic==2.13.5",
+  "pydantic-settings==2.15.0",
+  "sqlalchemy==2.1.3",
+  "psycopg[binary]==3.3.6",
+  "alembic==1.20.0",
+  "geoalchemy2==0.20.0",
+  "pgvector==0.5.0",
+  "pyjwt[crypto]==2.15.1",
+  "httpx==0.28.1",
+  "structlog==26.1.0",
+  "orjson==3.12.0",
+  "typer==0.27.2",
+  "redis==6.4.0",
+  "python-dotenv==1.2.4",
+]
+
+[project.scripts]
+pawguard-admin = "pawguard_api.cli:app"
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pawguard_api"]

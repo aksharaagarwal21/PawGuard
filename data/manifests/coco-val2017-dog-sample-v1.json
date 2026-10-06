@@ -1,0 +1,1389 @@
+{
+  "name": "coco-val2017-dog-sample",
+  "version": "1",
+  "seed": 20261006,
+  "source": "COCO 2017 val (https://cocodataset.org); annotations CC BY 4.0; images per-image licence",
+  "allowed_license_ids": [
+    4,
+    5,
+    7,
+    8
+  ],
+  "counts": {
+    "positives": 44,
+    "negatives": 25,
+    "verification": 15,
+    "dog_boxes": 59
+  },
+  "limitations": [
+    "Pet/street photos from Flickr, not Indian community-dog field imagery",
+    "val2017 is the authors' benchmark split",
+    "Crowd-annotated dog images excluded"
+  ],
+  "images": [
+    {
+      "image_id": 392818,
+      "file_name": "000000392818.jpg",
+      "width": 500,
+      "height": 451,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2446/3572256424_9d106e4692_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000392818.jpg",
+      "sha256": "8918cd7c88cfe2bf32a8417abf5ad4a0402d677573c149fb29de7a6b9b6490f5",
+      "dog_boxes_xywh": [
+        [
+          0.0,
+          10.55,
+          500.0,
+          436.45
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 89880,
+      "file_name": "000000089880.jpg",
+      "width": 500,
+      "height": 281,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3353/3424594672_333e3ee522_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000089880.jpg",
+      "sha256": "4cc6935c4f45d41f57a53c5fb2ac917a81b3ff40e6dde5d6265357c32e93f7b5",
+      "dog_boxes_xywh": [
+        [
+          145.5,
+          13.18,
+          150.11,
+          172.06
+        ],
+        [
+          256.47,
+          42.96,
+          163.02,
+          150.54
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 253386,
+      "file_name": "000000253386.jpg",
+      "width": 500,
+      "height": 333,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3196/3037448990_28822471dd_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000253386.jpg",
+      "sha256": "3764f11fe83bcb95e67778f8186a81fc837037a23b6f5835938d2026410f70ee",
+      "dog_boxes_xywh": [
+        [
+          145.39,
+          24.89,
+          316.25,
+          302.85
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 554291,
+      "file_name": "000000554291.jpg",
+      "width": 640,
+      "height": 428,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm1.staticflickr.com/103/256248429_ebcfe37830_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000554291.jpg",
+      "sha256": "87cfe902780e460e352a5de8b0ced6a8372dc7317aba136279edf3ff4e0527dc",
+      "dog_boxes_xywh": [
+        [
+          209.54,
+          69.66,
+          290.91,
+          345.52
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 404484,
+      "file_name": "000000404484.jpg",
+      "width": 320,
+      "height": 240,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm3.staticflickr.com/2645/4216057008_f835cc6fdf_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000404484.jpg",
+      "sha256": "3e1fd76af6b82f92fb57bcc74b4e84064574ef59148b7c09f00642e5a9138c81",
+      "dog_boxes_xywh": [
+        [
+          86.93,
+          90.76,
+          82.5,
+          74.54
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 190140,
+      "file_name": "000000190140.jpg",
+      "width": 640,
+      "height": 428,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm7.staticflickr.com/6118/6216901971_786976ff66_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000190140.jpg",
+      "sha256": "abade429d12b97abe8d8e437d38fa2beda1058343ddbc46fa5bdd80000aa6c32",
+      "dog_boxes_xywh": [
+        [
+          355.66,
+          155.09,
+          79.23,
+          147.26
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 462728,
+      "file_name": "000000462728.jpg",
+      "width": 640,
+      "height": 427,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm2.staticflickr.com/1031/552459283_e29e35c3ac_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000462728.jpg",
+      "sha256": "91b6a7a3f79c32d41c0768a7cc40392c1648944529731694218de0441d03a39b",
+      "dog_boxes_xywh": [
+        [
+          210.77,
+          203.58,
+          54.11,
+          42.83
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 222317,
+      "file_name": "000000222317.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm4.staticflickr.com/3009/3098419724_89827f6fd7_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000222317.jpg",
+      "sha256": "578a6e929caa3bb20a211d0b0fcb8a7b018d2532e0695fcdb046155c48dc8c40",
+      "dog_boxes_xywh": [
+        [
+          223.03,
+          197.82,
+          227.88,
+          89.21
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 427034,
+      "file_name": "000000427034.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm5.staticflickr.com/4146/4845125160_b23cf4bd2d_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000427034.jpg",
+      "sha256": "67f67faa801571ade9d12ca207f582bc5abdda9af672b9e5dab8e9414c2cb3a3",
+      "dog_boxes_xywh": [
+        [
+          280.81,
+          177.33,
+          359.19,
+          174.9
+        ],
+        [
+          208.08,
+          26.91,
+          32.94,
+          58.72
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 490171,
+      "file_name": "000000490171.jpg",
+      "width": 640,
+      "height": 427,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm2.staticflickr.com/1396/552454479_2adb976eb8_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000490171.jpg",
+      "sha256": "599233ed3ed254ac967c63ceb7109f0c17437b0dad9a4af31e1ffe27c0f9f17c",
+      "dog_boxes_xywh": [
+        [
+          275.03,
+          231.45,
+          109.27,
+          77.35
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 78565,
+      "file_name": "000000078565.jpg",
+      "width": 640,
+      "height": 499,
+      "license_id": 7,
+      "license": "No known copyright restrictions",
+      "flickr_url": "http://farm2.staticflickr.com/1299/4603303064_8d415a5200_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000078565.jpg",
+      "sha256": "af56785c7c458a53bf642cd48f7d209073302115e5d6806db3c6fb039df7558e",
+      "dog_boxes_xywh": [
+        [
+          201.78,
+          306.48,
+          31.21,
+          16.72
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 107226,
+      "file_name": "000000107226.jpg",
+      "width": 480,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2139/2185708967_4da3c7fb32_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000107226.jpg",
+      "sha256": "285a3dfd666d35fb60eb63b9dd46b7b49aae4fcafe194f51d7e4b446abdab725",
+      "dog_boxes_xywh": [
+        [
+          146.56,
+          290.11,
+          107.01,
+          206.37
+        ],
+        [
+          57.81,
+          283.53,
+          99.09,
+          228.47
+        ],
+        [
+          1.38,
+          360.6,
+          75.7,
+          228.48
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 17029,
+      "file_name": "000000017029.jpg",
+      "width": 640,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm8.staticflickr.com/7304/8746020648_f1e2075b86_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000017029.jpg",
+      "sha256": "d619327903c6b05520f0d6768807c067cce2d6d908d2d83da018a1da3b1792cf",
+      "dog_boxes_xywh": [
+        [
+          154.84,
+          105.81,
+          250.32,
+          436.13
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 126110,
+      "file_name": "000000126110.jpg",
+      "width": 320,
+      "height": 240,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm1.staticflickr.com/58/192105537_1b69c0b40d_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000126110.jpg",
+      "sha256": "68f6289ad123cea10bf3111a6776409bf571d0b57a1453475debe54e1a36e961",
+      "dog_boxes_xywh": [
+        [
+          105.06,
+          52.22,
+          56.14,
+          132.36
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 78823,
+      "file_name": "000000078823.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm1.staticflickr.com/9/13918737_12ed28cb16_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000078823.jpg",
+      "sha256": "d9fe245622dc52d9c977eb501aa70d23a9e0fb61e2873879db6c0a89b1bc6b88",
+      "dog_boxes_xywh": [
+        [
+          197.97,
+          117.22,
+          170.45,
+          222.07
+        ]
+      ],
+      "split": "verification",
+      "kind": "positive"
+    },
+    {
+      "image_id": 446522,
+      "file_name": "000000446522.jpg",
+      "width": 480,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm1.staticflickr.com/169/414738646_adafe60def_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000446522.jpg",
+      "sha256": "5be429c41a46270ced8ea13212b6f02302e00158d9a1040ea336ec5630237ed3",
+      "dog_boxes_xywh": [
+        [
+          151.95,
+          336.22,
+          212.48,
+          172.56
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 318238,
+      "file_name": "000000318238.jpg",
+      "width": 478,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm8.staticflickr.com/7402/9964003514_84ce7550c9_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000318238.jpg",
+      "sha256": "5a0511750ff647e606a5586676e1114cf337c73206bde3e9c3577995c3867e9d",
+      "dog_boxes_xywh": [
+        [
+          2.59,
+          289.62,
+          444.76,
+          283.15
+        ],
+        [
+          168.27,
+          162.88,
+          179.77,
+          176.9
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 139872,
+      "file_name": "000000139872.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm1.staticflickr.com/92/260183330_494bd996d8_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000139872.jpg",
+      "sha256": "1004f177853f43360869c733685f0994ded85ad297d92a3b82809d2cd70a6669",
+      "dog_boxes_xywh": [
+        [
+          66.91,
+          32.0,
+          415.03,
+          395.64
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 486479,
+      "file_name": "000000486479.jpg",
+      "width": 500,
+      "height": 375,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3563/3792891749_6efb555740_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000486479.jpg",
+      "sha256": "9f3bf68815b9d35646131e84d97ed6d20fd9de4d343cded54a8f726e4c167de7",
+      "dog_boxes_xywh": [
+        [
+          65.64,
+          52.89,
+          236.17,
+          181.84
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 546829,
+      "file_name": "000000546829.jpg",
+      "width": 640,
+      "height": 425,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3321/3602461508_d8fd434a9e_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000546829.jpg",
+      "sha256": "777a4b64d474ba0dc0b2f7094dae7b894aa50a5f701e7fda781b45094d27c28f",
+      "dog_boxes_xywh": [
+        [
+          208.59,
+          147.46,
+          84.62,
+          141.72
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 193674,
+      "file_name": "000000193674.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5170/5240208640_839ede4a38_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000193674.jpg",
+      "sha256": "fe94d775b39e9a7ad325404842bdc5ce2758e5cb3edaeb66d9be772ac5448020",
+      "dog_boxes_xywh": [
+        [
+          405.58,
+          162.71,
+          56.35,
+          175.48
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 189806,
+      "file_name": "000000189806.jpg",
+      "width": 500,
+      "height": 400,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm1.staticflickr.com/83/217730183_8f58409e7c_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000189806.jpg",
+      "sha256": "95ad20d361c8ca796a19e3543c102e9eaa221b871492b6f0894ae9cef6e18fa6",
+      "dog_boxes_xywh": [
+        [
+          263.63,
+          193.1,
+          180.04,
+          103.59
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 530624,
+      "file_name": "000000530624.jpg",
+      "width": 640,
+      "height": 478,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5195/7235177844_90ef706004_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000530624.jpg",
+      "sha256": "7823ebc01012afee0fc555b20d87030c5cebe71c3cc82f0cb41c68bf8d44ca8e",
+      "dog_boxes_xywh": [
+        [
+          96.57,
+          107.19,
+          518.55,
+          194.09
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 579321,
+      "file_name": "000000579321.jpg",
+      "width": 640,
+      "height": 498,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm5.staticflickr.com/4114/4737904204_465fa5d55b_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000579321.jpg",
+      "sha256": "7de922c9b80b5d223df9ed43fd551c00abed83ea85a5c36a7b8f19bfcfb00d29",
+      "dog_boxes_xywh": [
+        [
+          200.61,
+          89.65,
+          400.22,
+          251.02
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 372819,
+      "file_name": "000000372819.jpg",
+      "width": 640,
+      "height": 426,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2046/2516944023_d00345997d_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000372819.jpg",
+      "sha256": "ba959429e80e0291609b81caa25e1a31abb24a3de0df6c7f1f68dd1649349d47",
+      "dog_boxes_xywh": [
+        [
+          427.94,
+          192.69,
+          40.39,
+          85.34
+        ],
+        [
+          216.0,
+          223.86,
+          58.32,
+          97.49
+        ],
+        [
+          226.5,
+          139.08,
+          41.79,
+          92.0
+        ],
+        [
+          280.26,
+          109.24,
+          33.91,
+          76.76
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 560880,
+      "file_name": "000000560880.jpg",
+      "width": 640,
+      "height": 508,
+      "license_id": 7,
+      "license": "No known copyright restrictions",
+      "flickr_url": "http://farm4.staticflickr.com/3544/4603281590_fbf40d4e92_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000560880.jpg",
+      "sha256": "da716b857d3c953c702dd0776e3d118038ea84739890eb854623c31a56f53b0a",
+      "dog_boxes_xywh": [
+        [
+          279.55,
+          352.13,
+          25.96,
+          34.53
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 236784,
+      "file_name": "000000236784.jpg",
+      "width": 500,
+      "height": 400,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2380/2222474135_825753ebbd_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000236784.jpg",
+      "sha256": "cdd94432188f912462ec36a51f6e17efe537e472ef427654d37f26cf76bea4e7",
+      "dog_boxes_xywh": [
+        [
+          230.3,
+          193.0,
+          266.67,
+          131.71
+        ],
+        [
+          1.79,
+          194.26,
+          241.26,
+          154.26
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 80153,
+      "file_name": "000000080153.jpg",
+      "width": 428,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5142/5650798989_4e830b5a03_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000080153.jpg",
+      "sha256": "3805f4e59254e155f166f340ee8eff2beaea49ee475ae837782da3cfc65bf8ea",
+      "dog_boxes_xywh": [
+        [
+          204.15,
+          358.8,
+          86.89,
+          180.08
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 283412,
+      "file_name": "000000283412.jpg",
+      "width": 640,
+      "height": 427,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5215/5499994653_748a7cbcbd_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000283412.jpg",
+      "sha256": "ecff06907a7898f62175cdebf1108b752e085d9b53a4806869c6b4df508d6602",
+      "dog_boxes_xywh": [
+        [
+          1.73,
+          2.44,
+          439.07,
+          415.69
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 261161,
+      "file_name": "000000261161.jpg",
+      "width": 640,
+      "height": 426,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm9.staticflickr.com/8325/8113006533_a2d7ac54d0_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000261161.jpg",
+      "sha256": "bd6970139b63adcecd2039608f1b4ea928e0f431a0ba43ccb00af58e7190914f",
+      "dog_boxes_xywh": [
+        [
+          324.45,
+          26.68,
+          271.95,
+          399.32
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 338901,
+      "file_name": "000000338901.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm4.staticflickr.com/3220/3098425884_0dfc6b86d5_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000338901.jpg",
+      "sha256": "c523e93db4e127f191d892ddc1bbe8db14e894d76bf0231624a5cba918963254",
+      "dog_boxes_xywh": [
+        [
+          272.48,
+          140.61,
+          367.52,
+          228.84
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 309938,
+      "file_name": "000000309938.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm3.staticflickr.com/2460/3742502573_02458ab759_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000309938.jpg",
+      "sha256": "8956749b98223cb888cb948f97d64cbc7330d7a8c285da0921a8630cc2f6f4a8",
+      "dog_boxes_xywh": [
+        [
+          100.85,
+          110.55,
+          338.42,
+          231.75
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 182805,
+      "file_name": "000000182805.jpg",
+      "width": 640,
+      "height": 360,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm7.staticflickr.com/6218/6309322560_cf4708d8dc_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000182805.jpg",
+      "sha256": "e502d762b1a264156f1e6349702d742d6cdddd40a2b54a3390acbd8e5059d1dd",
+      "dog_boxes_xywh": [
+        [
+          279.33,
+          132.44,
+          93.79,
+          212.62
+        ],
+        [
+          325.29,
+          185.33,
+          237.31,
+          170.31
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 389933,
+      "file_name": "000000389933.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm5.staticflickr.com/4061/4376326145_7ef66603e3_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000389933.jpg",
+      "sha256": "27ccfbb2aec33b2e4ff4e03168119ddcbd3aadb021516bb7316d1c9468cca30e",
+      "dog_boxes_xywh": [
+        [
+          3.87,
+          82.26,
+          529.36,
+          391.93
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 262938,
+      "file_name": "000000262938.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm8.staticflickr.com/7029/6716837175_fb5e4de84a_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000262938.jpg",
+      "sha256": "ce78e1690b2b47515d3d1e36f149faee2cb032efcebc130a8f38c5489545958e",
+      "dog_boxes_xywh": [
+        [
+          434.84,
+          246.27,
+          167.24,
+          111.87
+        ],
+        [
+          116.39,
+          242.06,
+          176.14,
+          138.03
+        ],
+        [
+          1.08,
+          44.97,
+          311.73,
+          206.03
+        ],
+        [
+          255.64,
+          13.69,
+          326.83,
+          240.54
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 140203,
+      "file_name": "000000140203.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm1.staticflickr.com/47/151349771_c85a058c7d_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000140203.jpg",
+      "sha256": "5c3a04dada4c36aba47e5c65a25da677451e66c4a7344ebb602bb4fe4cda55d1",
+      "dog_boxes_xywh": [
+        [
+          485.46,
+          42.85,
+          92.86,
+          71.76
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 29393,
+      "file_name": "000000029393.jpg",
+      "width": 500,
+      "height": 375,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2556/4228514131_81f3416db3_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000029393.jpg",
+      "sha256": "378763dec71a25c7cb44ff9e345c84ca0fe2d8bf993b88775c360549edf3b733",
+      "dog_boxes_xywh": [
+        [
+          170.04,
+          157.52,
+          195.09,
+          183.7
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 331075,
+      "file_name": "000000331075.jpg",
+      "width": 640,
+      "height": 606,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3790/9178299324_d12a3582e0_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000331075.jpg",
+      "sha256": "f9a0c8e0050fa38bb4fd0a7d3007e0ff5def7cea1c67a9a70ae80c6256d9a549",
+      "dog_boxes_xywh": [
+        [
+          4.9,
+          110.18,
+          539.89,
+          495.82
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 377575,
+      "file_name": "000000377575.jpg",
+      "width": 426,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2598/3937557668_c8b472124b_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000377575.jpg",
+      "sha256": "18d7b9ea545f1561bb844213652194047a19fff86ff6e23a2bd7d10262bd72f3",
+      "dog_boxes_xywh": [
+        [
+          58.42,
+          159.35,
+          221.99,
+          463.45
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 347930,
+      "file_name": "000000347930.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm5.staticflickr.com/4049/4377071026_9646c57fb7_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000347930.jpg",
+      "sha256": "fff3dce10857486d2b36df904bc01807096373513a4a0508d84dda293fa979fe",
+      "dog_boxes_xywh": [
+        [
+          161.3,
+          103.48,
+          254.57,
+          335.22
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 498286,
+      "file_name": "000000498286.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm7.staticflickr.com/6195/6048065934_bfaf1be964_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000498286.jpg",
+      "sha256": "3253772566d47969b4ca29bdd608d84b9876a09ec6b25435ff00c27bf9c1b207",
+      "dog_boxes_xywh": [
+        [
+          0.97,
+          9.8,
+          467.44,
+          463.58
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 246454,
+      "file_name": "000000246454.jpg",
+      "width": 640,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3067/5758262175_6b35988fbd_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000246454.jpg",
+      "sha256": "b3f955e290bd58ccd622aad1a75465f74b1c382eb3c8641901b4d49213dbf5ec",
+      "dog_boxes_xywh": [
+        [
+          0.0,
+          270.62,
+          318.29,
+          161.25
+        ],
+        [
+          2.75,
+          219.19,
+          321.37,
+          370.82
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 241326,
+      "file_name": "000000241326.jpg",
+      "width": 500,
+      "height": 375,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm1.staticflickr.com/6/74600093_1e3ace7913_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000241326.jpg",
+      "sha256": "eb1585083b15741b1325aad6d9fc6d4950800563a2e748804721acf9620d5b97",
+      "dog_boxes_xywh": [
+        [
+          302.13,
+          189.4,
+          165.48,
+          169.28
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 366884,
+      "file_name": "000000366884.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3486/3939243337_e036a6b538_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000366884.jpg",
+      "sha256": "7d41c97dc524e33c5005651a44c75e6629d9f7b05b48b9b430b76db77765e0a8",
+      "dog_boxes_xywh": [
+        [
+          297.7,
+          399.52,
+          106.66,
+          80.48
+        ],
+        [
+          89.29,
+          445.56,
+          92.86,
+          34.44
+        ]
+      ],
+      "split": "evaluation",
+      "kind": "positive"
+    },
+    {
+      "image_id": 465430,
+      "file_name": "000000465430.jpg",
+      "width": 640,
+      "height": 513,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm3.staticflickr.com/2343/2069616548_eac2f134f5_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000465430.jpg",
+      "sha256": "125cccaac849d03c747dfe59bc681f5245b20cbc04ec00ef634c49fc7580e705",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 215778,
+      "file_name": "000000215778.jpg",
+      "width": 640,
+      "height": 427,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm3.staticflickr.com/2550/3728951244_f7df6b91ba_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000215778.jpg",
+      "sha256": "37486e1ac89a7860c4721892f3b56d8acde342a62dd211eba10a3128a9c1655c",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 153632,
+      "file_name": "000000153632.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2577/4039827010_75186a4bf5_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000153632.jpg",
+      "sha256": "26e7be7312bef629d313fdaedec6215c4e060b482d02d51b40ac557e5c8709fd",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 343937,
+      "file_name": "000000343937.jpg",
+      "width": 640,
+      "height": 428,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm5.staticflickr.com/4072/4320314557_bfcc972543_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000343937.jpg",
+      "sha256": "8695e43af989afc4b1b590c0174d944cd454752fdccf9ba648adb45d4922d20b",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 214753,
+      "file_name": "000000214753.jpg",
+      "width": 640,
+      "height": 424,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm9.staticflickr.com/8073/8392128987_e7b98a0936_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000214753.jpg",
+      "sha256": "cbf50318249d78406eeee4f1e91693acc0f8e05dc9e745632354369caae57777",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 32941,
+      "file_name": "000000032941.jpg",
+      "width": 458,
+      "height": 640,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm9.staticflickr.com/8067/8224728949_fa09beb316_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000032941.jpg",
+      "sha256": "2b881cc082e3d79f6685320ddf02e04ec534e7f904a090a4e627eb445cb26ebc",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 495146,
+      "file_name": "000000495146.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm8.staticflickr.com/7375/9211776644_83a3bd9c9b_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000495146.jpg",
+      "sha256": "cc4814681163a70e29c6aa2bb463b4d6a3c52a3c23f77b38357498c5ffee2d38",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 479126,
+      "file_name": "000000479126.jpg",
+      "width": 640,
+      "height": 427,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5189/5734725144_37742ab51b_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000479126.jpg",
+      "sha256": "a64293cb5d4bfa0b1e6e1c0603f7a4f9892afd90f353c9ed0b250449818d5d36",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 285,
+      "file_name": "000000000285.jpg",
+      "width": 586,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm8.staticflickr.com/7434/9138147604_c6225224b8_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000000285.jpg",
+      "sha256": "f3a2974ce3686332609124c70e3e6a2e3aca43fccf1cd1bd7c5c03820977f57d",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 231879,
+      "file_name": "000000231879.jpg",
+      "width": 640,
+      "height": 426,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm8.staticflickr.com/7140/7469646364_19f9d8b394_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000231879.jpg",
+      "sha256": "febabbb4aae52f71942bdaa8696492dd82eb4cc3805d948d41d283d4ca52980d",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 199771,
+      "file_name": "000000199771.jpg",
+      "width": 640,
+      "height": 425,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5035/7115744429_7d4deeb996_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000199771.jpg",
+      "sha256": "060235d75ac8a669d705e7685f73f53a09da291583f45faf45ac4ac1dbab4388",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 94326,
+      "file_name": "000000094326.jpg",
+      "width": 375,
+      "height": 500,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2691/4461834727_ac4efc5cce_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000094326.jpg",
+      "sha256": "492ffd8a904c5f016947af4928607b8978c10d3d46dbf9231e394162c26f6263",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 119233,
+      "file_name": "000000119233.jpg",
+      "width": 500,
+      "height": 334,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2248/2050977429_aff593ecc2_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000119233.jpg",
+      "sha256": "24bfe0c95b1dbd6163fb6d36c61a40958d03f8ff6e1a45a2fc4ae8cbb9c4daf2",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 35062,
+      "file_name": "000000035062.jpg",
+      "width": 425,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm5.staticflickr.com/4069/4705721638_eb16917a86_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000035062.jpg",
+      "sha256": "ced2374ae4276360bd7ca8f1aa2cf46bfebd62af2ac1eaa04a8e64fccc150333",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 397133,
+      "file_name": "000000397133.jpg",
+      "width": 640,
+      "height": 427,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm7.staticflickr.com/6116/6255196340_da26cf2c9e_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000397133.jpg",
+      "sha256": "09e1d25c75f7879bdaa69c327fece5cabacd53939c8c2ef9e87f1c97a2e478c4",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 479248,
+      "file_name": "000000479248.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm8.staticflickr.com/7296/9019745657_c8776db96f_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000479248.jpg",
+      "sha256": "7568f9ca909b10cb1ff733e79ed2661e310d8018261e5d8b4f4e6621e404508b",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 166165,
+      "file_name": "000000166165.jpg",
+      "width": 561,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm5.staticflickr.com/4149/5018726736_c0b5939690_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000166165.jpg",
+      "sha256": "9af70d781b5b0326a360917a64c13df5155f54252918b650d3c24049abc34078",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 410880,
+      "file_name": "000000410880.jpg",
+      "width": 500,
+      "height": 375,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2457/3790889558_3d54eae6fb_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000410880.jpg",
+      "sha256": "c3f1e039b14bec40394cec0cdcaf31f06c71cbe2723276731b209a16d0d39f11",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 341921,
+      "file_name": "000000341921.jpg",
+      "width": 640,
+      "height": 478,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm6.staticflickr.com/5184/5615933755_b24f4bdc42_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000341921.jpg",
+      "sha256": "40ec6e7a9b261979db6c8294b0cd9c0228541ed6647d3aaf129a6e6915bfe267",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 110972,
+      "file_name": "000000110972.jpg",
+      "width": 640,
+      "height": 487,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm9.staticflickr.com/8033/8046866985_abdbd7f0da_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000110972.jpg",
+      "sha256": "ec73a8372fe4579490693690ff4b56510af5ce4ce830642eb05c01f2baa58f91",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 520009,
+      "file_name": "000000520009.jpg",
+      "width": 500,
+      "height": 412,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm1.staticflickr.com/223/502213596_22f391ea0e_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000520009.jpg",
+      "sha256": "54617d5196a0d66e47f083ce2ecc67c990b5415eca52302dafdc0591597d4e02",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 319935,
+      "file_name": "000000319935.jpg",
+      "width": 640,
+      "height": 398,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm4.staticflickr.com/3352/3542980344_a845a4cb2c_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000319935.jpg",
+      "sha256": "dbc7d9ef1f9e15c8fdc67eeefbb74091b6d489af385bb85137e918e3d1b7e6f8",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 562059,
+      "file_name": "000000562059.jpg",
+      "width": 427,
+      "height": 640,
+      "license_id": 4,
+      "license": "Attribution License",
+      "flickr_url": "http://farm3.staticflickr.com/2817/9256079385_0d21c6c751_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000562059.jpg",
+      "sha256": "0d26126da0200cbfb7b59f925b427e5b60d9c9341d4be2b510bd67e61fa153ef",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 32887,
+      "file_name": "000000032887.jpg",
+      "width": 640,
+      "height": 480,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm6.staticflickr.com/5126/5218142854_bca4459220_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000032887.jpg",
+      "sha256": "f85c17ab33d54631410d6335a5eaa1de780904b777f1da15f9c06ce6e61d3520",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    },
+    {
+      "image_id": 293044,
+      "file_name": "000000293044.jpg",
+      "width": 288,
+      "height": 160,
+      "license_id": 5,
+      "license": "Attribution-ShareAlike License",
+      "flickr_url": "http://farm5.staticflickr.com/4028/4321379116_c1041e88b2_z.jpg",
+      "coco_url": "http://images.cocodataset.org/val2017/000000293044.jpg",
+      "sha256": "b0f6a381bc1e8b741787a129946dff2524bb530eda3f15b6af1bbfd3061c217a",
+      "dog_boxes_xywh": [],
+      "split": "evaluation",
+      "kind": "negative"
+    }
+  ]
+}

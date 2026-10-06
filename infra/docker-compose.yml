@@ -1,0 +1,73 @@
+# Local services that are not part of the Supabase stack.
+# Usage: docker compose -f infra/docker-compose.yml up -d
+# The Supabase stack (Postgres, Auth, Storage) is started separately with the Supabase CLI (see README).
+name: pawguard
+
+services:
+  broker:
+    # Valkey (BSD-3-Clause) is protocol-compatible with Redis and used as the Celery broker/result backend.
+    image: valkey/valkey:8.1.10-alpine
+    command: ["valkey-server", "--appendonly", "yes", "--save", "60", "1000"]
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - broker-data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  # --- Application containers (optional; `--profile app`). Development usually runs these on the host. ---
+  # They reach the Supabase CLI stack on the host through host.docker.internal.
+  api:
+    profiles: ["app"]
+    build: { context: .., dockerfile: infra/docker/python.Dockerfile, args: { PACKAGE: pawguard-api } }
+    env_file: ../.env
+    environment: &container-env
+      PAWGUARD_DATABASE_URL: postgresql://pawguard_api:${PAWGUARD_DB_API_PASSWORD}@host.docker.internal:54322/postgres
+      PAWGUARD_WORKER_DATABASE_URL: postgresql://pawguard_worker:${PAWGUARD_DB_WORKER_PASSWORD}@host.docker.internal:54322/postgres
+      PAWGUARD_MIGRATE_DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:54322/postgres
+      PAWGUARD_SUPABASE_URL: http://host.docker.internal:54321
+      PAWGUARD_AUTH_ISSUER: http://127.0.0.1:54321/auth/v1
+      PAWGUARD_REDIS_URL: redis://broker:6379/0
+      PAWGUARD_MODEL_DIR: /app/models
+    ports: ["127.0.0.1:8000:8000"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on: { broker: { condition: service_healthy } }
+
+  worker:
+    profiles: ["app"]
+    build: { context: .., dockerfile: infra/docker/python.Dockerfile, args: { PACKAGE: pawguard-worker } }
+    env_file: ../.env
+    environment: *container-env
+    command: ["pawguard-worker", "run"]
+    volumes:
+      # Registered model artefacts; checked against model_versions.sha256 before use.
+      - ../models:/app/models:ro
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on: { broker: { condition: service_healthy } }
+
+  dispatcher:
+    profiles: ["app"]
+    build: { context: .., dockerfile: infra/docker/python.Dockerfile, args: { PACKAGE: pawguard-worker } }
+    env_file: ../.env
+    environment: *container-env
+    command: ["pawguard-worker", "dispatch"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on: { broker: { condition: service_healthy } }
+
+  web:
+    profiles: ["app"]
+    build: { context: .., dockerfile: infra/docker/web.Dockerfile }
+    env_file: ../.env
+    environment:
+      PAWGUARD_API_INTERNAL_URL: http://api:8000
+      PAWGUARD_SUPABASE_URL: http://host.docker.internal:54321
+    ports: ["127.0.0.1:3001:3000"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    depends_on: [api]
+
+volumes:
+  broker-data:

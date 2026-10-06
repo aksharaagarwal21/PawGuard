@@ -1,0 +1,24 @@
+@import "tailwindcss";
+@import "@pawguard/ui/tokens.css";
+
+@source "../../../../packages/ui/src";
+
+@layer components {
+  .prose-pg {
+    max-width: 65ch;
+  }
+  .prose-pg p + p {
+    margin-top: 0.75rem;
+  }
+  .container-pg {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1240px;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 390px) {
+    .container-pg {
+      padding-inline: 1.25rem;
+    }
+  }
+}

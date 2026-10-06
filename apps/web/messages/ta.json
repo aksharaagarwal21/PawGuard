@@ -1,0 +1,61 @@
+{
+  "_status": "DRAFT — machine-assisted interface translation, not yet reviewed by a native Tamil speaker. Health guidance (help.*) is intentionally not translated until a qualified reviewer approves it.",
+  "common": {
+    "skipToContent": "முதன்மை உள்ளடக்கத்திற்குச் செல்லவும்",
+    "language": "மொழி",
+    "close": "மூடு",
+    "back": "பின்செல்",
+    "continue": "தொடரவும்",
+    "cancel": "ரத்துசெய்",
+    "retry": "மீண்டும் முயற்சிக்கவும்",
+    "loading": "ஏற்றப்படுகிறது…",
+    "optional": "(விருப்பத்தேர்வு)",
+    "required": "(கட்டாயம்)",
+    "signOut": "வெளியேறு",
+    "demoBanner": "டெமோ சூழல் — இங்குள்ள அனைத்து அமைப்புகள், நபர்கள் மற்றும் விலங்குகள் கற்பனையானவை. எதுவும் உண்மையான பதிவு அல்ல.",
+    "translationDraftNotice": "இந்த மொழிபெயர்ப்பு ஒரு வரைவு மற்றும் முழுமையற்றது; சில உரைகள் ஆங்கிலத்தில் தோன்றும். இது இன்னும் தமிழ் தாய்மொழியாளர் ஒருவரால் சரிபார்க்கப்படவில்லை.",
+    "untranslatedNotice": "இந்த உள்ளடக்கம் இன்னும் உங்கள் மொழியில் கிடைக்கவில்லை. ஆங்கிலத்தில் காட்டப்படுகிறது."
+  },
+  "nav": {
+    "learn": "கற்றுக்கொள்",
+    "findCare": "சிகிச்சை பெற",
+    "about": "எங்களைப் பற்றி",
+    "sources": "ஆதாரங்கள்",
+    "teamSignIn": "குழு உள்நுழைவு",
+    "getHelp": "கடிபட்ட பிறகு உதவி பெற",
+    "openMenu": "பட்டியைத் திற",
+    "today": "இன்று",
+    "system": "அமைப்பு நிலை",
+    "more": "மேலும்",
+    "organisation": "அமைப்பு",
+    "switchOrganisation": "அமைப்பை மாற்று",
+    "animals": "விலங்குகள்",
+    "tasks": "பணிகள்"
+  },
+  "landing": {
+    "headline": "மக்களைக் காப்போம். சமூக விலங்குகளைப் பாதுகாப்போம்.",
+    "primaryAction": "கடிபட்ட பிறகு உதவி பெற",
+    "secondaryAction": "தடுப்புப் பணிகளை அறிக"
+  },
+  "signIn": {
+    "title": "குழு உள்நுழைவு",
+    "email": "மின்னஞ்சல் முகவரி",
+    "password": "கடவுச்சொல்",
+    "submit": "உள்நுழை"
+  },
+  "app": {
+    "online": "இணைப்பில் உள்ளது",
+    "offline": "இணைப்பு இல்லை"
+  },
+  "today": {
+    "greeting": "வணக்கம், {name}",
+    "greetingNoName": "வணக்கம்",
+    "tasksTitle": "உங்கள் பணிகள்"
+  },
+  "roles": {
+    "field_volunteer": "களத் தன்னார்வலர்",
+    "veterinary_reviewer": "கால்நடை மருத்துவ மதிப்பாய்வாளர்",
+    "programme_coordinator": "திட்ட ஒருங்கிணைப்பாளர்",
+    "org_admin": "அமைப்பு நிர்வாகி"
+  }
+}

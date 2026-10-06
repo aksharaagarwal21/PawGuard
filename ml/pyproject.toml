@@ -1,0 +1,42 @@
+# PawGuard ML tooling: data preparation, evaluation, training and export (CLI `pawid`).
+# Separate uv project and lockfile so PyTorch never enters the API/worker images. Inference code lives in the
+# worker package (pawguard_worker.vision) and is reused here so evaluation runs exactly what production runs.
+[project]
+name = "pawguard-ml"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "pawguard-worker",
+  "onnx==1.23.1",
+  "typer==0.27.2",
+  "torch==2.14.1",
+  "transformers==5.18.0",
+  "safetensors==0.8.0",
+  "huggingface-hub==1.33.0",
+  "psutil==7.2.2",
+  "onnxscript==0.7.2",
+]
+
+[project.scripts]
+pawid = "pawguard_ml.cli:app"
+
+[tool.uv.sources]
+pawguard-worker = { path = "../services/worker", editable = true }
+pawguard-api = { path = "../services/api", editable = true }
+torch = { index = "pytorch-cpu" }
+
+# CPU-only PyTorch on every platform (no CUDA wheels in the lockfile; this project never needs a GPU).
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[dependency-groups]
+dev = ["pytest==9.1.1"]
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pawguard_ml"]
