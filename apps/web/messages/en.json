@@ -1110,7 +1110,7 @@
     "title": "Welcome to the PawGuard 360 demo",
     "intro": "PawGuard helps pet owners keep vaccination records and get reminders before each due date, with every record verified by the clinic's vet. It also supports community rabies programmes.",
     "fictionalTitle": "Everything here is fictional",
-    "fictionalBody": "The organisations, people and animals are demo data. Sign in with the one-click demo accounts on the next page — no password needed. Please don't upload photos of people or private places.",
+    "fictionalBody": "This demo uses fictional accounts, pets and clinics. You sign in with one click on the next page — no password to type. Please don't upload photos of people or private places.",
     "howTitle": "Community dog programmes: try it in four steps (about 3 minutes)",
     "steps": {
       "one": {
@@ -1168,7 +1168,76 @@
         "title": "Show the QR card",
         "body": "Sign in as Neha again: Coco is up to date. Open Coco → “Vaccination card (QR)” to see the QR code, the public card and the PDF."
       }
-    }
+    },
+    "beforeYouBegin": "Before you begin",
+    "beginIntro": "Pick how you'll use PawGuard. We'll show you which demo account to use and what to try first.",
+    "chooseTitle": "Choose how you'll use PawGuard",
+    "chooseIntro": "You can switch any time. This only changes what we suggest you try first.",
+    "selected": "Selected",
+    "youCan": "You can…",
+    "haveReady": "Have ready:",
+    "roles": {
+      "owner": {
+        "title": "I have a pet",
+        "one": "See your pets and when each vaccine is due.",
+        "two": "Get reminders and add them to your calendar.",
+        "three": "Show a QR card your vet has verified.",
+        "ready": "your pet's photo, and an old vaccination certificate if you have one."
+      },
+      "clinic": {
+        "title": "I work at a vet clinic",
+        "one": "See which pets are due this week or overdue.",
+        "two": "Verify certificates that owners upload.",
+        "three": "Record vaccines and set the next due date.",
+        "ready": "nothing — the demo clinic is already set up."
+      },
+      "volunteer": {
+        "title": "I volunteer with community dogs",
+        "one": "Find or register a community dog.",
+        "two": "Send vaccination evidence for a vet to check.",
+        "three": "Work offline on field tasks.",
+        "ready": "a dog photo (a sample is in the walkthrough below)."
+      }
+    },
+    "accountsTitle": "In this demo",
+    "colName": "Sign in as",
+    "colRole": "Role",
+    "colTry": "What to try first",
+    "demo": {
+      "neha": {
+        "name": "Neha",
+        "role": "Pet owner",
+        "try": "Look at your 3 pets and open Coco's reminder."
+      },
+      "kiran": {
+        "name": "Dr Kiran",
+        "role": "Vet, Lotus Pet Clinic",
+        "try": "Verify Coco's certificate."
+      },
+      "asha": {
+        "name": "Asha",
+        "role": "Clinic manager, Lotus Pet Clinic",
+        "try": "See who is due this week and who is waiting for the vet."
+      },
+      "vikram": {
+        "name": "Vikram",
+        "role": "Clinic manager, Banyan Veterinary Centre",
+        "try": "Check that another clinic can't see Lotus's pets."
+      },
+      "priya": {
+        "name": "Priya",
+        "role": "Community volunteer",
+        "try": "Find a dog from a photo and send vaccination evidence."
+      }
+    },
+    "continue": "Continue to sign in",
+    "continueLabel": "Let's start — continue to sign in",
+    "continueHint": {
+      "owner": "Next: choose “Sign in as Neha”.",
+      "clinic": "Next: choose “Sign in as Dr Kiran”.",
+      "volunteer": "Next: choose “Sign in as Priya”."
+    },
+    "walkthroughTitle": "Full demo walkthrough and sample files (for presenters)"
   },
   "modelEvidence": {
     "title": "Model evidence: photo matching",

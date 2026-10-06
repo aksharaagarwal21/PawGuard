@@ -27,3 +27,17 @@ for (const [label, viewport] of WIDTHS) {
     await check(page, `landing-${label}`);
   });
 }
+
+for (const [label, viewport] of WIDTHS) {
+  test(`get started page (${label})`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize(viewport);
+    await page.goto("/en/welcome");
+    await expect(page.getByRole("heading", { level: 1, name: /Before you begin/ })).toBeVisible();
+    await page.getByText("I work at a vet clinic").click();
+    await expect(page.getByText("Next: choose “Sign in as Dr Kiran”.")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Let's start — continue to sign in" })).toBeVisible();
+    await page.getByText("I have a pet").click();
+    await check(page, `get-started-${label}`);
+  });
+}
