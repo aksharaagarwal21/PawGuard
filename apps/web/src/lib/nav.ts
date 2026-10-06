@@ -7,6 +7,7 @@ export type NavIcon =
   | "today"
   | "pets"
   | "reminders"
+  | "notifications"
   | "clinic"
   | "animals"
   | "capture"
@@ -38,6 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "today", href: "/app", labelKey: "today", icon: "today", anyOf: STAFF_CAPS, mobile: true },
   { key: "pets", href: "/app/pets", labelKey: "pets", icon: "pets", anyOf: ["pet.own"], mobile: true },
   { key: "reminders", href: "/app/reminders", labelKey: "reminders", icon: "reminders", anyOf: ["pet.own"], mobile: true },
+  { key: "notifications", href: "/app/notifications", labelKey: "notifications", icon: "notifications", anyOf: ["pet.own"], mobile: false },
   {
     key: "clinic",
     href: "/app/clinic",

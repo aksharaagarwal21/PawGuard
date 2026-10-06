@@ -68,3 +68,22 @@ class NotificationsOverviewOut(Out):
 
 class ScanOut(Out):
     queued: int
+
+
+class PushKeyOut(Out):
+    public_key: str | None
+
+
+class PushSubscriptionKeys(StrictModel):
+    p256dh: str = Field(min_length=10, max_length=200)
+    auth: str = Field(min_length=8, max_length=100)
+
+
+class PushSubscriptionIn(StrictModel):
+    endpoint: str = Field(min_length=10, max_length=1000, pattern=r"^https://")
+    keys: PushSubscriptionKeys
+    user_agent: str | None = Field(default=None, max_length=300)
+
+
+class PushUnsubscribeIn(StrictModel):
+    endpoint: str = Field(min_length=10, max_length=1000)

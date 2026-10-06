@@ -25,7 +25,7 @@ TEST_LIMIT_PER_HOUR = 5
 def channel_available() -> dict[str, bool]:
     s = get_settings()
     return {"email": notify.email_configured(s),
-            "push": bool(s.vapid_public_key and s.vapid_private_key and s.vapid_contact),
+            "push": notify.push_configured(s),
             "whatsapp": bool(s.whatsapp_token and s.whatsapp_phone_number_id)}
 
 
@@ -118,3 +118,34 @@ def run_now(db: Any, ctx: OrgContext) -> int:
     n = int(db.execute(text("select app.queue_due_notifications()")).scalar() or 0)
     record_audit(db, ctx, "notification.scan_requested", "organisation", ctx.org_id, {"queued": n})
     return n
+
+
+# ---- Web Push subscriptions (own only) ---------------------------------------------------------------------------
+
+def add_push_subscription(p: Principal, endpoint: str, p256dh: str, auth: str, user_agent: str | None) -> None:
+    if not notify.push_endpoint_allowed(endpoint):
+        raise Unprocessable("This browser's push service isn't supported.",
+                            fields=[FieldError(field="endpoint", code="push_service_not_allowed",
+                                               message="Unknown push service.")])
+    with user_tx(p.user_id) as db:
+        db.execute(text("""
+            insert into app.push_subscriptions (user_id, endpoint, p256dh, auth, user_agent)
+            values (:u, :e, :k, :a, :ua)
+            on conflict (endpoint) do update set p256dh = excluded.p256dh, auth = excluded.auth,
+              user_agent = excluded.user_agent, revoked_at = null
+            where app.push_subscriptions.user_id = :u"""),
+            {"u": p.user_id, "e": endpoint, "k": p256dh, "a": auth, "ua": (user_agent or "")[:300] or None})
+        db.execute(text("""insert into app.notification_preferences (user_id, push_enabled) values (:u, true)
+                           on conflict (user_id) do update set push_enabled = true, updated_at = now()"""),
+                   {"u": p.user_id})
+
+
+def remove_push_subscription(p: Principal, endpoint: str) -> None:
+    with user_tx(p.user_id) as db:
+        db.execute(text("update app.push_subscriptions set revoked_at = now() where endpoint = :e and user_id = :u"),
+                   {"e": endpoint, "u": p.user_id})
+        left = db.execute(text("""select count(*) from app.push_subscriptions where user_id = :u
+                                   and revoked_at is null"""), {"u": p.user_id}).scalar()
+        if not left:
+            db.execute(text("update app.notification_preferences set push_enabled = false where user_id = :u"),
+                       {"u": p.user_id})

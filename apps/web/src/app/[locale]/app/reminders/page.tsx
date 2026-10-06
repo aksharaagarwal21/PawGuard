@@ -5,9 +5,10 @@ import { EmptyState, Notice } from "@pawguard/ui";
 
 import { PageBody, PageHeader } from "@/components/page-header";
 import { ReminderCard } from "@/components/pets/reminder-card";
+import { Link } from "@/i18n/navigation";
 import { pageContext } from "@/lib/page-context";
 
-/** In-app vaccination reminders for the owner's pets (14, 7 and 1 day before, and overdue). Nothing is sent. */
+/** In-app vaccination reminders for the owner's pets (14, 7 and 1 day before, and overdue); email, push and WhatsApp are opt-in. */
 export default async function RemindersPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -25,7 +26,10 @@ export default async function RemindersPage({ params }: { params: Promise<{ loca
   return (
     <PageBody>
       <PageHeader title={t("title")} intro={t("intro")} />
-      <Notice tone="neutral">{t("inAppOnly")}</Notice>
+      <Notice tone="neutral">
+        {t("channelsHint")}{" "}
+        <Link href="/app/notifications">{t("channelsLink")}</Link>
+      </Notice>
       {error ? <Notice tone="urgent">{t("loadFailed")}</Notice> : null}
       {reminders.length === 0 && !error ? (
         <EmptyState icon={<BellOff aria-hidden className="size-6" />} title={t("emptyTitle")}>

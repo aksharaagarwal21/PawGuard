@@ -33,7 +33,7 @@ for (const [label, viewport] of [
     await page.goto("/en/app/reminders");
     await expect(page.getByRole("heading", { name: "Reminders", level: 1 })).toBeVisible();
     await page.getByText("Notification preview").first().click();
-    await expect(page.getByText("Preview only — no message is actually sent.").first()).toBeVisible();
+    await expect(page.getByText("never by SMS", { exact: false }).first()).toBeVisible();
     await noScroll();
     await expectNoAxeViolations(page);
     await page.screenshot({ path: `test-results/pets/${label}-reminders.png`, fullPage: true });

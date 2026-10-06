@@ -15,6 +15,7 @@ import {
   Map,
   Menu,
   PawPrint,
+  Send,
   Stethoscope,
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -38,6 +39,7 @@ const ICONS: Record<NavItem["icon"], React.ComponentType<{ className?: string; "
   today: House,
   pets: Dog,
   reminders: Bell,
+  notifications: Send,
   clinic: Stethoscope,
   animals: PawPrint,
   capture: Camera,
@@ -67,7 +69,7 @@ export async function AppShell({
   const tr = await getTranslations("roles");
   const items = visibleNav(active.capabilities, active.professional_scopes, active.org_type);
   const mobileItems = items.filter((i) => i.mobile);
-  // Pet owners: count of reminders showing today, for the bell (in-app only; nothing is sent).
+  // Pet owners: count of reminders showing today, for the bell.
   let reminderCount = 0;
   if (active.capabilities.includes("pet.own")) {
     const { data } = await (await serverApi(active.org_id)).GET("/api/v1/my/reminders").catch(() => ({ data: undefined }));

@@ -440,3 +440,30 @@ def models_list() -> None:
 
 if __name__ == "__main__":
     app()
+
+
+push_app = typer.Typer(no_args_is_help=True, help="Web Push (VAPID) setup.")
+app.add_typer(push_app, name="push")
+
+
+@push_app.command("keys")
+def push_keys(rotate: bool = typer.Option(False, "--rotate", help="Replace existing keys (old browser "
+                                                                   "subscriptions stop working)")) -> None:
+    """Generate the VAPID key pair and write it to the repository's .env (git-ignored). The private key is never
+    printed."""
+    from pawguard_api.integrations.notify import generate_vapid_keys
+    from pawguard_api.settings import find_env_file
+
+    env_path = Path(find_env_file() or ".env")
+    lines = env_path.read_text(encoding="utf-8").splitlines() if env_path.exists() else []
+    current = {ln.split("=", 1)[0]: ln.split("=", 1)[1] for ln in lines if "=" in ln and not ln.startswith("#")}
+    if current.get("PAWGUARD_VAPID_PRIVATE_KEY") and not rotate:
+        typer.echo("VAPID keys already exist in .env (use --rotate to replace them).")
+        return
+    public, private = generate_vapid_keys()
+    keep = [ln for ln in lines if not ln.startswith(("PAWGUARD_VAPID_PUBLIC_KEY=", "PAWGUARD_VAPID_PRIVATE_KEY="))]
+    keep += [f"PAWGUARD_VAPID_PUBLIC_KEY={public}", f"PAWGUARD_VAPID_PRIVATE_KEY={private}"]
+    env_path.write_text("\n".join(keep) + "\n", encoding="utf-8")
+    typer.echo(f"Wrote VAPID keys to {env_path} (public key starts {public[:12]}…). Restart the API and worker.")
+    if not current.get("PAWGUARD_VAPID_CONTACT"):
+        typer.echo("Also set PAWGUARD_VAPID_CONTACT=mailto:you@example.com in .env.")

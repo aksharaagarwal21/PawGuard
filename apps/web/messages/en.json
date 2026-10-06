@@ -92,7 +92,8 @@
     "biteHelpShort": "Bitten by an animal? Get help now",
     "helpMenu": "Help",
     "showTour": "Show tour again",
-    "howToUse": "How to use PawGuard"
+    "howToUse": "How to use PawGuard",
+    "notifications": "Notifications"
   },
   "landing": {
     "headline": "Never miss your pet's vaccination again.",
@@ -1164,7 +1165,7 @@
       "offline": "Offline mode covers tasks and sightings only; photos and vaccination evidence need a connection.",
       "language": "Tamil and Hindi are partial drafts; some screens appear in English.",
       "reset": "Demo data may be reset at any time.",
-      "reminders": "Reminders are in-app only: email and SMS texts are previews, nothing is sent. Seeded due dates are fictional; the app only reminds and never decides treatment."
+      "reminders": "Reminders appear in the app. Email, browser notifications and WhatsApp are opt-in; in the demo they go only to the team's test inbox and test WhatsApp number. Seeded due dates are fictional; the app only reminds and never decides treatment."
     },
     "start": "Let's start",
     "aboutLink": "About PawGuard",
@@ -1176,7 +1177,7 @@
       },
       "two": {
         "title": "Act on a reminder",
-        "body": "Open “Reminders”. Open “Notification preview” (nothing is sent) or “Add to calendar”. On Coco's reminder choose “Mark as done”, add the sample certificate below and save."
+        "body": "Open “Reminders”. Open “Notification preview” to see the message text, or “Add to calendar”. On Coco's reminder choose “Mark as done”, add the sample certificate below and save."
       },
       "three": {
         "title": "Verify as the clinic vet",
@@ -1497,7 +1498,7 @@
   "reminders": {
     "title": "Reminders",
     "intro": "Reminders appear 14, 7 and 1 day before a due date, and again if it is overdue.",
-    "inAppOnly": "Reminders are shown in the app only. No email, SMS or WhatsApp message is sent.",
+    "inAppOnly": "Reminders always appear here. Email, notifications and WhatsApp are optional.",
     "loadFailed": "Reminders could not be loaded. Try again shortly.",
     "emptyTitle": "No reminders today",
     "emptyBody": "You're all caught up. We'll remind you here before the next due date.",
@@ -1517,14 +1518,16 @@
     "actionFailed": "That didn't work. Try again.",
     "addToCalendar": "Add to calendar (.ics)",
     "previewTitle": "Notification preview",
-    "previewNote": "Preview only — no message is actually sent.",
+    "previewNote": "This is the message text. It's sent only on the channels you turned on in Notifications — never by SMS.",
     "previewEmail": "Email",
     "previewSms": "SMS",
     "groups": {
       "overdue": "Overdue",
       "thisWeek": "This week",
       "later": "Later"
-    }
+    },
+    "channelsHint": "Reminders always appear here. You can also get them by email, browser notification or WhatsApp.",
+    "channelsLink": "Choose how to get reminders"
   },
   "demoClock": {
     "title": "Demo date (demo organisation only)",
@@ -1599,7 +1602,7 @@
   "faq": {
     "sms": {
       "q": "Do reminders send SMS?",
-      "a": "Not in this demo. Reminders appear in the app, and you can add them to your phone's calendar. The email and SMS text is shown as a preview only — nothing is sent."
+      "a": "No. SMS to Indian numbers needs a paid, registered SMS service, so PawGuard doesn't send SMS. Reminders always appear in the app, and you can turn on email, browser notifications or WhatsApp in Notifications."
     },
     "dueDate": {
       "q": "Who sets the due date?",
@@ -1702,5 +1705,88 @@
     "tourHint": "Signed in? Choose “Show tour again” under Help in the menu for a quick guided tour.",
     "coloursTitle": "What the colours mean",
     "faqTitle": "Questions people ask"
+  },
+  "notify": {
+    "title": "Notifications",
+    "intro": "Choose how you'd like to get vaccination reminders. Each one is off until you turn it on.",
+    "backToReminders": "Reminders",
+    "loadFailed": "Your notification settings could not be loaded. Try again shortly.",
+    "on": "On",
+    "off": "Off",
+    "notSetUp": "Not set up",
+    "saved": "Saved. You'll get reminders the way you chose.",
+    "sendTest": "Send me a test",
+    "testQueued": {
+      "email": "Test email on its way — check your inbox (and spam) in a minute.",
+      "push": "Test notification on its way — it should appear in a few seconds.",
+      "whatsapp": "Test WhatsApp message on its way."
+    },
+    "testLimited": "You've sent several tests already. Try again in an hour.",
+    "demoTitle": "In this demo",
+    "demoBody": "Messages go to the team's test inbox and test WhatsApp number, never to the fictional demo accounts.",
+    "footer": "PawGuard only reminds you; your vet decides what your pet needs. Reminder messages contain your pet's name, the vaccine, the date and your clinic — nothing else.",
+    "email": {
+      "title": "Email",
+      "body": "A short email on the reminder days: 14, 7 and 1 day before, and if overdue.",
+      "address": "Email address",
+      "addressHint": "Where we send reminders. In the demo, the team's test inbox is used.",
+      "unavailable": "Email isn't set up on this server yet."
+    },
+    "push": {
+      "title": "Browser notifications",
+      "body": "A notification on this phone or computer, even when PawGuard isn't open.",
+      "unavailable": "Notifications aren't set up on this server yet.",
+      "devices": "{count, plural, =0 {No devices yet.} one {On for # device.} other {On for # devices.}}",
+      "turnOn": "Turn on notifications on this device",
+      "turnOff": "Turn off on this device",
+      "onHere": "On for this device.",
+      "failed": "Notifications couldn't be turned on — try again.",
+      "state": {
+        "unsupported": "This browser can't show notifications. Try Chrome on Android, or a current desktop browser.",
+        "ios-install": "On iPhone or iPad: tap Share → Add to Home Screen, then open PawGuard from that icon and turn notifications on there (iOS 16.4 or later).",
+        "denied": "Notifications are blocked for this site. Allow them in your browser's site settings, then reload."
+      }
+    },
+    "whatsapp": {
+      "title": "WhatsApp",
+      "body": "A short WhatsApp message on the reminder days.",
+      "number": "WhatsApp number",
+      "numberHint": "With country code, e.g. +91 98765 43210 (no spaces needed).",
+      "unavailable": "WhatsApp isn't set up on this server yet."
+    },
+    "panel": {
+      "title": "Messages",
+      "provider": {
+        "email": "Email",
+        "push": "Notifications",
+        "whatsapp": "WhatsApp"
+      },
+      "state": {
+        "ok": "Working",
+        "not_configured": "Not set up",
+        "token_expired": "Token expired — renew it",
+        "rate_limited": "Busy — retrying shortly",
+        "cap_reached": "Daily limit reached — waiting",
+        "error": "Problem — see detail"
+      },
+      "delivery": {
+        "queued": "Queued",
+        "sending": "Sending",
+        "sent": "Sent",
+        "deferred": "Waiting to retry",
+        "failed": "Failed",
+        "skipped": "Not sent"
+      },
+      "colWhen": "When",
+      "colChannel": "Channel",
+      "colAbout": "About",
+      "colState": "Status",
+      "test": "Test message",
+      "none": "No messages yet.",
+      "runNow": "Send due reminders now",
+      "runHint": "Demo only. Normally this happens every 10 minutes.",
+      "queued": "{count, plural, =0 {Nothing new to send.} one {# message queued.} other {# messages queued.}}",
+      "failed": "That didn't work. Try again."
+    }
   }
 }

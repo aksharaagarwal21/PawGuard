@@ -188,3 +188,61 @@ def test_staff_overview_has_states_not_addresses(client, setup, owner_engine):
     # Demo-only scan trigger.
     assert client.post("/api/v1/clinic/notifications/run", headers=_h(w.tok["vet"], w.org)).status_code == 403
     assert uuid.UUID(body["deliveries"][0]["id"])
+
+
+# ---- Web Push ----------------------------------------------------------------------------------------------------
+
+def test_vapid_keys_and_endpoint_allow_list():
+    import base64
+
+    pub, priv = notify.generate_vapid_keys()
+    pad = lambda s: s + "=" * (-len(s) % 4)  # noqa: E731
+    assert len(base64.urlsafe_b64decode(pad(pub))) == 65 and len(base64.urlsafe_b64decode(pad(priv))) == 32
+    assert notify.push_endpoint_allowed("https://fcm.googleapis.com/fcm/send/abc")
+    assert notify.push_endpoint_allowed("https://web.push.apple.com/QGx")
+    assert notify.push_endpoint_allowed("https://wns2-pn1p.notify.windows.com/w/?token=x")
+    assert not notify.push_endpoint_allowed("https://evil.example.com/fcm.googleapis.com")
+    assert not notify.push_endpoint_allowed("https://fcm.googleapis.com.evil.com/x")
+    assert not notify.push_endpoint_allowed("http://fcm.googleapis.com/x")
+
+
+def test_push_subscribe_send_and_revoke_gone_devices(client, setup, owner_engine, monkeypatch):
+    import pywebpush
+
+    from pawguard_worker import notify as worker_notify
+
+    pub, priv = notify.generate_vapid_keys()
+    for k, v in {"vapid_public_key": pub, "vapid_private_key": priv, "vapid_contact": "mailto:t@example.com"}.items():
+        monkeypatch.setattr(setup.settings, k, v)
+    w = setup.build(demo=False)
+    assert client.get("/api/v1/push/public-key").json()["public_key"] == pub
+    keys = {"p256dh": "B" * 87, "auth": "A" * 22}
+    bad = client.post("/api/v1/my/push-subscriptions", headers=_h(w.tok["owner"]),
+                      json={"endpoint": "https://attacker.example.com/x", "keys": keys})
+    assert bad.status_code == 422
+    for ep in ("https://fcm.googleapis.com/fcm/send/one", "https://fcm.googleapis.com/fcm/send/gone"):
+        assert client.post("/api/v1/my/push-subscriptions", headers=_h(w.tok["owner"]),
+                           json={"endpoint": ep, "keys": keys}).status_code == 204
+    assert client.get("/api/v1/my/notification-settings", headers=_h(w.tok["owner"])).json()["push_devices"] == 2
+
+    calls = []
+
+    def fake_webpush(sub, data, **kw):
+        calls.append((sub["endpoint"], data, kw["vapid_claims"]))
+        if sub["endpoint"].endswith("gone"):
+            raise pywebpush.WebPushException("gone", response=SimpleNamespace(status_code=410, text=""))
+        return SimpleNamespace(status_code=201)
+
+    monkeypatch.setattr(pywebpush, "webpush", fake_webpush)
+    assert _queue(owner_engine) == 1  # push enabled by subscribing
+    assert worker_notify.drain().get("sent") == 1
+    assert {c[0] for c in calls} == {"https://fcm.googleapis.com/fcm/send/one", "https://fcm.googleapis.com/fcm/send/gone"}
+    assert "Coco" in calls[0][1] and calls[0][2] == {"sub": "mailto:t@example.com"}
+    with owner_engine.begin() as c:
+        live = c.execute(text("select endpoint from app.push_subscriptions where user_id = :u and revoked_at is null"),
+                         {"u": w.owner}).scalars().all()
+    assert live == ["https://fcm.googleapis.com/fcm/send/one"]  # the gone device was revoked
+    assert client.post("/api/v1/my/push-subscriptions/remove", headers=_h(w.tok["owner"]),
+                       json={"endpoint": "https://fcm.googleapis.com/fcm/send/one"}).status_code == 204
+    d = client.get("/api/v1/my/notification-settings", headers=_h(w.tok["owner"])).json()
+    assert d["push_devices"] == 0 and d["push_enabled"] is False

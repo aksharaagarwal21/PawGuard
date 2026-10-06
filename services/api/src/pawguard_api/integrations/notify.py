@@ -93,3 +93,76 @@ def send_email(s: Settings, to: str, msg: Message) -> str:
     except (smtplib.SMTPServerDisconnected, smtplib.SMTPConnectError, TimeoutError, OSError) as exc:
         raise ProviderError("unreachable", retry_in=300, detail="SMTP server not reachable") from exc
     return msg_id
+
+
+# ---- Web Push (VAPID) --------------------------------------------------------------------------------------------
+
+# Browsers' push services. Subscriptions pointing anywhere else are refused, so the server never posts to arbitrary
+# addresses (no server-side request forgery through a crafted "subscription").
+PUSH_HOSTS = ("fcm.googleapis.com", "updates.push.services.mozilla.com", "push.services.mozilla.com",
+              "web.push.apple.com", ".push.apple.com", ".notify.windows.com", "push.api.chrome.google.com")
+
+
+def push_endpoint_allowed(endpoint: str) -> bool:
+    from urllib.parse import urlparse
+
+    u = urlparse(endpoint)
+    host = (u.hostname or "").lower()
+    return u.scheme == "https" and any(host == h.lstrip(".") or (h.startswith(".") and host.endswith(h))
+                                       for h in PUSH_HOSTS)
+
+
+def push_configured(s: Settings) -> bool:
+    return bool(s.vapid_public_key and s.vapid_private_key and s.vapid_contact)
+
+
+def generate_vapid_keys() -> tuple[str, str]:
+    """(public applicationServerKey, private raw key), both base64url without padding."""
+    import base64
+
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric import ec
+
+    key = ec.generate_private_key(ec.SECP256R1())
+    raw = key.private_numbers().private_value.to_bytes(32, "big")
+    pub = key.public_key().public_bytes(serialization.Encoding.X962, serialization.PublicFormat.UncompressedPoint)
+
+    def b64(b: bytes) -> str:
+        return base64.urlsafe_b64encode(b).rstrip(b"=").decode()
+
+    return b64(pub), b64(raw)
+
+
+def send_push(s: Settings, subscriptions: list[dict[str, str]], msg: Message, *,
+              on_gone: Any = None, on_ok: Any = None) -> str:
+    """Send to every device of the person. Returns how many devices accepted it. Expired devices are revoked."""
+    import json
+
+    from pywebpush import WebPushException, webpush
+
+    if not push_configured(s):
+        raise ProviderError("not_configured", status="not_configured", detail="VAPID keys or contact not set")
+    subs = [x for x in subscriptions if push_endpoint_allowed(x.get("endpoint", ""))]
+    if not subs:
+        raise ProviderError("no_recipient", detail="No browser has turned on notifications")
+    payload = json.dumps({"title": msg.subject, "body": msg.short, "url": "/en/app/reminders", "tag": "pawguard"})
+    ok, last_error = 0, ""
+    for sub in subs:
+        try:
+            webpush({"endpoint": sub["endpoint"], "keys": {"p256dh": sub["p256dh"], "auth": sub["auth"]}},
+                    data=payload, vapid_private_key=s.vapid_private_key,
+                    vapid_claims={"sub": s.vapid_contact or ""}, ttl=86400, timeout=15)
+            ok += 1
+            if on_ok:
+                on_ok(sub["endpoint"])
+        except WebPushException as exc:
+            code = getattr(getattr(exc, "response", None), "status_code", 0)
+            if code in (404, 410) and on_gone:
+                on_gone(sub["endpoint"])  # the browser unsubscribed or the subscription expired
+            elif code == 429:
+                raise ProviderError("rate_limited", retry_in=600, status="rate_limited",
+                                    detail="Push service is rate limiting — will retry") from exc
+            last_error = f"push service answered {code}"
+    if ok == 0:
+        raise ProviderError("push_failed", retry_in=600 if last_error else None, detail=last_error or "no device")
+    return f"{ok} device(s)"

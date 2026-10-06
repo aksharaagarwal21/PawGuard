@@ -23,7 +23,7 @@ for (const [label, viewport] of WIDTHS) {
     await expect(page.getByRole("heading", { name: "What the colours mean" })).toBeVisible();
     await expect(page.getByText("This doesn't mean your pet is unvaccinated.", { exact: false })).toBeVisible();
     await page.getByText("Do reminders send SMS?").click();
-    await expect(page.getByText("nothing is sent", { exact: false })).toBeVisible();
+    await expect(page.getByText("doesn't send SMS", { exact: false })).toBeVisible();
     await check(page, `landing-${label}`);
   });
 }

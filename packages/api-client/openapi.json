@@ -1493,6 +1493,29 @@
         "title": "CardOut",
         "type": "object"
       },
+      "ChannelsAvailableOut": {
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "boolean"
+          },
+          "push": {
+            "title": "Push",
+            "type": "boolean"
+          },
+          "whatsapp": {
+            "title": "Whatsapp",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "email",
+          "push",
+          "whatsapp"
+        ],
+        "title": "ChannelsAvailableOut",
+        "type": "object"
+      },
       "ClinicDashboardOut": {
         "properties": {
           "awaiting_verification": {
@@ -1697,6 +1720,95 @@
           "administered_on"
         ],
         "title": "ClinicVaccinationIn",
+        "type": "object"
+      },
+      "DeliveryOut": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "email",
+              "push",
+              "whatsapp"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "vaccination_reminder",
+              "test"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "pet_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pet Name"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "sending",
+              "sent",
+              "deferred",
+              "failed",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "channel",
+          "kind",
+          "state",
+          "pet_name",
+          "created_at",
+          "sent_at",
+          "last_error"
+        ],
+        "title": "DeliveryOut",
         "type": "object"
       },
       "DemoAccountOut": {
@@ -3405,6 +3517,148 @@
         "title": "MergePropose",
         "type": "object"
       },
+      "NotificationSettingsIn": {
+        "additionalProperties": false,
+        "properties": {
+          "email_address": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Address"
+          },
+          "email_enabled": {
+            "default": false,
+            "title": "Email Enabled",
+            "type": "boolean"
+          },
+          "push_enabled": {
+            "default": false,
+            "title": "Push Enabled",
+            "type": "boolean"
+          },
+          "whatsapp_enabled": {
+            "default": false,
+            "title": "Whatsapp Enabled",
+            "type": "boolean"
+          },
+          "whatsapp_number": {
+            "anyOf": [
+              {
+                "pattern": "^\\+[1-9][0-9]{7,14}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Whatsapp Number"
+          }
+        },
+        "title": "NotificationSettingsIn",
+        "type": "object"
+      },
+      "NotificationSettingsOut": {
+        "properties": {
+          "available": {
+            "$ref": "#/components/schemas/ChannelsAvailableOut"
+          },
+          "demo_email_set": {
+            "title": "Demo Email Set",
+            "type": "boolean"
+          },
+          "demo_recipients": {
+            "title": "Demo Recipients",
+            "type": "boolean"
+          },
+          "demo_whatsapp_set": {
+            "title": "Demo Whatsapp Set",
+            "type": "boolean"
+          },
+          "email_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Address"
+          },
+          "email_enabled": {
+            "title": "Email Enabled",
+            "type": "boolean"
+          },
+          "push_devices": {
+            "title": "Push Devices",
+            "type": "integer"
+          },
+          "push_enabled": {
+            "title": "Push Enabled",
+            "type": "boolean"
+          },
+          "whatsapp_enabled": {
+            "title": "Whatsapp Enabled",
+            "type": "boolean"
+          },
+          "whatsapp_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Whatsapp Number"
+          }
+        },
+        "required": [
+          "email_enabled",
+          "email_address",
+          "push_enabled",
+          "push_devices",
+          "whatsapp_enabled",
+          "whatsapp_number",
+          "demo_recipients",
+          "demo_email_set",
+          "demo_whatsapp_set",
+          "available"
+        ],
+        "title": "NotificationSettingsOut",
+        "type": "object"
+      },
+      "NotificationsOverviewOut": {
+        "properties": {
+          "deliveries": {
+            "items": {
+              "$ref": "#/components/schemas/DeliveryOut"
+            },
+            "title": "Deliveries",
+            "type": "array"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderOut"
+            },
+            "title": "Providers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "providers",
+          "deliveries"
+        ],
+        "title": "NotificationsOverviewOut",
+        "type": "object"
+      },
       "ObservationCreate": {
         "additionalProperties": false,
         "properties": {
@@ -4871,6 +5125,67 @@
         "title": "ProviderCapability",
         "type": "object"
       },
+      "ProviderOut": {
+        "properties": {
+          "configured": {
+            "title": "Configured",
+            "type": "boolean"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "provider": {
+            "enum": [
+              "email",
+              "push",
+              "whatsapp"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "not_configured",
+              "token_expired",
+              "rate_limited",
+              "cap_reached",
+              "error"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "provider",
+          "configured",
+          "state",
+          "detail",
+          "updated_at"
+        ],
+        "title": "ProviderOut",
+        "type": "object"
+      },
       "ProvidersOut": {
         "properties": {
           "capabilities": {
@@ -4991,6 +5306,98 @@
           "next_due_on"
         ],
         "title": "PublicVaccinationOut",
+        "type": "object"
+      },
+      "PushKeyOut": {
+        "properties": {
+          "public_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Public Key"
+          }
+        },
+        "required": [
+          "public_key"
+        ],
+        "title": "PushKeyOut",
+        "type": "object"
+      },
+      "PushSubscriptionIn": {
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "maxLength": 1000,
+            "minLength": 10,
+            "pattern": "^https://",
+            "title": "Endpoint",
+            "type": "string"
+          },
+          "keys": {
+            "$ref": "#/components/schemas/PushSubscriptionKeys"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          }
+        },
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "title": "PushSubscriptionIn",
+        "type": "object"
+      },
+      "PushSubscriptionKeys": {
+        "additionalProperties": false,
+        "properties": {
+          "auth": {
+            "maxLength": 100,
+            "minLength": 8,
+            "title": "Auth",
+            "type": "string"
+          },
+          "p256dh": {
+            "maxLength": 200,
+            "minLength": 10,
+            "title": "P256Dh",
+            "type": "string"
+          }
+        },
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "title": "PushSubscriptionKeys",
+        "type": "object"
+      },
+      "PushUnsubscribeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "endpoint": {
+            "maxLength": 1000,
+            "minLength": 10,
+            "title": "Endpoint",
+            "type": "string"
+          }
+        },
+        "required": [
+          "endpoint"
+        ],
+        "title": "PushUnsubscribeIn",
         "type": "object"
       },
       "QualityOut": {
@@ -5268,6 +5675,19 @@
           "created_at"
         ],
         "title": "ReviewOut",
+        "type": "object"
+      },
+      "ScanOut": {
+        "properties": {
+          "queued": {
+            "title": "Queued",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "queued"
+        ],
+        "title": "ScanOut",
         "type": "object"
       },
       "SignedUrlOut": {
@@ -6376,6 +6796,25 @@
           "row_version"
         ],
         "title": "TeamOut",
+        "type": "object"
+      },
+      "TestMessageIn": {
+        "additionalProperties": false,
+        "properties": {
+          "channel": {
+            "enum": [
+              "email",
+              "push",
+              "whatsapp"
+            ],
+            "title": "Channel",
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel"
+        ],
+        "title": "TestMessageIn",
         "type": "object"
       },
       "TimelineEntryOut": {
@@ -10106,6 +10545,180 @@
         ]
       }
     },
+    "/api/v1/clinic/notifications": {
+      "get": {
+        "description": "Permission: clinic staff. Shows delivery states and provider status (e.g. \"token expired\"), never addresses.",
+        "operationId": "notifications_overview",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsOverviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Provider status and recent deliveries",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/clinic/notifications/run": {
+      "post": {
+        "description": "Permission: clinic staff in a demo organisation with demo mode on. Normally runs every 10 minutes.",
+        "operationId": "notifications_run_now",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScanOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Queue due reminders now (demo)",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/api/v1/clinic/vaccinations": {
       "post": {
         "description": "Permission: ``vaccination.review`` with an approved ``veterinary_review`` authority and a live session.\nStored as verified (the vet's own record) with the vet's next due date, or the demo template if none.",
@@ -12505,6 +13118,249 @@
         ]
       }
     },
+    "/api/v1/my/notification-settings": {
+      "get": {
+        "description": "Permission: any signed-in user, own settings only.",
+        "operationId": "notifications_get_settings_",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "My notification settings",
+        "tags": [
+          "notifications"
+        ]
+      },
+      "put": {
+        "description": "Permission: any signed-in user, own settings only. Every channel is opt-in.",
+        "operationId": "notifications_put_settings",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationSettingsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Turn email, push or WhatsApp reminders on or off",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/my/notification-settings/test": {
+      "post": {
+        "description": "Permission: any member. At most 5 test messages an hour. Sent by the worker within about 15 seconds.",
+        "operationId": "notifications_send_test",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestMessageIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Send myself a test message",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
     "/api/v1/my/pets": {
       "get": {
         "description": "Permission: ``pet.own`` in at least one clinic. Only pets linked to the caller as owner.",
@@ -13272,6 +14128,152 @@
         "summary": "Vaccines my pet's clinic records",
         "tags": [
           "pets"
+        ]
+      }
+    },
+    "/api/v1/my/push-subscriptions": {
+      "post": {
+        "description": "Permission: any signed-in user, own subscriptions only. Only known browser push services are accepted.",
+        "operationId": "notifications_add_push",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushSubscriptionIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Turn on notifications in this browser",
+        "tags": [
+          "notifications"
+        ]
+      }
+    },
+    "/api/v1/my/push-subscriptions/remove": {
+      "post": {
+        "description": "Permission: any signed-in user, own subscriptions only.",
+        "operationId": "notifications_remove_push",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PushUnsubscribeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Turn off notifications in this browser",
+        "tags": [
+          "notifications"
         ]
       }
     },
@@ -14364,6 +15366,58 @@
         "summary": "Public vaccination card",
         "tags": [
           "public"
+        ]
+      }
+    },
+    "/api/v1/push/public-key": {
+      "get": {
+        "description": "Permission: public (the public half of the VAPID key pair). Null when push is not set up.",
+        "operationId": "notifications_push_public_key",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushKeyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Web Push application server key",
+        "tags": [
+          "notifications"
         ]
       }
     },

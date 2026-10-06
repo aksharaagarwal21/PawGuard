@@ -8,9 +8,13 @@ from pawguard_api.notify_contracts import (
     NotificationSettingsIn,
     NotificationSettingsOut,
     NotificationsOverviewOut,
+    PushKeyOut,
+    PushSubscriptionIn,
+    PushUnsubscribeIn,
     ScanOut,
     TestMessageIn,
 )
+from pawguard_api.settings import get_settings
 
 router = APIRouter(prefix="/api/v1", tags=["notifications"])
 
@@ -49,3 +53,24 @@ def run_now(ctx: CurrentOrg) -> ScanOut:
     """Permission: clinic staff in a demo organisation with demo mode on. Normally runs every 10 minutes."""
     with ctx.tx() as db:
         return ScanOut(queued=notifications.run_now(db, ctx))
+
+
+@router.get("/push/public-key", response_model=PushKeyOut, summary="Web Push application server key")
+def push_public_key() -> PushKeyOut:
+    """Permission: public (the public half of the VAPID key pair). Null when push is not set up."""
+    s = get_settings()
+    return PushKeyOut(public_key=s.vapid_public_key if notifications.channel_available()["push"] else None)
+
+
+@router.post("/my/push-subscriptions", status_code=204, summary="Turn on notifications in this browser")
+def add_push(body: PushSubscriptionIn, p: CurrentPrincipal) -> Response:
+    """Permission: any signed-in user, own subscriptions only. Only known browser push services are accepted."""
+    notifications.add_push_subscription(p, body.endpoint, body.keys.p256dh, body.keys.auth, body.user_agent)
+    return Response(status_code=204)
+
+
+@router.post("/my/push-subscriptions/remove", status_code=204, summary="Turn off notifications in this browser")
+def remove_push(body: PushUnsubscribeIn, p: CurrentPrincipal) -> Response:
+    """Permission: any signed-in user, own subscriptions only."""
+    notifications.remove_push_subscription(p, body.endpoint)
+    return Response(status_code=204)

@@ -396,6 +396,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/clinic/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Provider status and recent deliveries
+         * @description Permission: clinic staff. Shows delivery states and provider status (e.g. "token expired"), never addresses.
+         */
+        get: operations["notifications_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clinic/notifications/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Queue due reminders now (demo)
+         * @description Permission: clinic staff in a demo organisation with demo mode on. Normally runs every 10 minutes.
+         */
+        post: operations["notifications_run_now"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/clinic/vaccinations": {
         parameters: {
             query?: never;
@@ -883,6 +923,50 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/notification-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My notification settings
+         * @description Permission: any signed-in user, own settings only.
+         */
+        get: operations["notifications_get_settings_"];
+        /**
+         * Turn email, push or WhatsApp reminders on or off
+         * @description Permission: any signed-in user, own settings only. Every channel is opt-in.
+         */
+        put: operations["notifications_put_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/notification-settings/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send myself a test message
+         * @description Permission: any member. At most 5 test messages an hour. Sent by the worker within about 15 seconds.
+         */
+        post: operations["notifications_send_test"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/pets": {
         parameters: {
             query?: never;
@@ -1026,6 +1110,46 @@ export interface paths {
         get: operations["pets_vaccine_options"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/push-subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Turn on notifications in this browser
+         * @description Permission: any signed-in user, own subscriptions only. Only known browser push services are accepted.
+         */
+        post: operations["notifications_add_push"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/push-subscriptions/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Turn off notifications in this browser
+         * @description Permission: any signed-in user, own subscriptions only.
+         */
+        post: operations["notifications_remove_push"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1269,6 +1393,26 @@ export interface paths {
          *     name and verified vaccinations only — nothing about the owner or any location.
          */
         get: operations["public_get_card"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/push/public-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Web Push application server key
+         * @description Permission: public (the public half of the VAPID key pair). Null when push is not set up.
+         */
+        get: operations["notifications_push_public_key"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2125,6 +2269,15 @@ export interface components {
             /** Url Path */
             url_path: string;
         };
+        /** ChannelsAvailableOut */
+        ChannelsAvailableOut: {
+            /** Email */
+            email: boolean;
+            /** Push */
+            push: boolean;
+            /** Whatsapp */
+            whatsapp: boolean;
+        };
         /** ClinicDashboardOut */
         ClinicDashboardOut: {
             /** Awaiting Verification */
@@ -2210,6 +2363,40 @@ export interface components {
              * Format: uuid
              */
             product_id: string;
+        };
+        /** DeliveryOut */
+        DeliveryOut: {
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "email" | "push" | "whatsapp";
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "vaccination_reminder" | "test";
+            /** Last Error */
+            last_error: string | null;
+            /** Pet Name */
+            pet_name: string | null;
+            /** Sent At */
+            sent_at: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "sending" | "sent" | "deferred" | "failed" | "skipped";
         };
         /** DemoAccountOut */
         DemoAccountOut: {
@@ -2859,6 +3046,57 @@ export interface components {
              */
             target_animal_id: string;
         };
+        /** NotificationSettingsIn */
+        NotificationSettingsIn: {
+            /** Email Address */
+            email_address?: string | null;
+            /**
+             * Email Enabled
+             * @default false
+             */
+            email_enabled?: boolean;
+            /**
+             * Push Enabled
+             * @default false
+             */
+            push_enabled?: boolean;
+            /**
+             * Whatsapp Enabled
+             * @default false
+             */
+            whatsapp_enabled?: boolean;
+            /** Whatsapp Number */
+            whatsapp_number?: string | null;
+        };
+        /** NotificationSettingsOut */
+        NotificationSettingsOut: {
+            available: components["schemas"]["ChannelsAvailableOut"];
+            /** Demo Email Set */
+            demo_email_set: boolean;
+            /** Demo Recipients */
+            demo_recipients: boolean;
+            /** Demo Whatsapp Set */
+            demo_whatsapp_set: boolean;
+            /** Email Address */
+            email_address: string | null;
+            /** Email Enabled */
+            email_enabled: boolean;
+            /** Push Devices */
+            push_devices: number;
+            /** Push Enabled */
+            push_enabled: boolean;
+            /** Whatsapp Enabled */
+            whatsapp_enabled: boolean;
+            /** Whatsapp Number */
+            whatsapp_number: string | null;
+        };
+        /** NotificationsOverviewOut */
+        NotificationsOverviewOut: {
+            /** Deliveries */
+            deliveries: components["schemas"]["DeliveryOut"][];
+            /** Providers */
+            providers: components["schemas"]["ProviderOut"][];
+        };
         /** ObservationCreate */
         ObservationCreate: {
             /** Animal Id */
@@ -3360,6 +3598,25 @@ export interface components {
             /** Status */
             status: string;
         };
+        /** ProviderOut */
+        ProviderOut: {
+            /** Configured */
+            configured: boolean;
+            /** Detail */
+            detail: string | null;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "email" | "push" | "whatsapp";
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "ok" | "not_configured" | "token_expired" | "rate_limited" | "cap_reached" | "error";
+            /** Updated At */
+            updated_at: string | null;
+        };
         /** ProvidersOut */
         ProvidersOut: {
             /** Capabilities */
@@ -3400,6 +3657,31 @@ export interface components {
             next_due_on: string | null;
             /** Vaccine */
             vaccine: string;
+        };
+        /** PushKeyOut */
+        PushKeyOut: {
+            /** Public Key */
+            public_key: string | null;
+        };
+        /** PushSubscriptionIn */
+        PushSubscriptionIn: {
+            /** Endpoint */
+            endpoint: string;
+            keys: components["schemas"]["PushSubscriptionKeys"];
+            /** User Agent */
+            user_agent?: string | null;
+        };
+        /** PushSubscriptionKeys */
+        PushSubscriptionKeys: {
+            /** Auth */
+            auth: string;
+            /** P256Dh */
+            p256dh: string;
+        };
+        /** PushUnsubscribeIn */
+        PushUnsubscribeIn: {
+            /** Endpoint */
+            endpoint: string;
         };
         /** QualityOut */
         QualityOut: {
@@ -3513,6 +3795,11 @@ export interface components {
              * Format: uuid
              */
             reviewer_user_id: string;
+        };
+        /** ScanOut */
+        ScanOut: {
+            /** Queued */
+            queued: number;
         };
         /** SignedUrlOut */
         SignedUrlOut: {
@@ -3855,6 +4142,14 @@ export interface components {
             shift_start: string;
             /** Start Area Id */
             start_area_id: string | null;
+        };
+        /** TestMessageIn */
+        TestMessageIn: {
+            /**
+             * Channel
+             * @enum {string}
+             */
+            channel: "email" | "push" | "whatsapp";
         };
         /** TimelineEntryOut */
         TimelineEntryOut: {
@@ -5475,6 +5770,106 @@ export interface operations {
             };
         };
     };
+    notifications_overview: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationsOverviewOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_run_now: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     clinic_record_vaccination: {
         parameters: {
             query?: never;
@@ -6829,6 +7224,162 @@ export interface operations {
             };
         };
     };
+    notifications_get_settings_: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSettingsOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_put_settings: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSettingsOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_send_test: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestMessageIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     pets_list_pets: {
         parameters: {
             query?: never;
@@ -7269,6 +7820,108 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["ProductOptionOut"][];
                 };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_add_push: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushSubscriptionIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_remove_push: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushUnsubscribeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Unauthorized */
             401: {
@@ -7902,6 +8555,53 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicCardOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    notifications_push_public_key: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushKeyOut"];
                 };
             };
             /** @description Unauthorized */

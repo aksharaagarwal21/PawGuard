@@ -6,6 +6,7 @@ import { Card, Notice, StatusChip } from "@pawguard/ui";
 import { PageBody } from "@/components/page-header";
 import { ClinicBoard } from "@/components/pets/clinic-board";
 import { ClinicRecordForm } from "@/components/pets/clinic-record-form";
+import { MessagesPanel } from "@/components/notify/messages-panel";
 import { DemoClockControl } from "@/components/pets/demo-clock";
 import { WelcomeTour } from "@/components/tour/welcome-tour";
 import { pageContext } from "@/lib/page-context";
@@ -22,7 +23,10 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
   const ctx = await pageContext();
   const t = await getTranslations("clinic");
   const tc = await getTranslations("common");
-  const { data: d, error } = await ctx.api.GET("/api/v1/clinic/dashboard");
+  const [{ data: d, error }, messages] = await Promise.all([
+    ctx.api.GET("/api/v1/clinic/dashboard"),
+    ctx.api.GET("/api/v1/clinic/notifications"),
+  ]);
   if (!d) return <PageBody><Notice tone="urgent">{error?.error?.message ?? tc("tryAgainLater")}</Notice></PageBody>;
   const canReview = ctx.can("vaccination.review");
   const realToday = new Date().toLocaleDateString("en-CA", { timeZone: ctx.tz });
@@ -63,6 +67,8 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
           <ClinicRecordForm pets={d.pets} products={d.products} today={realToday} />
         </section>
       ) : null}
+
+      {messages.data ? <MessagesPanel data={messages.data} tz={ctx.tz} demo={d.demo_clock_available} /> : null}
 
       {d.demo_clock_available ? (
         <section aria-labelledby="demo-tools" className="space-y-3 rounded-card border-2 border-dashed border-control p-4" data-tour="clinic-demo">
