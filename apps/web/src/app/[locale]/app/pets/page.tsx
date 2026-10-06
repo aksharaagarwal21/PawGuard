@@ -6,8 +6,16 @@ import { Button, Notice, StatusChip } from "@pawguard/ui";
 import { PageBody } from "@/components/page-header";
 import { NextStepCard, dueWords, pickNextStep } from "@/components/pets/next-step";
 import { PetAvatar, PetStatusChip } from "@/components/pets/status";
+import { WelcomeTour } from "@/components/tour/welcome-tour";
 import { Link } from "@/i18n/navigation";
 import { pageContext } from "@/lib/page-context";
+
+const OWNER_TOUR = [
+  { target: '[data-tour="pets"]', key: "pets" },
+  { target: '[data-tour="bell"]', key: "bell" },
+  { target: '[data-tour="next-step"]', key: "next" },
+  { target: '[data-tour="pets"] li:first-child', key: "card" },
+];
 
 function greetingKey(tz: string): "morning" | "afternoon" | "evening" {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hourCycle: "h23", timeZone: tz }).format(new Date()));
@@ -106,6 +114,7 @@ export default async function MyPetsPage({ params }: { params: Promise<{ locale:
         </>
       )}
       <p className="text-sm text-ink-2">{t("remindOnly")}</p>
+      {pets.length > 0 ? <WelcomeTour id="owner" steps={OWNER_TOUR} /> : null}
     </PageBody>
   );
 }

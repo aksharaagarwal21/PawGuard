@@ -5,6 +5,7 @@ import {
   CalendarRange,
   Camera,
   ClipboardCheck,
+  Compass,
   Dog,
   FileSpreadsheet,
   FlaskConical,
@@ -71,9 +72,16 @@ export async function AppShell({
     const { data } = await (await serverApi(active.org_id)).GET("/api/v1/my/reminders").catch(() => ({ data: undefined }));
     reminderCount = data?.length ?? 0;
   }
+  // "Show tour again" (Help): owners on My pets, clinic staff on the clinic dashboard.
+  const tourHref = active.capabilities.includes("pet.own")
+    ? "/app/pets?tour=1"
+    : active.org_type === "veterinary_service" && active.capabilities.includes("animal.read")
+      ? "/app/clinic?tour=1"
+      : null;
   const bell = active.capabilities.includes("pet.own") ? (
     <Link
       href="/app/reminders"
+      data-tour="bell"
       className="relative inline-flex min-h-11 min-w-11 items-center justify-center rounded-control text-ink no-underline hover:bg-sage"
       aria-label={reminderCount ? t("remindersBellCount", { count: reminderCount }) : t("reminders")}
     >
@@ -150,6 +158,15 @@ export async function AppShell({
           </ul>
         </nav>
         <div className="space-y-3 border-t border-divider p-5">
+          {tourHref ? (
+            <div>
+              <p className="text-xs font-semibold text-ink-2">{t("helpMenu")}</p>
+              <Link href={tourHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold">
+                <Compass aria-hidden className="size-4" />
+                {t("showTour")}
+              </Link>
+            </div>
+          ) : null}
           <div>
             <ConnectionStatus />
           </div>

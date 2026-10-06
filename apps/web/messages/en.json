@@ -89,7 +89,9 @@
     "helpGuide": "Help",
     "signIn": "Sign in",
     "getStarted": "Get started",
-    "biteHelpShort": "Bitten by an animal? Get help now"
+    "biteHelpShort": "Bitten by an animal? Get help now",
+    "helpMenu": "Help",
+    "showTour": "Show tour again"
   },
   "landing": {
     "headline": "Never miss your pet's vaccination again.",
@@ -1606,6 +1608,49 @@
     "noVerified": {
       "q": "What is “No verified record”?",
       "a": "It means no vet has confirmed a vaccine in this app yet. It does not mean your pet is unvaccinated. Add a past vaccination with its certificate, and your vet will check it."
+    }
+  },
+  "tour": {
+    "stepOf": "Step {step} of {total}",
+    "skip": "Skip tour",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "owner": {
+      "pets": {
+        "title": "Your pets and their status",
+        "body": "Each pet shows one status — icon, word and colour — and when the next dose is due."
+      },
+      "bell": {
+        "title": "The reminders bell",
+        "body": "The number shows today's reminders. Tap it to snooze, mark as done or add a date to your calendar."
+      },
+      "next": {
+        "title": "Your next step",
+        "body": "This box always shows the single most useful thing to do now."
+      },
+      "card": {
+        "title": "The vaccination card",
+        "body": "Open a pet to find its QR vaccination card — show it to a groomer, kennel or new vet."
+      }
+    },
+    "clinic": {
+      "tiles": {
+        "title": "Today at a glance",
+        "body": "Four counts: waiting for you, overdue, due this week and due in 8–14 days. Tap a count to see those pets."
+      },
+      "queue": {
+        "title": "Verify first",
+        "body": "Owner uploads wait here. Open one, check the certificate and verify it with the next due date."
+      },
+      "record": {
+        "title": "Record a clinic vaccination",
+        "body": "Vaccines given here are saved as verified, and the owner's reminders update at once."
+      },
+      "demo": {
+        "title": "Demo tools",
+        "body": "In the demo you can move the date forward to show how reminders progress."
+      }
     }
   }
 }

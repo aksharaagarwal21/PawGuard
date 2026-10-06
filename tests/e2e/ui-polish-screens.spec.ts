@@ -77,3 +77,27 @@ for (const [label, viewport] of WIDTHS) {
     await check(page, `add-pet-${label}`);
   });
 }
+
+for (const [label, viewport] of WIDTHS) {
+  test(`owner welcome tour (${label})`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.emulateMedia({ reducedMotion: "reduce" }); // no highlight animation: stable screenshots
+    await page.setViewportSize(viewport);
+    await signIn(page, DEMO.owner.email);
+    await page.goto("/en/app/pets?tour=1");
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByText("Step 1 of 4")).toBeVisible();
+    await expect(dialog.getByRole("heading", { name: "Your pets and their status" })).toBeVisible();
+    await page.keyboard.press("ArrowRight");
+    await expect(dialog.getByRole("heading", { name: "The reminders bell" })).toBeVisible();
+    await dialog.getByRole("button", { name: "Next" }).click();
+    await expect(dialog.getByRole("heading", { name: "Your next step" })).toBeVisible();
+    await page.waitForTimeout(300); // let the post-scroll re-measure run
+    await page.screenshot({ path: `test-results/ui-polish/tour-${label}.png` });
+    await dialog.getByRole("button", { name: "Back" }).click();
+    await expect(dialog.getByRole("heading", { name: "The reminders bell" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(page).toHaveURL(/\/en\/app\/pets$/);
+  });
+}
