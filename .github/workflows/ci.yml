@@ -1,11 +1,11 @@
 # Continuous integration. Mirrors scripts/check.sh, which is the version actually exercised locally.
-# NOTE: this workflow has not yet run on a hosted runner (the repository has no remote); see IMPLEMENTATION_STATUS.
+# NOTE: not yet validated on a hosted runner — it does not start the background worker/dispatcher that the
+# photo-dependent end-to-end tests need. Manual trigger only (Actions tab → ci → Run workflow) until it has been
+# made to pass; local results are in docs/RELEASE_REPORT_PREVENTION.md.
 name: ci
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
