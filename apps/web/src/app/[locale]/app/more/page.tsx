@@ -64,18 +64,23 @@ export default async function MorePage({ params }: { params: Promise<{ locale: s
           </button>
         </form>
       ) : null}
-      {tourHref ? (
-        <section aria-labelledby="help-h" className="space-y-2">
-          <h2 id="help-h" className="text-lg">{t("helpMenu")}</h2>
-          <ul className="divide-y divide-divider rounded-card border border-divider bg-surface">
+      <section aria-labelledby="help-h" className="space-y-2">
+        <h2 id="help-h" className="text-lg">{t("helpMenu")}</h2>
+        <ul className="divide-y divide-divider rounded-card border border-divider bg-surface">
+          <li>
+            <Link href="/guide" className="flex min-h-12 items-center px-4 font-display font-semibold text-ink no-underline hover:bg-sage">
+              {t("howToUse")}
+            </Link>
+          </li>
+          {tourHref ? (
             <li>
               <Link href={tourHref} className="flex min-h-12 items-center px-4 font-display font-semibold text-ink no-underline hover:bg-sage">
                 {t("showTour")}
               </Link>
             </li>
-          </ul>
-        </section>
-      ) : null}
+          ) : null}
+        </ul>
+      </section>
       <LanguageSwitcher />
       <SignOutForm locale={locale} className="inline-flex min-h-11 items-center gap-2 rounded-control border border-control bg-surface px-4 font-semibold hover:bg-sage" />
     </div>

@@ -91,7 +91,8 @@
     "getStarted": "Get started",
     "biteHelpShort": "Bitten by an animal? Get help now",
     "helpMenu": "Help",
-    "showTour": "Show tour again"
+    "showTour": "Show tour again",
+    "howToUse": "How to use PawGuard"
   },
   "landing": {
     "headline": "Never miss your pet's vaccination again.",
@@ -1659,5 +1660,47 @@
         "body": "In the demo you can move the date forward to show how reminders progress."
       }
     }
+  },
+  "guide": {
+    "title": "How to use PawGuard",
+    "intro": "Short guides for each kind of user, what the status colours mean, and answers to common questions.",
+    "contents": "On this page",
+    "toc": {
+      "roles": "Guides by role",
+      "colours": "What the colours mean",
+      "questions": "Questions"
+    },
+    "biteTitle": "Bitten or scratched by an animal?",
+    "biteLink": "Get help after a bite — what to do now",
+    "rolesTitle": "Guides by role",
+    "roles": {
+      "owner": {
+        "title": "Pet owners",
+        "one": "Add your pet: name, photo and your vet clinic.",
+        "two": "Add past vaccinations with a photo of the certificate. They show as “Waiting for vet” until your vet checks them.",
+        "three": "Follow the “Next step” box and the reminders bell. Show the QR card when someone asks for proof."
+      },
+      "vet": {
+        "title": "Clinic vets",
+        "one": "Open the clinic dashboard. The verification queue comes first.",
+        "two": "Open a record, check the certificate, then verify it and set the next due date.",
+        "three": "Record vaccines you give at the clinic; they are saved as verified and the owner's reminders update."
+      },
+      "manager": {
+        "title": "Clinic managers",
+        "one": "Use the count tiles to see who is overdue or due this week.",
+        "two": "Tap a tile to show only those pets.",
+        "three": "Remember the count covers pets registered in this app, not every pet in your area."
+      },
+      "volunteer": {
+        "title": "Community volunteers",
+        "one": "Search for a community dog before registering a new one.",
+        "two": "Add a sighting or vaccination evidence; a vet verifies it.",
+        "three": "Use the offline field kit when there's no signal; it sends your work later."
+      }
+    },
+    "tourHint": "Signed in? Choose “Show tour again” under Help in the menu for a quick guided tour.",
+    "coloursTitle": "What the colours mean",
+    "faqTitle": "Questions people ask"
   }
 }

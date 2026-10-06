@@ -118,3 +118,16 @@ for (const [label, viewport] of WIDTHS) {
     await expect(page.getByRole("heading", { name: /^Awaiting verification/ })).toBeVisible();
   });
 }
+
+for (const [label, viewport] of WIDTHS) {
+  test(`help guide (${label})`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize(viewport);
+    await page.goto("/en");
+    await page.getByRole("navigation", { name: "Main navigation" }).getByRole("link", { name: "Help" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "How to use PawGuard" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Pet owners" })).toBeVisible();
+    await expect(page.getByText("Do reminders send SMS?")).toBeVisible();
+    await check(page, `guide-${label}`);
+  });
+}

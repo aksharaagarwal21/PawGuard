@@ -37,7 +37,7 @@ export async function PublicHeader() {
               </Link>
             </li>
             <li>
-              <Link href="/#faq" className={navLink}>
+              <Link href="/guide" className={navLink}>
                 {t("helpGuide")}
               </Link>
             </li>

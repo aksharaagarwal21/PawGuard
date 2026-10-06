@@ -2,6 +2,7 @@ import {
   Activity,
   Backpack,
   Bell,
+  BookOpen,
   CalendarRange,
   Camera,
   ClipboardCheck,
@@ -158,15 +159,19 @@ export async function AppShell({
           </ul>
         </nav>
         <div className="space-y-3 border-t border-divider p-5">
-          {tourHref ? (
-            <div>
-              <p className="text-xs font-semibold text-ink-2">{t("helpMenu")}</p>
-              <Link href={tourHref} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold">
+          <div>
+            <p className="text-xs font-semibold text-ink-2">{t("helpMenu")}</p>
+            <Link href="/guide" className="flex min-h-11 items-center gap-2 text-sm font-semibold">
+              <BookOpen aria-hidden className="size-4" />
+              {t("howToUse")}
+            </Link>
+            {tourHref ? (
+              <Link href={tourHref} className="flex min-h-11 items-center gap-2 text-sm font-semibold">
                 <Compass aria-hidden className="size-4" />
                 {t("showTour")}
               </Link>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
           <div>
             <ConnectionStatus />
           </div>
