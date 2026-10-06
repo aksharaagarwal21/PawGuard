@@ -22,3 +22,10 @@
     }
   }
 }
+
+/* Gentle in-page scrolling, only for people who have not asked for reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

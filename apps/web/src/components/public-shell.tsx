@@ -9,49 +9,63 @@ import { Wordmark } from "./wordmark";
 
 export async function PublicHeader() {
   const t = await getTranslations("nav");
+  const tm = await getTranslations("meta");
+  const getStarted = serverEnv().demoMode ? "/welcome" : "/sign-in";
+  const navLink =
+    "inline-flex min-h-11 items-center rounded-control px-3 font-display font-semibold text-ink no-underline hover:bg-sage motion-safe:transition-colors motion-safe:duration-150";
   return (
     <header className="border-b border-divider bg-canvas">
-      <div className="container-pg flex flex-wrap items-center gap-x-6 gap-y-2 py-3">
-        <Link href="/" className="no-underline">
-          <Wordmark />
+      <div className="container-pg flex flex-wrap items-center gap-x-4 gap-y-1 pt-3 pb-1">
+        <Link href="/" className="no-underline" aria-label={tm("siteName")}>
+          <span className="sm:hidden">
+            <Wordmark compact />
+          </span>
+          <span className="hidden sm:inline">
+            <Wordmark />
+          </span>
         </Link>
-        <nav aria-label={t("mainNavigation")} className="order-3 w-full sm:order-none sm:w-auto">
-          <ul className="flex flex-wrap gap-x-1 text-sm">
-            {(
-              [
-                ["/learn", t("learn")],
-                ["/find-care", t("findCare")],
-                ["/about", t("about")],
-              ] as const
-            ).map(([href, label]) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className="inline-flex min-h-11 items-center rounded-control px-3 font-display font-semibold text-ink no-underline hover:bg-sage"
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
+        <nav aria-label={t("mainNavigation")} className="order-3 lg:order-none">
+          <ul className="-ml-3 flex flex-wrap text-sm">
+            <li>
+              <Link href="/#how" className={navLink}>
+                {t("howItWorks")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/#for-clinics" className={navLink}>
+                {t("forClinics")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/#faq" className={navLink}>
+                {t("helpGuide")}
+              </Link>
+            </li>
           </ul>
         </nav>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="order-4 ml-auto lg:order-none">
           <LanguageSwitcher />
+        </div>
+        <div className="ml-auto flex items-center gap-2 lg:ml-0">
           <Link
             href="/sign-in"
             className="inline-flex min-h-11 items-center rounded-control border border-control bg-surface px-3 font-display text-sm font-semibold text-ink no-underline hover:bg-sage"
           >
-            {t("teamSignIn")}
+            {t("signIn")}
+          </Link>
+          <Link
+            href={getStarted}
+            className="inline-flex min-h-11 items-center rounded-control bg-primary px-4 font-display text-sm font-semibold text-white no-underline hover:bg-primary-hover"
+          >
+            {t("getStarted")}
           </Link>
         </div>
       </div>
-      <div className="bg-urgent-soft">
-        <div className="container-pg py-2">
-          <Link href="/help" className="inline-flex min-h-11 items-center gap-2 font-display font-bold text-urgent">
-            <HeartPulse aria-hidden className="size-5" />
-            {t("getHelp")}
-          </Link>
-        </div>
+      <div className="container-pg pb-2">
+        <Link href="/help" className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-urgent">
+          <HeartPulse aria-hidden className="size-4" />
+          {t("biteHelpShort")}
+        </Link>
       </div>
     </header>
   );
@@ -80,16 +94,26 @@ export async function TranslationNotice({ locale }: { locale: string }) {
 export async function PublicFooter() {
   const t = await getTranslations("nav");
   const tm = await getTranslations("meta");
+  const tf = await getTranslations("footer");
   return (
     <footer className="mt-16 border-t border-divider bg-surface">
-      <div className="container-pg flex flex-wrap items-center justify-between gap-4 py-8 text-sm text-ink-2">
-        <p>{tm("siteName")}</p>
-        <ul className="flex flex-wrap gap-4">
+      <div className="container-pg grid gap-6 py-8 text-sm text-ink-2 md:grid-cols-[1fr_auto] md:items-start">
+        <div className="space-y-2">
+          <p className="font-display font-semibold text-ink">{tm("siteName")}</p>
+          {serverEnv().demoMode ? <p className="font-semibold">{tf("demoVersion")}</p> : null}
+          <p>{tf("credit")}</p>
+        </div>
+        <ul className="flex flex-wrap gap-x-5 gap-y-2">
           <li>
-            <Link href="/sources">{t("sources")}</Link>
+            <Link href="/help" className="font-semibold text-urgent">
+              {t("getHelp")}
+            </Link>
           </li>
           <li>
             <Link href="/about">{t("about")}</Link>
+          </li>
+          <li>
+            <Link href="/sources">{t("sources")}</Link>
           </li>
         </ul>
       </div>

@@ -1,133 +1,226 @@
-import { BellRing, ClipboardCheck, FilePlus2, QrCode, Search, ShieldQuestion } from "lucide-react";
+import {
+  BellRing,
+  Camera,
+  ClipboardCheck,
+  Dog,
+  ExternalLink,
+  LockKeyhole,
+  QrCode,
+  ShieldCheck,
+  Stethoscope,
+  Tag,
+  Users,
+} from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { Button } from "@pawguard/ui";
+import { Button, StatusChip } from "@pawguard/ui";
 
+import { Faq } from "@/components/landing/faq";
+import { StatusGuide } from "@/components/landing/status-guide";
+import { PetStatusChip } from "@/components/pets/status";
 import { PublicPage } from "@/components/public-shell";
 import { Link } from "@/i18n/navigation";
+import { serverEnv } from "@/lib/server-env";
 
+const STEPS = [
+  { key: "add", Icon: Camera },
+  { key: "vet", Icon: Stethoscope },
+  { key: "remind", Icon: BellRing },
+  { key: "card", Icon: QrCode },
+] as const;
+
+const AUDIENCES = [
+  { key: "owners", Icon: Dog, bg: "bg-sage", id: "for-owners" },
+  { key: "clinics", Icon: Stethoscope, bg: "bg-sky", id: "for-clinics" },
+  { key: "volunteers", Icon: Users, bg: "bg-lavender", id: "for-volunteers" },
+] as const;
+
+const TRUST = [
+  { key: "vets", Icon: ShieldCheck },
+  { key: "contact", Icon: LockKeyhole },
+  { key: "reminds", Icon: Stethoscope },
+  { key: "demo", Icon: Tag },
+] as const;
+
+const WHO_URL = "https://www.who.int/news-room/fact-sheets/detail/rabies";
+
+/** Public landing page, told as a short story: what it is, how it works, what the colours mean, who it's for. */
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("landing");
-  const petSteps = [
-    { key: "one", Icon: FilePlus2, bg: "bg-sage" },
-    { key: "two", Icon: BellRing, bg: "bg-sand" },
-    { key: "three", Icon: QrCode, bg: "bg-sky" },
-  ] as const;
-  const steps = [
-    { key: "one", Icon: Search, bg: "bg-sage" },
-    { key: "two", Icon: ClipboardCheck, bg: "bg-sky" },
-    { key: "three", Icon: ShieldQuestion, bg: "bg-lavender" },
-  ] as const;
+  const getStarted = serverEnv().demoMode ? "/welcome" : "/sign-in";
   return (
     <PublicPage locale={locale}>
-      <section className="container-pg grid items-center gap-10 py-12 md:grid-cols-[1.15fr_0.85fr] md:py-20">
+      {/* Hero */}
+      <section className="container-pg grid items-center gap-10 py-12 md:py-16 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <h1 className="text-3xl md:text-[2.875rem] md:leading-[1.12]">{t("headline")}</h1>
           <p className="prose-pg mt-5 text-lg text-ink-2">{t("subheading")}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">
-              <Link href="/sign-in">{t("primaryAction")}</Link>
+              <Link href={getStarted}>{t("getStarted")}</Link>
             </Button>
             <Button asChild variant="secondary" size="lg">
-              <a href="#pets">{t("secondaryAction")}</a>
-            </Button>
-            <Button asChild variant="urgent">
-              <Link href="/help">{t("bitesAction")}</Link>
+              <a href="#how">{t("seeHow")}</a>
             </Button>
           </div>
         </div>
-        <HeroIllustration />
+        <PreviewCard />
       </section>
 
-      <section id="pets" className="bg-surface py-14">
+      {/* How it works */}
+      <section id="how" aria-labelledby="how-h" className="scroll-mt-4 bg-surface py-14">
         <div className="container-pg">
-          <h2 className="text-2xl">{t("petHowTitle")}</h2>
-          <ol className="mt-8 grid gap-6 md:grid-cols-3">
-            {petSteps.map(({ key, Icon, bg }, i) => (
-              <li key={key} className="rounded-card border border-divider p-6">
-                <span className={`flex size-11 items-center justify-center rounded-full ${bg} text-primary`}>
-                  <Icon aria-hidden className="size-5" />
+          <h2 id="how-h" className="text-2xl">{t("howTitle")}</h2>
+          <p className="mt-2 max-w-prose text-ink-2">{t("howIntro")}</p>
+          <ol className="relative mt-10 grid gap-8 lg:grid-cols-4 lg:gap-6">
+            {/* Thin connecting line: vertical on phones, horizontal on wide screens. */}
+            <span aria-hidden className="absolute top-5 right-[12.5%] left-[12.5%] hidden h-0.5 bg-divider lg:block" />
+            {STEPS.map(({ key, Icon }, i) => (
+              <li key={key} className="relative flex gap-4 lg:flex-col lg:items-center lg:text-center">
+                {i < STEPS.length - 1 ? (
+                  <span aria-hidden className="absolute top-10 -bottom-8 left-5 w-0.5 -translate-x-1/2 bg-divider lg:hidden" />
+                ) : null}
+                <span className="relative z-10 flex size-10 shrink-0 items-center justify-center rounded-full bg-primary font-display font-bold text-white ring-4 ring-surface">
+                  {i + 1}
                 </span>
-                <h3 className="mt-4 text-lg">
-                  <span className="text-ink-2">{i + 1}. </span>
-                  {t(`petSteps.${key}.title`)}
-                </h3>
-                <p className="mt-2 text-ink-2">{t(`petSteps.${key}.body`)}</p>
+                <div>
+                  <h3 className="text-lg">
+                    <Icon aria-hidden className="mr-1.5 inline size-5 align-[-3px] text-primary" />
+                    {t(`steps.${key}.title`)}
+                  </h3>
+                  <p className="mt-1 text-ink-2">{t(`steps.${key}.body`)}</p>
+                </div>
               </li>
             ))}
           </ol>
-          <p className="mt-6 text-ink-2">{t("clinicNote")}</p>
         </div>
       </section>
 
-      <section id="prevention" className="py-14">
+      {/* What the colours mean */}
+      <section aria-labelledby="colours-h" className="container-pg py-14">
+        <h2 id="colours-h" className="text-2xl">{t("coloursTitle")}</h2>
+        <p className="mt-2 max-w-prose text-ink-2">{t("coloursIntro")}</p>
+        <div className="mt-6 max-w-3xl">
+          <StatusGuide />
+        </div>
+      </section>
+
+      {/* Who it's for */}
+      <section aria-labelledby="who-h" className="bg-surface py-14">
         <div className="container-pg">
-          <h2 className="text-2xl">{t("howTitle")}</h2>
-          <ol className="mt-8 grid gap-6 md:grid-cols-3">
-            {steps.map(({ key, Icon, bg }, i) => (
-              <li key={key} className="rounded-card border border-divider p-6">
+          <h2 id="who-h" className="text-2xl">{t("whoTitle")}</h2>
+          <ul className="mt-8 grid gap-5 md:grid-cols-3">
+            {AUDIENCES.map(({ key, Icon, bg, id }) => (
+              <li key={key} id={id} className="scroll-mt-4 rounded-card border border-divider p-6">
                 <span className={`flex size-11 items-center justify-center rounded-full ${bg} text-primary`}>
                   <Icon aria-hidden className="size-5" />
                 </span>
-                <h3 className="mt-4 text-lg">
-                  <span className="text-ink-2">{i + 1}. </span>
-                  {t(`steps.${key}.title`)}
-                </h3>
-                <p className="mt-2 text-ink-2">{t(`steps.${key}.body`)}</p>
+                <h3 className="mt-4 text-lg">{t(`who.${key}.title`)}</h3>
+                <ul className="mt-3 list-disc space-y-1.5 pl-5 text-ink-2">
+                  {(["one", "two", "three"] as const).map((b) => (
+                    <li key={b}>{t(`who.${key}.${b}`)}</li>
+                  ))}
+                </ul>
               </li>
             ))}
-          </ol>
-          <p className="mt-6 text-sm text-ink-2">{t("releaseNote")}</p>
-        </div>
-      </section>
-
-      <section className="container-pg py-14">
-        <div className="rounded-card bg-sand p-6 md:p-8">
-          <h2 className="text-xl">{t("transparencyTitle")}</h2>
-          <ul className="prose-pg mt-4 list-disc space-y-2 pl-5">
-            <li>{t("transparency.one")}</li>
-            <li>{t("transparency.two")}</li>
-            <li>{t("transparency.three")}</li>
-            <li>{t("transparency.four")}</li>
           </ul>
+        </div>
+      </section>
+
+      {/* Why you can trust it */}
+      <section aria-labelledby="trust-h" className="container-pg py-14">
+        <h2 id="trust-h" className="text-2xl">{t("trustTitle")}</h2>
+        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+          {TRUST.map(({ key, Icon }) => (
+            <li key={key} className="flex gap-3 rounded-card bg-sage p-4">
+              <Icon aria-hidden className="mt-0.5 size-5 shrink-0 text-primary" />
+              <p>{t(`trust.${key}`)}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Why it matters: quoted, attributed facts only */}
+      <section aria-labelledby="matters-h" className="bg-sand py-14">
+        <div className="container-pg">
+          <h2 id="matters-h" className="text-2xl">{t("mattersTitle")}</h2>
+          <p className="mt-2 max-w-prose">{t("mattersIntro")}</p>
+          <ul className="mt-6 grid gap-4 md:grid-cols-3" lang="en">
+            {(["preventable", "dogs", "vaccinating"] as const).map((k) => (
+              <li key={k} className="rounded-card bg-surface p-5">
+                <blockquote cite={WHO_URL}>
+                  <p>“{t(`matters.${k}`)}”</p>
+                </blockquote>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm">
+            {t("mattersSource")}{" "}
+            <a href={WHO_URL} target="_blank" rel="noopener noreferrer">
+              {t("mattersSourceLink")}
+              <ExternalLink aria-hidden className="ml-1 inline size-3.5" />
+            </a>{" "}
+            · {t("mattersChecked")}
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" aria-labelledby="faq-h" className="container-pg scroll-mt-4 py-14">
+        <h2 id="faq-h" className="text-2xl">{t("faqTitle")}</h2>
+        <div className="mt-6 max-w-3xl">
+          <Faq />
+        </div>
+        <div className="mt-10 flex flex-wrap items-center gap-3">
+          <Button asChild size="lg">
+            <Link href={getStarted}>{t("getStarted")}</Link>
+          </Button>
+          <p className="text-ink-2">{t("closing")}</p>
         </div>
       </section>
     </PublicPage>
   );
 }
 
-/** Decorative, generated illustration — not a photograph of any real animal or person. */
-function HeroIllustration() {
+/** Product preview: what "My pets" looks like (fictional pets). Not a statistic and not real data. */
+async function PreviewCard() {
+  const t = await getTranslations("landing.preview");
+  const pets = [
+    { name: "Bruno", kind: "dog", status: "up_to_date", line: t("brunoLine") },
+    { name: "Misty", kind: "cat", status: "due_soon", line: t("mistyLine") },
+    { name: "Coco", kind: "dog", status: "overdue", line: t("cocoLine") },
+  ] as const;
   return (
-    <svg aria-hidden viewBox="0 0 420 340" className="mx-auto w-full max-w-md">
-      <rect x="10" y="20" width="400" height="300" rx="28" fill="#E8F1E9" />
-      <circle cx="345" cy="78" r="30" fill="#FBF1DE" />
-      <path d="M10 250 Q120 200 210 240 T410 230 V292 a28 28 0 0 1 -28 28 H38 a28 28 0 0 1 -28 -28Z" fill="#CBD8CE" />
-      <g transform="translate(205 118)">
-        <ellipse cx="72" cy="168" rx="86" ry="10" fill="#203A34" opacity="0.08" />
-        <path d="M116 132 q34 -6 30 -40" stroke="#A97C4E" strokeWidth="10" fill="none" strokeLinecap="round" />
-        <ellipse cx="74" cy="124" rx="48" ry="44" fill="#B88A5A" />
-        <rect x="48" y="128" width="15" height="38" rx="7" fill="#A97C4E" />
-        <rect x="84" y="128" width="15" height="38" rx="7" fill="#A97C4E" />
-        <ellipse cx="38" cy="44" rx="13" ry="25" transform="rotate(18 38 44)" fill="#8E6440" />
-        <ellipse cx="106" cy="44" rx="13" ry="25" transform="rotate(-18 106 44)" fill="#8E6440" />
-        <circle cx="72" cy="54" r="36" fill="#B88A5A" />
-        <ellipse cx="72" cy="72" rx="19" ry="14" fill="#E2C49E" />
-        <ellipse cx="72" cy="64" rx="6.5" ry="4.5" fill="#203A34" />
-        <circle cx="58" cy="47" r="4.2" fill="#203A34" />
-        <circle cx="86" cy="47" r="4.2" fill="#203A34" />
-        <rect x="47" y="88" width="50" height="8" rx="4" fill="#205C4F" />
-        <circle cx="72" cy="101" r="5" fill="#FBF1DE" stroke="#205C4F" strokeWidth="1.5" />
-      </g>
-      <g transform="translate(40 60)">
-        <rect width="120" height="76" rx="12" fill="#FFFFFF" />
-        <rect x="14" y="16" width="54" height="8" rx="4" fill="#576E64" opacity="0.5" />
-        <rect x="14" y="32" width="88" height="8" rx="4" fill="#576E64" opacity="0.3" />
-        <rect x="14" y="50" width="46" height="14" rx="7" fill="#E8F1E9" />
-        <path d="M22 57 l4 4 l8 -8" stroke="#205C4F" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-      </g>
-    </svg>
+    <figure className="mx-auto w-full max-w-md">
+      <div className="rounded-card border border-divider bg-surface p-5 shadow-card">
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-display text-lg font-semibold">{t("title")}</p>
+          <StatusChip kind="demo">{t("example")}</StatusChip>
+        </div>
+        <ul className="mt-4 space-y-3">
+          {pets.map((p) => (
+            <li key={p.name} className="flex flex-wrap items-center gap-3 rounded-control border border-divider p-3">
+              <span aria-hidden className="flex size-11 shrink-0 items-center justify-center rounded-full bg-sage text-primary">
+                <Dog className="size-5" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-display font-semibold">
+                  {p.name} <span className="text-sm font-normal text-ink-2">· {t(p.kind)}</span>
+                </p>
+                <p className="text-sm text-ink-2">{p.line}</p>
+              </div>
+              <PetStatusChip status={{ status: p.status }} />
+            </li>
+          ))}
+        </ul>
+        <div className="mt-4 flex items-center gap-2 rounded-control bg-sand p-3 text-sm">
+          <ClipboardCheck aria-hidden className="size-4 shrink-0 text-primary" />
+          <span>{t("nextStep")}</span>
+        </div>
+      </div>
+      <figcaption className="mt-2 text-center text-sm text-ink-2">{t("caption")}</figcaption>
+    </figure>
   );
 }

@@ -19,7 +19,7 @@ const STATUS_STYLE: Record<PetStatus["status"], { cls: string; Icon: typeof Chec
 };
 
 /** Pet vaccination status: icon + text, never colour alone. */
-export function PetStatusChip({ status, className }: { status: PetStatus; className?: string }) {
+export function PetStatusChip({ status, className }: { status: Pick<PetStatus, "status">; className?: string }) {
   const t = useTranslations("pets.status");
   const { cls, Icon } = STATUS_STYLE[status.status];
   return (

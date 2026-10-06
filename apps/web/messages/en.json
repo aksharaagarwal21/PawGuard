@@ -83,53 +83,92 @@
     "pets": "My pets",
     "reminders": "Reminders",
     "clinic": "Clinic",
-    "remindersBellCount": "{count, plural, one {# reminder} other {# reminders}} today"
+    "remindersBellCount": "{count, plural, one {# reminder} other {# reminders}} today",
+    "howItWorks": "How it works",
+    "forClinics": "For clinics",
+    "helpGuide": "Help",
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "biteHelpShort": "Bitten by an animal? Get help now"
   },
   "landing": {
-    "headline": "Never miss your pet's next vaccination.",
-    "subheading": "PawGuard keeps your pet's vaccination records in one place, reminds you before each due date and lets your clinic's vet verify every record. Clinics see which registered pets are due or overdue.",
-    "primaryAction": "Sign in to My pets",
-    "secondaryAction": "How it works",
-    "howTitle": "Also in PawGuard: community animal programmes",
+    "headline": "Never miss your pet's vaccination again.",
+    "subheading": "Keep your pet's vaccine records in one place, get reminders before they're due, and carry a digital card your vet has verified.",
+    "getStarted": "Get started",
+    "seeHow": "See how it works",
+    "preview": {
+      "title": "My pets",
+      "example": "Example",
+      "dog": "Dog",
+      "cat": "Cat",
+      "brunoLine": "Next dose in 8 months",
+      "mistyLine": "Due in 10 days",
+      "cocoLine": "5 days overdue",
+      "nextStep": "Next step: Coco is overdue. Book a visit or mark it as done.",
+      "caption": "What you'll see after signing in (fictional pets)."
+    },
+    "howTitle": "How it works",
+    "howIntro": "Four steps, from adding your pet to showing a verified card.",
     "steps": {
-      "one": {
-        "title": "Find or register the animal",
-        "body": "Trained teams search existing records first, so each community animal has one history instead of many scattered notes."
+      "add": {
+        "title": "Add your pet",
+        "body": "Add your pet's name, photo and vet clinic."
       },
-      "two": {
-        "title": "Record vaccination evidence",
-        "body": "Field teams submit what was given, when and by whom. Nothing counts as verified until a veterinary reviewer checks it."
+      "vet": {
+        "title": "Your vet records the vaccine",
+        "body": "They confirm it and set the next due date."
       },
-      "three": {
-        "title": "See what is known — and what isn't",
-        "body": "Coordinators see verified records, gaps and uncertainty, so the next round of work goes where it is needed."
+      "remind": {
+        "title": "Get reminders",
+        "body": "14 days, 7 days and 1 day before, and if overdue. Add them to your calendar."
+      },
+      "card": {
+        "title": "Show your card",
+        "body": "A QR vaccination card anyone can scan."
       }
     },
-    "transparencyTitle": "What this site is — and isn't",
-    "transparency": {
-      "one": "PawGuard does not diagnose rabies and cannot tell whether an animal is safe.",
-      "two": "A vaccination record shows that a vaccine was recorded as given. It is not a guarantee about the animal.",
-      "three": "Health guidance on this site is starter content until a qualified local reviewer approves it. Each page shows its source and review status.",
-      "four": "PawGuard only reminds. Next due dates come from your vet, or from a demo schedule template labelled “confirm with your vet”. It never decides treatment."
-    },
-    "releaseNote": "Community programmes use the same verified vaccination records. Learning resources and a facility directory are planned for later releases.",
-    "bitesAction": "Get help after a bite",
-    "petHowTitle": "How pet vaccination tracking works",
-    "petSteps": {
-      "one": {
-        "title": "Add your pet and past vaccinations",
-        "body": "Upload the certificate. Your entry stays marked “entered by owner (unverified)” until the clinic's vet checks it."
+    "coloursTitle": "What the colours mean",
+    "coloursIntro": "Every status has a colour, an icon and a name, so you never have to guess.",
+    "whoTitle": "Who it's for",
+    "who": {
+      "owners": {
+        "title": "Pet owners",
+        "one": "Keep every vaccine record in one place.",
+        "two": "Get reminders before each due date.",
+        "three": "Show a QR card your vet has verified."
       },
-      "two": {
-        "title": "Get reminders before each due date",
-        "body": "In the app 14, 7 and 1 day before, and again if overdue. Snooze, mark as done or add the date to your calendar."
+      "clinics": {
+        "title": "Vet clinics",
+        "one": "See which pets are due this week or overdue.",
+        "two": "Verify owners' certificates in one queue.",
+        "three": "Record vaccines with the next due date."
       },
-      "three": {
-        "title": "Show a QR vaccination card",
-        "body": "Verified vaccinations only. Replace or turn off the QR code at any time."
+      "volunteers": {
+        "title": "Community volunteers",
+        "one": "Register community dogs and sightings.",
+        "two": "Send vaccination evidence for a vet to check.",
+        "three": "Plan vaccination rounds, even offline."
       }
     },
-    "clinicNote": "For clinics: a dashboard of registered pets due this week, overdue or awaiting verification, and a workbench where an approved vet verifies owner uploads and sets the next due date."
+    "trustTitle": "Why you can trust it",
+    "trust": {
+      "vets": "Only vets can verify a vaccine.",
+      "contact": "Your contact details never appear on the public card.",
+      "reminds": "The app reminds you. It never decides treatment.",
+      "demo": "Demo data is clearly labelled."
+    },
+    "mattersTitle": "Why it matters",
+    "mattersIntro": "Vaccinating pets protects them — and the people around them. In the World Health Organization's words:",
+    "matters": {
+      "preventable": "Rabies is a vaccine-preventable, zoonotic, viral disease affecting the central nervous system.",
+      "dogs": "Dog bites and scratches cause 99% of the human rabies cases and can be prevented through dog vaccination and bite prevention.",
+      "vaccinating": "Vaccinating dogs, including puppies, through mass dog vaccination programs is the most cost-effective strategy for preventing rabies in people because it stops the transmission at its source."
+    },
+    "mattersSource": "Source:",
+    "mattersSourceLink": "WHO rabies fact sheet (updated 17 September 2026)",
+    "mattersChecked": "checked 6 October 2026",
+    "faqTitle": "Questions people ask",
+    "closing": "Takes about two minutes with the demo accounts."
   },
   "help": {
     "title": "Bitten or scratched by an animal?",
@@ -1201,7 +1240,7 @@
       "up_to_date": "Up to date",
       "due_soon": "Due soon",
       "overdue": "Overdue",
-      "unverified_record": "Entered by owner (unverified)",
+      "unverified_record": "Waiting for vet",
       "no_verified_record": "No verified record"
     },
     "noVerifiedHint": "No vaccination verified by a vet is recorded here yet. Add a past vaccination with its certificate.",
@@ -1367,6 +1406,39 @@
       "dateFuture": "The date cannot be in the future.",
       "dueAfter": "The next due date must be after the vaccination date.",
       "templateOption": "{name} (demo template: {days} days)"
+    }
+  },
+  "footer": {
+    "demoVersion": "Demo version — not for real medical use.",
+    "credit": "Made for a hackathon, October 2026. All pets, people and clinics in the demo are fictional."
+  },
+  "statusGuide": {
+    "up_to_date": "Verified by a vet, and the next dose is more than 2 weeks away.",
+    "due_soon": "The next dose is due within 14 days. Book a visit.",
+    "overdue": "The due date has passed. Visit your vet soon.",
+    "unverified_record": "You added a record. Your vet will check it.",
+    "no_verified_record": "We have no vet-confirmed vaccine yet. This doesn't mean your pet is unvaccinated."
+  },
+  "faq": {
+    "sms": {
+      "q": "Do reminders send SMS?",
+      "a": "Not in this demo. Reminders appear in the app, and you can add them to your phone's calendar. The email and SMS text is shown as a preview only — nothing is sent."
+    },
+    "dueDate": {
+      "q": "Who sets the due date?",
+      "a": "Your vet. When a vet verifies a vaccine, they enter the next due date. If they leave it empty, a clearly labelled demo template may fill it in — always confirm the date with your vet."
+    },
+    "lostCertificate": {
+      "q": "What if I lost my paper certificate?",
+      "a": "Ask your clinic. Your vet can record the vaccine from the clinic's own records, and it shows as verified. After that, your QR card works in place of the paper."
+    },
+    "privacy": {
+      "q": "Is my data private?",
+      "a": "Only you and your clinic's staff can see your pet's records. The public QR card shows your pet's name, photo, clinic and verified vaccines — never your name, phone or address. You can turn the card off at any time."
+    },
+    "noVerified": {
+      "q": "What is “No verified record”?",
+      "a": "It means no vet has confirmed a vaccine in this app yet. It does not mean your pet is unvaccinated. Add a past vaccination with its certificate, and your vet will check it."
     }
   }
 }
