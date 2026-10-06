@@ -11,7 +11,18 @@ import { browserApi, parseApiError } from "@/lib/api-browser";
 type Outcome = "verified" | "needs_correction" | "rejected";
 
 /** Verify / request correction / reject. Each needs explicit confirmation; the latter two need a reason. */
-export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string; rowVersion: number; nextId?: string }) {
+export function ReviewActions({
+  eventId,
+  rowVersion,
+  nextId,
+  suggestedNextDue = null,
+}: {
+  eventId: string;
+  rowVersion: number;
+  nextId?: string;
+  /** From the certificate draft (OCR); the vet confirms or changes it. */
+  suggestedNextDue?: string | null;
+}) {
   const t = useTranslations("review");
   const tc = useTranslations("common");
   const router = useRouter();
@@ -56,7 +67,7 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
   };
   return (
     <div className="sticky bottom-20 flex flex-wrap gap-3 rounded-card border border-divider bg-surface p-4 shadow-card md:bottom-4">
-      <Button onClick={() => { setError(null); setReason(""); setNextDue(""); setOutcome("verified"); }}>{t("verify")}</Button>
+      <Button onClick={() => { setError(null); setReason(""); setNextDue(suggestedNextDue ?? ""); setOutcome("verified"); }}>{t("verify")}</Button>
       <Button variant="secondary" onClick={() => { setError(null); setReason(""); setOutcome("needs_correction"); }}>
         {t("requestCorrection")}
       </Button>
@@ -86,7 +97,12 @@ export function ReviewActions({ eventId, rowVersion, nextId }: { eventId: string
           </Field>
         ) : (
           <>
-            <Field id="review-next-due" label={t("nextDueLabel")} hint={t("nextDueHint")} marker={tc("optional")}>
+            <Field
+              id="review-next-due"
+              label={t("nextDueLabel")}
+              hint={suggestedNextDue ? `${t("nextDueFromCertificate")} ${t("nextDueHint")}` : t("nextDueHint")}
+              marker={tc("optional")}
+            >
               {(aria) => <TextInput {...aria} type="date" value={nextDue} onChange={(e) => setNextDue(e.target.value)} />}
             </Field>
             {error ? (

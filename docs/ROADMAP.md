@@ -8,7 +8,7 @@ Free-tier plan (see `FREE_SERVICES_SETUP.md`). Status as of 7 October 2026, bran
 | Web Push (VAPID) | Built and configured |
 | WhatsApp Cloud API test number, webhook receipts | Built; needs your Meta test number values |
 | Ask PawGuard assistant (Gemini free tier / Ollama) | Built; needs a Gemini key or Ollama |
-| Certificate OCR (Tesseract / PaddleOCR, eng/hin/tam; optional Gemini vision) — draft only, vet verifies | Next |
+| Certificate OCR (Tesseract eng/hin/tam; optional Gemini vision for demo organisations only) — draft only, vet verifies | Built; needs Tesseract installed (one admin command); accuracy measured only on synthetic certificates |
 | In-browser voice assistant (Web Speech API, en-IN / hi-IN / ta-IN, text fallback) | Built (needs the assistant configured) |
 | Twilio trial calls to verified numbers (optional) | Next |
 | Lost pet finder with in-app private messages (no phone masking) | Next |

@@ -40,12 +40,15 @@ export default async function ReviewPage({
   const [{ data: e }] = selectedId
     ? await Promise.all([ctx.api.GET("/api/v1/vaccination-events/{event_id}", { params: { path: { event_id: selectedId } } })])
     : [{ data: undefined }];
-  const [{ data: animal }, { data: others }] = e
+  const [{ data: animal }, { data: others }, { data: drafts }] = e
     ? await Promise.all([
         ctx.api.GET("/api/v1/animals/{animal_id}", { params: { path: { animal_id: e.animal_id } } }),
         ctx.api.GET("/api/v1/vaccination-events", { params: { query: { animal_id: e.animal_id, limit: 20 } } }),
+        ctx.api.GET("/api/v1/vaccination-events/{event_id}/certificate-drafts", { params: { path: { event_id: e.id } } }),
       ])
-    : [{ data: undefined }, { data: undefined }];
+    : [{ data: undefined }, { data: undefined }, { data: undefined }];
+  const draft = drafts?.[0];
+  const fmtDay = (d: string | null | undefined) => formatPartialDate(d, "day", locale, nr);
   const nr = tc("notRecorded");
   const nextId = items.find((i) => i.id !== selectedId)?.id;
 
@@ -135,6 +138,24 @@ export default async function ReviewPage({
                       ))}
                     </ul>
                   )}
+                  {draft ? (
+                    <div className="mt-3 rounded-control border border-dashed border-control p-3 text-sm">
+                      <p className="font-semibold">{tv("ocr.title")}</p>
+                      <p className="text-ink-2">{tv("ocr.note")}</p>
+                      <ul className="mt-1 list-disc pl-5">
+                        <li>{tv("ocr.given", { date: draft.administered_on ? fmtDay(draft.administered_on) : "—" })}</li>
+                        <li>{tv("ocr.vaccine", { name: draft.product_text ?? "—" })}</li>
+                        <li>{tv("ocr.lot", { lot: draft.lot_text ?? "—" })}</li>
+                        <li>{tv("ocr.nextDue", { date: draft.next_due_on ? fmtDay(draft.next_due_on) : "—" })}</li>
+                      </ul>
+                      {draft.confidence !== null && draft.confidence !== undefined ? (
+                        <p className="text-xs text-ink-2">{tv("ocr.confidence", { pct: Math.round(draft.confidence * 100), engine: draft.engine })}</p>
+                      ) : null}
+                      {draft.warnings.map((w) => (
+                        <p key={w} className="text-xs font-semibold">{w}</p>
+                      ))}
+                    </div>
+                  ) : null}
                 </Card>
                 <Card>
                   <h3 className="text-base">{tv("title")}</h3>
@@ -194,7 +215,9 @@ export default async function ReviewPage({
                   </ul>
                 )}
               </Card>
-              {e.state === "submitted" ? <ReviewActions eventId={e.id} rowVersion={e.row_version} nextId={nextId} /> : null}
+              {e.state === "submitted" ? (
+                <ReviewActions eventId={e.id} rowVersion={e.row_version} nextId={nextId} suggestedNextDue={draft?.next_due_on ?? null} />
+              ) : null}
             </section>
           ) : (
             <p className="text-ink-2">{t("select")}</p>

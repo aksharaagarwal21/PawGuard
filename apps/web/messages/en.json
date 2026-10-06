@@ -613,6 +613,15 @@
       "sync": "Offline sync",
       "owner_entry": "Entered by the pet owner (unverified)",
       "clinic_record": "Recorded at the clinic by the vet"
+    },
+    "ocr": {
+      "title": "Draft read from the certificate (OCR)",
+      "note": "Check each field against the image; this draft verifies nothing.",
+      "given": "Given on: {date}",
+      "vaccine": "Vaccine: {name}",
+      "lot": "Batch: {lot}",
+      "nextDue": "Next due on the certificate: {date}",
+      "confidence": "Reading confidence about {pct}% ({engine})."
     }
   },
   "review": {
@@ -642,7 +651,8 @@
     "notAuthorised": "Reviewing needs an approved veterinary authority in this organisation.",
     "staleRow": "Someone else reviewed or changed this record. The queue has been refreshed.",
     "nextDueLabel": "Next due date",
-    "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a demo schedule template, that date is used and labelled “Demo template — confirm with your vet”."
+    "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a demo schedule template, that date is used and labelled “Demo template — confirm with your vet”.",
+    "nextDueFromCertificate": "Pre-filled from the certificate draft — check it."
   },
   "tasks": {
     "title": "Tasks",
@@ -1496,6 +1506,26 @@
     "stepper": {
       "stepOf": "Step {step} of {total}",
       "progressLabel": "Progress"
+    },
+    "ocr": {
+      "read": "Read the certificate",
+      "reading": "Reading…",
+      "hint": "Optional: fill in the vaccine and date from your photo. You'll check them before saving.",
+      "filled": "Filled in from your certificate — please check each field:",
+      "vaccine": "Vaccine: {name}",
+      "noVaccine": "Vaccine: couldn't read it — choose it yourself",
+      "given": "Given on: {date}",
+      "noDate": "Date: couldn't read it — enter it yourself",
+      "lot": "Batch: {lot}",
+      "nextDue": "The certificate says next due {date} — your vet will confirm the date.",
+      "confidence": "Reading confidence: about {pct}%. Your vet still checks the certificate.",
+      "errors": {
+        "media_not_ready": "The photo is still being checked — try again in a few seconds.",
+        "pdf_not_supported": "PDFs can't be read automatically yet — type the details, or upload a photo.",
+        "ocr_unavailable": "Certificate reading isn't available right now — please type the details.",
+        "rate_limited": "You've read many certificates this hour — please type the details.",
+        "generic": "The certificate couldn't be read — please type the details."
+      }
     }
   },
   "reminders": {

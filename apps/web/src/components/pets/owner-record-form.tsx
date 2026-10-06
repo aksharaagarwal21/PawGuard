@@ -9,6 +9,7 @@ import { Uploader } from "@/components/prevention/uploader";
 import { useRouter } from "@/i18n/navigation";
 import { browserApi, parseApiError, type FieldErrors } from "@/lib/api-browser";
 
+import { ReadCertificate, type CertificateDraft } from "./read-certificate";
 import { ReviewList, StepProgress } from "./stepper";
 
 type Product = { id: string; name: string };
@@ -53,6 +54,16 @@ export function OwnerRecordForm({
   const [saved, setSaved] = useState(false);
   const [step, setStep] = useState(0);
   const onCerts = useCallback((ids: string[]) => setCerts(ids), []);
+  // OCR draft from the certificate: pre-fills vaccine and date for the person to check.
+  function applyDraft(d: CertificateDraft) {
+    const match = d.product_id ? products.find((p) => p.id === d.product_id) : undefined;
+    if (match) setProduct(match.id);
+    else if (d.product_text) {
+      setProduct(OTHER);
+      setProductText(d.product_text);
+    }
+    if (d.administered_on && d.administered_on <= today) setDate(d.administered_on);
+  }
   const prefix = reminder ? `done-${reminder.id}` : `rec-${petId}`;
 
   function validate(upTo: number): FieldErrors {
@@ -148,6 +159,7 @@ export function OwnerRecordForm({
           <p className="text-sm font-semibold text-urgent">{errors.certificate_media_ids}</p>
         ) : null}
         <Uploader purpose="vaccination_evidence" allowPdf multiple idPrefix={`${prefix}-cert`} orgId={clinicOrgId} onChange={onCerts} />
+        <ReadCertificate mediaId={certs[0]} onDraft={applyDraft} />
       </fieldset>
       {stepped && step === 2 ? (
         <ReviewList

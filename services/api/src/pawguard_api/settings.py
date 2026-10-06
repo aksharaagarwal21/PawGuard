@@ -91,6 +91,10 @@ class Settings(BaseSettings):
     gemini_model: str | None = None
     ollama_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "qwen2.5:3b"
+    # Certificate OCR: tesseract (local, eng+hin+tam) | gemini (demo organisations only) | off.
+    ocr_engine: str = "tesseract"
+    tesseract_cmd: str | None = None
+    tessdata_dir: str | None = None
 
     @model_validator(mode="after")
     def _defaults_and_guards(self) -> "Settings":

@@ -1,6 +1,6 @@
 """API shapes for notification settings, test messages and the staff delivery overview."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Literal
 from uuid import UUID
 
@@ -126,3 +126,25 @@ class ConfirmEmailIn(StrictModel):
 
 class ConfirmEmailOut(Out):
     confirmed: bool
+
+
+# ---- certificate OCR ---------------------------------------------------------------------------------------------
+
+class OcrStatusOut(Out):
+    available: bool
+    engine: Literal["tesseract", "gemini", "off"]
+    languages: list[str]
+    reason: str | None
+
+
+class CertificateDraftOut(Out):
+    media_id: UUID
+    engine: Literal["tesseract", "gemini"]
+    languages: list[str]
+    administered_on: date | None
+    next_due_on: date | None
+    product_id: UUID | None
+    product_text: str | None
+    lot_text: str | None
+    confidence: float | None
+    warnings: list[str]

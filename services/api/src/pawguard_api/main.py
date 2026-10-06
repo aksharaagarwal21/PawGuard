@@ -14,6 +14,7 @@ from pawguard_api.routers import (
     animals,
     assistant,
     campaigns,
+    certificates,
     clinic,
     demo,
     health,
@@ -83,7 +84,8 @@ def create_app() -> FastAPI:
     app.include_router(system.router)
     app.include_router(demo.router)
     for r in (animals, vaccinations, media, tasks, merges, reference, programme, imports, identity, sync, campaigns,
-              pets, clinic, public_cards, notifications, webhooks, assistant):
+              pets, clinic, public_cards, notifications, webhooks, assistant,
+              certificates):
         app.include_router(r.router)
     return app
 

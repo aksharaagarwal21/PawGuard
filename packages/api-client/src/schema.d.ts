@@ -929,6 +929,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/certificates/{media_id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Read my certificate photo into a draft
+         * @description Permission: the person who uploaded the certificate. Reads the photo (not PDFs) with OCR and returns a draft —
+         *     dates, matched vaccine, batch — to check before saving. The full text is not stored. 20 reads an hour.
+         */
+        post: operations["certificates_read_certificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/clinics": {
         parameters: {
             query?: never;
@@ -1344,6 +1365,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ocr/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Is certificate reading available?
+         * @description Permission: any signed-in user.
+         */
+        get: operations["certificates_ocr_status"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/plans/{plan_id}": {
         parameters: {
             query?: never;
@@ -1740,6 +1781,26 @@ export interface paths {
          *     ``needs_correction`` or drafts. Creates a new record that supersedes the old one; nothing is deleted.
          */
         post: operations["vaccinations_amend"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vaccination-events/{event_id}/certificate-drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * OCR drafts for a record's certificates
+         * @description Permission: clinic staff. Shown beside the image in the review workbench; never verifies anything.
+         */
+        get: operations["certificates_drafts"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2422,6 +2483,35 @@ export interface components {
             token: string;
             /** Url Path */
             url_path: string;
+        };
+        /** CertificateDraftOut */
+        CertificateDraftOut: {
+            /** Administered On */
+            administered_on: string | null;
+            /** Confidence */
+            confidence: number | null;
+            /**
+             * Engine
+             * @enum {string}
+             */
+            engine: "tesseract" | "gemini";
+            /** Languages */
+            languages: string[];
+            /** Lot Text */
+            lot_text: string | null;
+            /**
+             * Media Id
+             * Format: uuid
+             */
+            media_id: string;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Product Id */
+            product_id: string | null;
+            /** Product Text */
+            product_text: string | null;
+            /** Warnings */
+            warnings: string[];
         };
         /** ChannelsAvailableOut */
         ChannelsAvailableOut: {
@@ -3386,6 +3476,20 @@ export interface components {
              * @enum {string}
              */
             time_precision: "exact" | "day" | "month" | "unknown";
+        };
+        /** OcrStatusOut */
+        OcrStatusOut: {
+            /** Available */
+            available: boolean;
+            /**
+             * Engine
+             * @enum {string}
+             */
+            engine: "tesseract" | "gemini" | "off";
+            /** Languages */
+            languages: string[];
+            /** Reason */
+            reason: string | null;
         };
         /** OfflineSightingPayload */
         OfflineSightingPayload: {
@@ -7447,6 +7551,57 @@ export interface operations {
             };
         };
     };
+    certificates_read_certificate: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                media_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateDraftOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     pets_my_clinics: {
         parameters: {
             query?: never;
@@ -8641,6 +8796,55 @@ export interface operations {
             };
         };
     };
+    certificates_ocr_status: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OcrStatusOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     campaigns_get_plan: {
         parameters: {
             query?: never;
@@ -9782,6 +9986,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VaccinationOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    certificates_drafts: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateDraftOut"][];
                 };
             };
             /** @description Unauthorized */

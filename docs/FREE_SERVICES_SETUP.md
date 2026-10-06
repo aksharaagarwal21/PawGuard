@@ -98,6 +98,21 @@ service must not be part of an app "directed towards or … likely to be accesse
 1. Install from <https://ollama.com>, then run `ollama pull qwen2.5:3b`.
 2. `.env`: `PAWGUARD_LLM_PROVIDER=ollama` (and `PAWGUARD_OLLAMA_MODEL` if you pulled a different model).
 
+## 5. Certificate reading (OCR) — Tesseract, one install (2 minutes)
+
+The English, Hindi and Tamil language files are already in `models/tessdata` (downloaded from the official
+`tesseract-ocr/tessdata_fast` repository, Apache-2.0) and `.env` points to them (`PAWGUARD_TESSDATA_DIR`). Only the
+program itself needs an administrator install:
+
+1. Start → type **PowerShell** → right-click → **Run as administrator**.
+2. Run: `winget install --id UB-Mannheim.TesseractOCR -e` (the official Windows build, Apache-2.0) and accept.
+3. Restart the API. Owners then see **Read the certificate** after uploading a photo; vets see the draft beside the
+   image. Check accuracy on synthetic certificates: `uv run python scripts/ocr_eval.py --n 20`.
+
+Reading is a **draft**: the person checks every field and a vet still verifies the record. PDFs aren't read. The
+full certificate text is never stored. (Optional: `PAWGUARD_OCR_ENGINE=gemini` uses Gemini vision, but only for demo
+organisations, because real certificates carry people's names and the free tier must not receive personal data.)
+
 ## After you've added the values: test each channel (5 minutes)
 
 1. Restart the services so they read the new `.env` (API, worker and dispatcher).
