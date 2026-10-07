@@ -18,12 +18,17 @@ browserApi.use({
 export type FieldErrors = Record<string, string>;
 
 /** Normalise an API error body into a code, message and per-field messages. */
-export function parseApiError(error: unknown): { code: string; message: string; fields: FieldErrors } {
+export function parseApiError(error: unknown): {
+  code: string;
+  message: string;
+  fields: FieldErrors;
+  details: Record<string, unknown>;
+} {
   const body = (error as ApiError | undefined)?.error;
-  if (!body) return { code: "network_error", message: "", fields: {} };
+  if (!body) return { code: "network_error", message: "", fields: {}, details: {} };
   const fields: FieldErrors = {};
   for (const f of body.fields ?? []) fields[f.field] = f.message;
-  return { code: body.code, message: body.message, fields };
+  return { code: body.code, message: body.message, fields, details: (body.details ?? {}) as Record<string, unknown> };
 }
 
 /** RFC 4122 v4 UUID. Uses getRandomValues, which (unlike randomUUID) also works outside secure contexts. */

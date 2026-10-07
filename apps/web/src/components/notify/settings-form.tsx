@@ -58,8 +58,15 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
     const { error, response } = await browserApi.POST("/api/v1/my/notification-settings/test", { body: { channel } });
     if (response.status === 202) return setMessage({ tone: "success", text: t(`testQueued.${channel}`) });
     const p = parseApiError(error);
+    const minutes = Number(p.details.retry_in_minutes ?? 60);
     const text =
-      p.code === "rate_limited" ? t("testLimited") : p.code === "email_not_confirmed" ? t("email.confirmFirst") : p.message || tc("tryAgainLater");
+      p.code === "rate_limited"
+        ? t("testLimited", { minutes })
+        : p.code === "email_not_confirmed"
+          ? t("email.confirmFirst")
+          : p.code === "number_missing"
+            ? t("call.numberFirst")
+            : p.message || tc("tryAgainLater");
     setMessage({ tone: "urgent", text });
   }
 
@@ -68,7 +75,10 @@ export function NotificationSettingsForm({ initial, vapidKey }: { initial: Setti
     const { error, response } = await browserApi.POST("/api/v1/my/notification-settings/resend-confirmation");
     if (response.status === 202) return setMessage({ tone: "success", text: t("email.resent") });
     const p = parseApiError(error);
-    setMessage({ tone: "urgent", text: p.code === "rate_limited" ? t("testLimited") : p.message || tc("tryAgainLater") });
+    setMessage({
+      tone: "urgent",
+      text: p.code === "rate_limited" ? t("testLimited", { minutes: Number(p.details.retry_in_minutes ?? 60) }) : p.message || tc("tryAgainLater"),
+    });
   }
 
   const row = (

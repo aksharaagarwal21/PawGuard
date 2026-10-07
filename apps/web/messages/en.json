@@ -1800,7 +1800,7 @@
       "whatsapp": "Test WhatsApp message on its way.",
       "call": "Test call on its way — your phone should ring in a few seconds."
     },
-    "testLimited": "You've sent several tests already. Try again in an hour.",
+    "testLimited": "You've sent several tests on this channel. Try again in {minutes, plural, one {# minute} other {# minutes}}.",
     "demoTitle": "Test recipients",
     "demoBody": "Messages go to the team's test inbox and test WhatsApp number, never to the sample accounts.",
     "footer": "PawGuard only reminds you; your vet decides what your pet needs. Reminder messages contain your pet's name, the vaccine, the date and your clinic — nothing else.",
@@ -1898,7 +1898,8 @@
       "body": "A short automated call on the reminder days, with a keypad answer. Twilio trial: only numbers verified in your Twilio account can be called.",
       "number": "Phone number",
       "numberHint": "With country code, e.g. +91 98765 43210. It must be verified in the Twilio trial account.",
-      "unavailable": "Phone calls aren't set up on this server (optional)."
+      "unavailable": "Phone calls aren't set up on this server (optional).",
+      "numberFirst": "Turn on phone calls and save your number first, then send a test."
     },
     "waDemo": {
       "title": "WhatsApp (Twilio trial)",

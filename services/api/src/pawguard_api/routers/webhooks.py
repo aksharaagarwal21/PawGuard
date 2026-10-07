@@ -32,6 +32,23 @@ def whatsapp_verify(mode: Annotated[str | None, Query(alias="hub.mode")] = None,
     raise Forbidden("Verification failed.", code="webhook_verification_failed")
 
 
+@router.api_route("/twilio/voice", methods=["GET", "POST"], summary="Phone-call script (Twilio)",
+                  response_class=Response)
+async def twilio_voice(d: Annotated[str, Query(max_length=40)], m: Annotated[str, Query(max_length=600)],
+                       sig: Annotated[str, Query(alias="s", max_length=64)]) -> Response:
+    """Permission: public, but only for links PawGuard created (our signature over the delivery and the text, made
+    with a server-only secret). Returns the spoken reminder (XML-escaped) and the keypad question."""
+    import hmac
+
+    from pawguard_api.integrations import notify
+
+    s = get_settings()
+    if not (s.twilio_auth_token and hmac.compare_digest(sig, notify.voice_signature(s, d, m))):
+        raise Forbidden("Invalid signature.", code="webhook_signature_invalid")
+    gather = f"{s.public_app_url}/api/v1/webhooks/twilio/gather?d={d}"
+    return Response(notify.voice_twiml(m, gather), media_type="application/xml")
+
+
 @router.post("/twilio/gather", summary="Phone-call keypad answer (Twilio)", response_class=Response)
 async def twilio_gather(request: Request, d: Annotated[str, Query(max_length=40)],
                         signature: Annotated[str | None, Header(alias="X-Twilio-Signature")] = None) -> Response:

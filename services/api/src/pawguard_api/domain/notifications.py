@@ -4,7 +4,9 @@ Channels are opt-in per person. Addresses are entered by the person themselves; 
 only to the configured test recipients. Staff see delivery states and provider status, never addresses.
 """
 
+import math
 import uuid
+from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
 from sqlalchemy import text
@@ -144,11 +146,20 @@ def send_test(db: Any, ctx: OrgContext, channel: Channel) -> None:
         if not ok:
             raise ApiError("Confirm your email address first — open the link we sent you.",
                            code="email_not_confirmed", status_code=409)
-    recent = db.execute(text("""select count(*) from app.notification_deliveries where user_id = :u and kind = 'test'
-                                and created_at > now() - interval '1 hour'"""), {"u": ctx.user_id}).scalar()
-    if (recent or 0) >= TEST_LIMIT_PER_HOUR:
-        raise ApiError("You've sent several test messages already. Try again in an hour.",
-                       code="rate_limited", status_code=429)
+    if channel == "call":  # a call goes to the person's own number (WhatsApp tests go to the team's test number)
+        prefs = db.execute(text("select call_enabled, call_number from app.notification_preferences "
+                                "where user_id = :u"), {"u": ctx.user_id}).first()
+        if not (prefs and prefs.call_enabled and prefs.call_number):
+            raise ApiError("Turn this on and save your phone number first.", code="number_missing", status_code=409)
+    # Per channel (testing email must not use up the phone-call tests); tests we skipped ourselves don't count.
+    recent = db.execute(text("""select count(*) as n, min(created_at) as first from app.notification_deliveries
+                                where user_id = :u and kind = 'test' and channel = :c and state <> 'skipped'
+                                  and created_at > now() - interval '1 hour'"""),
+                        {"u": ctx.user_id, "c": channel}).one()
+    if recent.n >= TEST_LIMIT_PER_HOUR:
+        wait = max(1, math.ceil((recent.first + timedelta(hours=1) - datetime.now(UTC)).total_seconds() / 60))
+        raise ApiError(f"You've sent several tests on this channel. Try again in {wait} minutes.",
+                       code="rate_limited", status_code=429, details={"retry_in_minutes": wait})
     db.execute(text("""insert into app.notification_deliveries (org_id, user_id, channel, kind, dedupe_key)
                        values (:o, :u, :c, 'test', :k)"""),
                {"o": ctx.org_id, "u": ctx.user_id, "c": channel, "k": f"test:{uuid.uuid4()}"})

@@ -467,9 +467,16 @@ def test_call_reminder_and_signed_keypad_reply(client, setup, owner_engine, monk
     assert worker_notify.drain().get("sent") == 1
     url, data, auth = calls[-1]
     assert url.endswith("/Accounts/AC123/Calls.json") and data["To"] == "+919800000002" and auth == ("AC123", "tok")
-    assert "Coco" in data["Twiml"] and "https://pawguard.example/api/v1/webhooks/twilio/gather?d=" in data["Twiml"]
+    # Twilio fetches the script from us (trial accounts refuse an inline Twiml); only a signed request gets it.
+    assert "Twiml" not in data and data["Url"].startswith("https://pawguard.example/api/v1/webhooks/twilio/voice?d=")
     with owner_engine.begin() as c:
         delivery = c.execute(text("select id from app.notification_deliveries where channel = 'call'")).scalar()
+    query = data["Url"].split("?", 1)[1]
+    forged = query.replace("Coco", "Rex")  # changing the spoken text breaks our signature
+    assert client.post(f"/api/v1/webhooks/twilio/voice?{forged}", data={"CallSid": "CA1"}).status_code == 403
+    script = client.post(f"/api/v1/webhooks/twilio/voice?{query}", data={"CallSid": "CA1"})
+    assert script.status_code == 200 and "Coco" in script.text
+    assert f"https://pawguard.example/api/v1/webhooks/twilio/gather?d={delivery}" in script.text
     gather_url = f"https://pawguard.example/api/v1/webhooks/twilio/gather?d={delivery}"
     params = {"Digits": "2", "CallSid": "CA1"}
     sig = RequestValidator("tok").compute_signature(gather_url, params)

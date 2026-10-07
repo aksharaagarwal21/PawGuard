@@ -372,11 +372,28 @@ def call_configured(s: Settings) -> bool:
     return bool(s.twilio_account_sid and s.twilio_auth_token and s.twilio_from_number)
 
 
+VOICE_PATH = "/api/v1/webhooks/twilio/voice"
+
+
+def voice_signature(s: Settings, delivery_id: str, text_: str) -> str:
+    """Our own signature on the call-script link (over the decoded values, so proxies re-encoding the address don't
+    matter): only links we created get a script. Keyed with the server-only Twilio auth token."""
+    import hashlib
+    import hmac
+
+    key = (s.twilio_auth_token or "").encode("utf-8")
+    return hmac.new(key, f"{delivery_id}|{text_}".encode(), hashlib.sha256).hexdigest()[:40]
+
+
 def call_twiml(msg: Message, gather_url: str | None) -> str:
+    return voice_twiml(msg.short, gather_url)
+
+
+def voice_twiml(short: str, gather_url: str | None) -> str:
     """Spoken reminder. Every value is XML-escaped (pet names are typed by people), so nothing can inject TwiML."""
     from xml.sax.saxutils import escape, quoteattr
 
-    say = escape(msg.short.replace("PawGuard:", "Hello. This is a reminder from PawGuard.", 1))
+    say = escape(short.replace("PawGuard:", "Hello. This is a reminder from PawGuard.", 1))
     parts = [f"<Response><Say>{say}</Say>"]
     if gather_url:  # the keypad needs a public HTTPS address for Twilio to post the answer to
         parts.append(f'<Gather numDigits="1" timeout="6" method="POST" action={quoteattr(gather_url)}>'
@@ -390,12 +407,21 @@ def send_call(s: Settings, to: str, msg: Message, delivery_id: str) -> str:
 
     if not call_configured(s):
         raise ProviderError("not_configured", status="not_configured", detail="Twilio account, token or number not set")
-    gather = (f"{s.public_app_url}/api/v1/webhooks/twilio/gather?d={delivery_id}"
-              if s.public_app_url.startswith("https://") else None)
+    from urllib.parse import urlencode
+
+    public = s.public_app_url.startswith("https://")
+    gather = f"{s.public_app_url}/api/v1/webhooks/twilio/gather?d={delivery_id}" if public else None
+    data = {"To": to, "From": s.twilio_from_number}
+    if public:
+        # Twilio fetches the script from us (signed request). Trial accounts refuse an inline "Twiml" parameter.
+        text_ = msg.short[:500]
+        data["Url"] = f"{s.public_app_url}{VOICE_PATH}?" + urlencode(
+            {"d": delivery_id, "m": text_, "s": voice_signature(s, delivery_id, text_)})
+    else:
+        data["Twiml"] = call_twiml(msg, gather)
     url = f"https://api.twilio.com/2010-04-01/Accounts/{s.twilio_account_sid}/Calls.json"
     try:
-        r = httpx.post(url, data={"To": to, "From": s.twilio_from_number, "Twiml": call_twiml(msg, gather)},
-                       auth=(s.twilio_account_sid or "", s.twilio_auth_token or ""), timeout=20)
+        r = httpx.post(url, data=data, auth=(s.twilio_account_sid or "", s.twilio_auth_token or ""), timeout=20)
     except httpx.HTTPError as exc:
         raise ProviderError("unreachable", retry_in=300, detail="Twilio not reachable") from exc
     if r.status_code < 300:
@@ -404,9 +430,13 @@ def send_call(s: Settings, to: str, msg: Message, delivery_id: str) -> str:
         except (ValueError, KeyError) as exc:
             raise ProviderError("bad_response", detail="Unexpected Twilio response") from exc
     try:
-        code = int(r.json().get("code") or -1)
-    except (ValueError, TypeError):
-        code = -1
+        body = r.json()
+        code = int(body.get("code") or -1)
+        message = str(body.get("message") or "")
+    except (ValueError, TypeError, AttributeError):
+        code, message = -1, ""
+    if "trial accounts have limited parameter access" in message:
+        raise ProviderError("trial_restricted", detail="Twilio trial: calls need the public HTTPS link to be running")
     # Codes from Twilio's error dictionary.
     if code == 21219:
         raise ProviderError("not_verified_number",
