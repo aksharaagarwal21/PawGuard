@@ -95,7 +95,8 @@
     "howToUse": "How to use PawGuard",
     "notifications": "Notifications",
     "assistant": "Ask PawGuard",
-    "lost": "Lost & found"
+    "lost": "Lost & found",
+    "verifyCertificate": "Verify a certificate"
   },
   "landing": {
     "headline": "Never miss your pet's vaccination again.",
@@ -1458,7 +1459,8 @@
       "walletLabel": "Vaccination card for {name}",
       "verifiedList": "Vaccinations verified by a vet",
       "tagsPdf": "Print collar tags (PDF)",
-      "tagsHint": "16 small QR tags on one A4 sheet: print at 100%, cut out and laminate. Making a new QR code makes old tags stop working."
+      "tagsHint": "16 small QR tags on one A4 sheet: print at 100%, cut out and laminate. Making a new QR code makes old tags stop working.",
+      "linkQrLabel": "Scan for this pet's page"
     },
     "greeting": {
       "morning": "Good morning, {name}.",
@@ -1527,6 +1529,19 @@
         "rate_limited": "You've read many certificates this hour — please type the details.",
         "generic": "The certificate couldn't be read — please type the details."
       }
+    },
+    "signed": {
+      "title": "Signed certificate (tamper-proof)",
+      "scanToVerify": "Scan to verify this certificate",
+      "qrLabel": "Signed certificate for {vaccine} — scan to verify",
+      "noRabies": "No signed rabies certificate yet. It appears here once your vet has verified a rabies vaccination.",
+      "showQr": "Show verify QR",
+      "notIssued": "Verified, but no signed certificate yet — ask your clinic.",
+      "given": "Given {date}",
+      "nextDue": "next due {date}",
+      "ownerEntered": "Owner-entered (unverified) records are never signed.",
+      "waiting": "{count, plural, one {# record is} other {# records are}} waiting for your vet.",
+      "honesty": "The signature shows that a registered clinic issued this record and that it wasn't changed. It doesn't show that your pet is healthy, or that an animal someone is looking at is this pet."
     }
   },
   "reminders": {
@@ -1620,7 +1635,8 @@
     "filteredBy": "Showing only: {name}.",
     "showAll": "Show everything",
     "demoTools": "Demo tools",
-    "demoToolsIntro": "Only in demo organisations. Use these to show how reminders progress; real clinics never see this."
+    "demoToolsIntro": "Only in demo organisations. Use these to show how reminders progress; real clinics never see this.",
+    "verifyLink": "Verify a certificate (scan a PawGuard QR)"
   },
   "footer": {
     "demoVersion": "Demo version — not for real medical use.",
@@ -2019,6 +2035,71 @@
       "demo": "Demo data",
       "closed": "The owner has marked the pet found, so this conversation is closed.",
       "keepLink": "Keep this page's link to come back. Anyone with the link can read this conversation."
+    }
+  },
+  "verify": {
+    "title": "Verify a vaccination certificate",
+    "intro": "Scan the signed QR code on a PawGuard vaccination certificate to check that a registered clinic issued it and that nothing was changed. This works without an internet connection once this page has been opened.",
+    "listsTitle": "Trust list",
+    "listsUpdated": "Trust list and cancellations last updated: {time}",
+    "listsNever": "The trust list hasn't been downloaded yet. Connect to the internet once to download it.",
+    "offline": "You're offline — checking with the saved lists.",
+    "stale": "Lists may be out of date — connect to update.",
+    "updateFailed": "Couldn't update the lists just now. The saved lists are still used.",
+    "updateNow": "Update now",
+    "scanTitle": "Check a certificate",
+    "scan": "Scan with camera",
+    "stopCamera": "Stop camera",
+    "upload": "Upload a photo of the QR code",
+    "cameraView": "Camera view for scanning",
+    "pasteLabel": "Or paste the code text",
+    "check": "Check",
+    "samplesLink": "Demo: sample certificates to try (genuine, altered, cancelled)",
+    "footerNote": "Verification confirms the record came from a registered clinic and wasn't changed. It does not confirm the pet's health.",
+    "unreadableTitle": "Can't read the code",
+    "unreadableBody": "This isn't a readable PawGuard certificate. Hold the camera steady with the whole QR code in view and good light, try a sharper photo, or paste the text that starts with PG1:.",
+    "noListsTitle": "Can't check yet",
+    "noListsBody": "This device hasn't downloaded the trust list yet. Connect to the internet once, then check again.",
+    "alteredTitle": "Altered or not genuine",
+    "alteredBody": "This certificate was changed or wasn't issued by a registered clinic.",
+    "untrustedTitle": "Issued by an unknown or untrusted clinic",
+    "untrusted": {
+      "unknown_clinic": "The clinic that signed this certificate isn't in the PawGuard trust list.",
+      "key_revoked": "The clinic's signing key was withdrawn, so certificates signed with it can't be trusted.",
+      "outside_validity": "It was signed outside the period in which the clinic's key was valid."
+    },
+    "revokedTitle": "Replaced or cancelled",
+    "revokedBody": "This certificate was replaced or cancelled by the clinic.",
+    "revokedDetail": "Clinic: {clinic}. Vaccination date on it: {given}. Ask the owner for the current certificate.",
+    "genuineTitle": "Genuine",
+    "genuineBody": "Issued by {clinic}, {vet} on {issued}. {vaccine}, given {given}, next due {due}.",
+    "lot": "Batch / lot: {lot}",
+    "pet": "Pet",
+    "reference": "Reference",
+    "photoAlt": "Photo of the pet on record",
+    "matchAnimal": "Check that this matches the animal in front of you.",
+    "demoIssuer": "Demo data — a fictional clinic and pet.",
+    "overdueTitle": "Next dose overdue",
+    "overdueBody": "Genuine, but the next due date has passed.",
+    "samples": {
+      "title": "Sample certificates (demo)",
+      "intro": "Fictional demo data. Open the verifier on a phone and scan these from the screen, or copy the text.",
+      "unavailable": "The samples couldn't be loaded. Is the API running with signing set up?",
+      "missing": "Not available in this demo database.",
+      "showText": "Show the code text",
+      "back": "Back to the verifier",
+      "genuine": {
+        "title": "Genuine",
+        "body": "Bruno's rabies certificate from the fictional Lotus Pet Clinic."
+      },
+      "altered": {
+        "title": "Altered",
+        "body": "The same certificate with the vaccination date changed by one day — the signature no longer matches."
+      },
+      "cancelled": {
+        "title": "Cancelled",
+        "body": "An earlier certificate that the clinic replaced."
+      }
     }
   }
 }

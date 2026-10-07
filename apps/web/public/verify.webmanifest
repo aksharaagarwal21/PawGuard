@@ -1,0 +1,15 @@
+{
+  "name": "PawGuard — Verify a vaccination certificate",
+  "short_name": "PawGuard Verify",
+  "description": "Check a PawGuard vaccination certificate, also without a connection.",
+  "start_url": "/en/verify",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f8f3",
+  "theme_color": "#205c4f",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

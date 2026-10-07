@@ -61,4 +61,7 @@ def run_seed(c: Connection, auth: SupabaseAuthAdmin) -> dict[str, object]:
     users = seed_accounts(c, auth)
     summary: dict[str, object] = {"organisations": len(ORGS), "accounts": len(users)}
     summary.update(seed_domain(c, users))
+    from pawguard_api.seed.credentials import seed_credentials
+
+    summary.update(seed_credentials(c))
     return summary

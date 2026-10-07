@@ -1,10 +1,12 @@
 /*
- * PawGuard service worker — registered only after a person chooses "use this device for field work".
- * It stores the field kit page (which contains no personal data) and content-hashed static assets, so the kit opens
- * without a connection. It never stores API responses, sign-in traffic, photos or other pages' HTML.
+ * PawGuard service worker — registered after a person chooses "use this device for field work", or when the public
+ * certificate verifier (/verify) is opened. It stores those two pages (neither contains personal data), the QR reader's
+ * WebAssembly file and content-hashed static assets, so they open without a connection. It never stores API
+ * responses, sign-in traffic, photos or other pages' HTML.
  */
 const SHELL = "pawguard-shell-v1";
 const FIELD = /^\/(en|ta|hi)\/field\/?$/;
+const VERIFY = /^\/(en|ta|hi)\/verify\/?$/;
 let disabled = false; // set when the person signs out or stops offline use; this worker then stores nothing
 
 async function wipe() {
@@ -36,7 +38,7 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/auth")) return; // never cached
 
-  if (url.pathname.startsWith("/_next/static/")) {
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/vendor/zxing/")) {
     event.respondWith(
       (async () => {
         const cache = await caches.open(SHELL);
@@ -55,7 +57,9 @@ self.addEventListener("fetch", (event) => {
       (async () => {
         try {
           const res = await fetch(req);
-          if (FIELD.test(url.pathname) && res.ok) (await caches.open(SHELL)).put(url.pathname, res.clone());
+          if ((FIELD.test(url.pathname) || VERIFY.test(url.pathname)) && res.ok) {
+            (await caches.open(SHELL)).put(url.pathname, res.clone());
+          }
           return res;
         } catch (err) {
           const cache = await caches.open(SHELL);

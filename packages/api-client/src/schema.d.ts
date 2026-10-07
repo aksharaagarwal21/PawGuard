@@ -1283,6 +1283,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/my/pets/{pet_id}/certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * My pet's signed vaccination certificates
+         * @description Permission: the caller owns this pet. Verified vaccinations with their signed QR; owner-entered records are
+         *     only counted (never signed).
+         */
+        get: operations["certificates (signed)_my_certificates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/my/pets/{pet_id}/found": {
         parameters: {
             query?: never;
@@ -1750,6 +1771,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/credentials/{credential_id}/photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pet photo for comparison (online check)
+         * @description Permission: public; the credential id comes from a scanned certificate. Only for active certificates; returns
+         *     the pet's photo if it has one, never anything about the owner or a location.
+         */
+        get: operations["certificates (signed)_credential_photo"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/demo-certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Demo sample certificates (demo mode only)
+         * @description Permission: public, demo mode only. A genuine, an altered (one date changed, not re-signed) and a cancelled
+         *     certificate from the fictional demo clinics.
+         */
+        get: operations["certificates (signed)_demo_certificates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/found/{token}": {
         parameters: {
             query?: never;
@@ -1784,6 +1847,47 @@ export interface paths {
          * @description Permission: whoever holds the conversation link; only while the pet is reported lost (30 a day).
          */
         post: operations["lost pets_finder_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/revocations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Signed list of cancelled certificates
+         * @description Permission: public. Certificate ids that a clinic cancelled or replaced; signed by the platform root key.
+         */
+        get: operations["certificates (signed)_revocations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/trust-list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Signed list of trusted clinic keys
+         * @description Permission: public. COSE_Sign1 signed by the platform root key (its public key is built into the app).
+         *     Retired keys stay listed so older certificates still verify; revoked keys are marked revoked.
+         */
+        get: operations["certificates (signed)_trust_list"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2049,6 +2153,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/vaccination-events/{event_id}/certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue (or re-issue) the signed certificate for a verified record
+         * @description Permission: veterinary reviewer of the record's organisation. Refused (409 not_verified) for records that no
+         *     vet has verified, including owner-entered ones. An existing certificate is replaced (revoked) first.
+         */
+        post: operations["certificates (signed)_issue_certificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/vaccination-events/{event_id}/certificate-drafts": {
         parameters: {
             query?: never;
@@ -2063,6 +2188,27 @@ export interface paths {
         get: operations["certificates_drafts"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/vaccination-events/{event_id}/correction": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Correct a verified record (vet); replaces its signed certificate
+         * @description Permission: approved veterinary reviewer. A new verified record supersedes the old one; the old certificate is
+         *     revoked (pointing at the new one) and a new certificate is issued, in one transaction.
+         */
+        post: operations["certificates (signed)_correct"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2818,6 +2964,32 @@ export interface components {
             /** Warnings */
             warnings: string[];
         };
+        /** CertificateOut */
+        CertificateOut: {
+            /** Administered On */
+            administered_on: string | null;
+            /** Credential Id */
+            credential_id: string | null;
+            /**
+             * Event Id
+             * Format: uuid
+             */
+            event_id: string;
+            /** Is Rabies */
+            is_rabies: boolean;
+            /** Issued At */
+            issued_at: string | null;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Next Due Source */
+            next_due_source: string | null;
+            /** Qr Svg */
+            qr_svg: string | null;
+            /** Qr Text */
+            qr_text: string | null;
+            /** Vaccine */
+            vaccine: string | null;
+        };
         /** ChannelsAvailableOut */
         ChannelsAvailableOut: {
             /** Call */
@@ -2925,6 +3097,11 @@ export interface components {
             /** Confirmed */
             confirmed: boolean;
         };
+        /** CredentialPhotoOut */
+        CredentialPhotoOut: {
+            /** Photo Url */
+            photo_url: string | null;
+        };
         /** DeliveryOut */
         DeliveryOut: {
             /**
@@ -2989,6 +3166,19 @@ export interface components {
              * Format: date
              */
             today: string;
+        };
+        /** DemoSampleOut */
+        DemoSampleOut: {
+            /** Qr Svg */
+            qr_svg: string | null;
+            /** Qr Text */
+            qr_text: string | null;
+        };
+        /** DemoSamplesOut */
+        DemoSamplesOut: {
+            altered: components["schemas"]["DemoSampleOut"];
+            cancelled: components["schemas"]["DemoSampleOut"];
+            genuine: components["schemas"]["DemoSampleOut"];
         };
         /** DetectionOut */
         DetectionOut: {
@@ -3330,6 +3520,14 @@ export interface components {
             valid_count: number;
             /** Warning Count */
             warning_count: number;
+        };
+        /** IssuedOut */
+        IssuedOut: {
+            /**
+             * Credential Id
+             * Format: uuid
+             */
+            credential_id: string;
         };
         /**
          * LocationIn
@@ -4012,6 +4210,15 @@ export interface components {
             species: string;
             status: components["schemas"]["PetStatusOut"];
         };
+        /** PetCertificatesOut */
+        PetCertificatesOut: {
+            /** Featured Event Id */
+            featured_event_id: string | null;
+            /** Items */
+            items: components["schemas"]["CertificateOut"][];
+            /** Unverified Count */
+            unverified_count: number;
+        };
         /** PetCreate */
         PetCreate: {
             /**
@@ -4514,6 +4721,18 @@ export interface components {
             /** Queued */
             queued: number;
         };
+        /** SignedListOut */
+        SignedListOut: {
+            /** Cose */
+            cose: string;
+            /**
+             * Format
+             * @enum {string}
+             */
+            format: "PG-TL1" | "PG-RL1";
+            /** Version */
+            version: number;
+        };
         /** SignedUrlOut */
         SignedUrlOut: {
             /** Expires In Seconds */
@@ -5000,6 +5219,24 @@ export interface components {
             source_type?: "field_entry" | "certificate_upload" | "partner_record" | "owner_entry" | "clinic_record";
             /** Submitter Note */
             submitter_note?: string | null;
+        };
+        /**
+         * VaccinationCorrect
+         * @description A vet's correction of a verified record (the old record is kept as superseded).
+         */
+        VaccinationCorrect: {
+            /** Administered On */
+            administered_on?: string | null;
+            /** Lot Text */
+            lot_text?: string | null;
+            /** Next Due On */
+            next_due_on?: string | null;
+            /** Product Id */
+            product_id?: string | null;
+            /** Reason */
+            reason: string;
+            /** Row Version */
+            row_version: number;
         };
         /** VaccinationCreate */
         VaccinationCreate: {
@@ -9086,6 +9323,57 @@ export interface operations {
             };
         };
     };
+    "certificates (signed)_my_certificates": {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                pet_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PetCertificatesOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     "lost pets_mark_found": {
         parameters: {
             query?: never;
@@ -10286,6 +10574,102 @@ export interface operations {
             };
         };
     };
+    "certificates (signed)_credential_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                credential_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialPhotoOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "certificates (signed)_demo_certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DemoSamplesOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     "lost pets_finder_thread": {
         parameters: {
             query?: never;
@@ -10356,6 +10740,100 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "certificates (signed)_revocations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedListOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "certificates (signed)_trust_list": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SignedListOut"];
+                };
             };
             /** @description Unauthorized */
             401: {
@@ -11187,6 +11665,58 @@ export interface operations {
             };
         };
     };
+    "certificates (signed)_issue_certificate": {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     certificates_drafts: {
         parameters: {
             query?: never;
@@ -11208,6 +11738,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CertificateDraftOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "certificates (signed)_correct": {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VaccinationCorrect"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssuedOut"];
                 };
             };
             /** @description Unauthorized */

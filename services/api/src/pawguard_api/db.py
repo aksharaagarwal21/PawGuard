@@ -22,7 +22,8 @@ def _engine(url: str, pool_size: int) -> Engine:
     if url.startswith("postgresql://"):
         url = "postgresql+psycopg://" + url.removeprefix("postgresql://")
     return create_engine(url, pool_size=pool_size, max_overflow=pool_size, pool_pre_ping=True,
-                         pool_recycle=1800, connect_args={"application_name": "pawguard"})
+                         pool_recycle=1800, connect_args={"application_name": "pawguard"},
+                         hide_parameters=True)  # errors never echo SQL parameters (addresses, sealed keys) into logs
 
 
 @lru_cache

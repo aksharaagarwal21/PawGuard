@@ -24,8 +24,9 @@ from pawguard_api.contracts import (
     VaccinationCreate,
     VaccinationOut,
 )
+from pawguard_api.credential_contracts import VaccinationCorrect
 from pawguard_api.deps import OrgContext
-from pawguard_api.domain import reminders
+from pawguard_api.domain import credentials, reminders
 from pawguard_api.domain.animals import ensure_area, load_animal
 from pawguard_api.domain.common import (
     decode_cursor,
@@ -202,6 +203,8 @@ def review(db: Session, ctx: OrgContext, event_id: UUID, data: ReviewCreate) -> 
         event.verified_at = text("now()")
     db.flush()
     reminders.after_review(db, ctx.org_id, event, data.outcome, data.next_due_on)  # same transaction
+    if data.outcome == "verified":  # signed certificate in the same transaction (skipped if signing is not set up)
+        credentials.try_issue(db, credentials.Actor(ctx.org_id, ctx.user_id, ctx.request_id), event.id)
     if data.outcome == "needs_correction" and event.submitted_by is not None:
         submitter = db.execute(select(Membership.id).where(Membership.user_id == event.submitted_by,
                                                            Membership.status == "active")).scalar()
@@ -238,6 +241,40 @@ def amend(db: Session, ctx: OrgContext, event_id: UUID, data: VaccinationAmend) 
                        where source_event_id = :e and task_type = 'evidence_correction'
                          and state in ('unassigned','assigned','in_progress','blocked')"""), {"e": old.id})
     record_audit(db, ctx, "vaccination_event.superseded", "vaccination_event", old.id, {"superseded_by": str(new_id)})
+    return new_id
+
+
+def correct_verified(db: Session, ctx: OrgContext, event_id: UUID, data: VaccinationCorrect) -> UUID:
+    """A vet corrects a verified record: a new verified record replaces it (the old one is kept as superseded), and
+    the old signed certificate is revoked in favour of a new one — all in one transaction."""
+    ctx.require(Cap.VACCINATION_REVIEW)
+    ctx.require_live_session(db)
+    old = _lock_event(db, event_id)
+    if old.state != "verified":
+        raise Conflict("Only verified records can be corrected this way.", code="invalid_state",
+                       details={"state": old.state})
+    expect_version(old.row_version, data.row_version, "vaccination record")
+    administered_on = data.administered_on or old.administered_on
+    if data.next_due_on is not None and administered_on is not None and data.next_due_on <= administered_on:
+        raise Unprocessable("The next due date must be after the vaccination date.",
+                            fields=[FieldError(field="next_due_on", code="due_before_administration",
+                                               message="Next due date is not after the vaccination date.")])
+    new_id = submit(db, ctx, VaccinationCreate(
+        animal_id=old.animal_id, date_precision="day" if data.administered_on else old.date_precision,
+        administered_on=administered_on, product_id=data.product_id or old.product_id,
+        product_text=None if data.product_id else old.product_text, lot_id=None if data.lot_text else old.lot_id,
+        lot_text=data.lot_text if data.lot_text is not None else old.lot_text,
+        administered_by_name=old.administered_by_name, source_type=old.source_type,
+        source_reference=old.source_reference), supersedes=old)
+    new: Any = db.get(VaccinationEvent, new_id)
+    new.state, new.verified_by, new.verified_at = "verified", ctx.user_id, text("now()")
+    old.state, old.superseded_by_event_id = "superseded", new_id
+    db.flush()
+    reminders.after_review(db, ctx.org_id, new, "verified", data.next_due_on or old.next_review_on)
+    credentials.reissue_after_correction(db, credentials.Actor(ctx.org_id, ctx.user_id, ctx.request_id),
+                                         old.id, new_id)
+    record_audit(db, ctx, "vaccination_event.corrected", "vaccination_event", old.id, {"superseded_by": str(new_id)},
+                 reason=data.reason)
     return new_id
 
 

@@ -41,6 +41,11 @@ export async function PublicHeader() {
                 {t("helpGuide")}
               </Link>
             </li>
+            <li>
+              <Link href="/verify" className={navLink}>
+                {t("verifyCertificate")}
+              </Link>
+            </li>
           </ul>
         </nav>
         <div className="order-4 ml-auto lg:order-none">
@@ -114,6 +119,9 @@ export async function PublicFooter() {
           </li>
           <li>
             <Link href="/sources">{t("sources")}</Link>
+          </li>
+          <li>
+            <Link href="/verify">{t("verifyCertificate")}</Link>
           </li>
         </ul>
       </div>

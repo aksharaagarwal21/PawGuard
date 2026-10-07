@@ -1,4 +1,4 @@
-import { Wrench } from "lucide-react";
+import { ShieldCheck, Wrench } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Card, Notice, StatusChip } from "@pawguard/ui";
@@ -10,6 +10,7 @@ import { MessagesPanel } from "@/components/notify/messages-panel";
 import { WhatsAppDemo } from "@/components/notify/whatsapp-demo";
 import { DemoClockControl } from "@/components/pets/demo-clock";
 import { WelcomeTour } from "@/components/tour/welcome-tour";
+import { Link } from "@/i18n/navigation";
 import { pageContext } from "@/lib/page-context";
 
 /** "Demo — Lotus Pet Clinic (fictional)" → "Lotus Pet Clinic" for the heading; the demo label is shown as a chip. */
@@ -47,6 +48,12 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
             {t("todayAt", { clinic: shortName(ctx.active.org_name) })}
           </h1>
           <p className="mt-1 text-ink-2">{t("intro")}</p>
+          <p className="mt-1 text-sm">
+            <Link href="/verify" className="inline-flex min-h-11 items-center gap-1.5 font-semibold">
+              <ShieldCheck aria-hidden className="size-4" />
+              {t("verifyLink")}
+            </Link>
+          </p>
         </div>
         {ctx.active.org_is_demo ? <StatusChip kind="demo">{t("demoClinic")}</StatusChip> : null}
       </div>

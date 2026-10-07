@@ -1725,6 +1725,125 @@
         "title": "CertificateDraftOut",
         "type": "object"
       },
+      "CertificateOut": {
+        "properties": {
+          "administered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Administered On"
+          },
+          "credential_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credential Id"
+          },
+          "event_id": {
+            "format": "uuid",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "is_rabies": {
+            "title": "Is Rabies",
+            "type": "boolean"
+          },
+          "issued_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Issued At"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "next_due_source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due Source"
+          },
+          "qr_svg": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Svg"
+          },
+          "qr_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Text"
+          },
+          "vaccine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vaccine"
+          }
+        },
+        "required": [
+          "event_id",
+          "vaccine",
+          "administered_on",
+          "next_due_on",
+          "next_due_source",
+          "is_rabies",
+          "credential_id",
+          "qr_text",
+          "qr_svg",
+          "issued_at"
+        ],
+        "title": "CertificateOut",
+        "type": "object"
+      },
       "ChannelsAvailableOut": {
         "properties": {
           "call": {
@@ -1988,6 +2107,26 @@
         "title": "ConfirmEmailOut",
         "type": "object"
       },
+      "CredentialPhotoOut": {
+        "properties": {
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          }
+        },
+        "required": [
+          "photo_url"
+        ],
+        "title": "CredentialPhotoOut",
+        "type": "object"
+      },
       "DeliveryOut": {
         "properties": {
           "channel": {
@@ -2159,6 +2298,58 @@
           "real_today"
         ],
         "title": "DemoClockOut",
+        "type": "object"
+      },
+      "DemoSampleOut": {
+        "properties": {
+          "qr_svg": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Svg"
+          },
+          "qr_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Text"
+          }
+        },
+        "required": [
+          "qr_text",
+          "qr_svg"
+        ],
+        "title": "DemoSampleOut",
+        "type": "object"
+      },
+      "DemoSamplesOut": {
+        "properties": {
+          "altered": {
+            "$ref": "#/components/schemas/DemoSampleOut"
+          },
+          "cancelled": {
+            "$ref": "#/components/schemas/DemoSampleOut"
+          },
+          "genuine": {
+            "$ref": "#/components/schemas/DemoSampleOut"
+          }
+        },
+        "required": [
+          "genuine",
+          "altered",
+          "cancelled"
+        ],
+        "title": "DemoSamplesOut",
         "type": "object"
       },
       "DetectionOut": {
@@ -3037,6 +3228,20 @@
           "row_version"
         ],
         "title": "ImportSummary",
+        "type": "object"
+      },
+      "IssuedOut": {
+        "properties": {
+          "credential_id": {
+            "format": "uuid",
+            "title": "Credential Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "credential_id"
+        ],
+        "title": "IssuedOut",
         "type": "object"
       },
       "LocationIn": {
@@ -5058,6 +5263,40 @@
         "title": "PetCardOut",
         "type": "object"
       },
+      "PetCertificatesOut": {
+        "properties": {
+          "featured_event_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Featured Event Id"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CertificateOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "unverified_count": {
+            "title": "Unverified Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "featured_event_id",
+          "items",
+          "unverified_count"
+        ],
+        "title": "PetCertificatesOut",
+        "type": "object"
+      },
       "PetCreate": {
         "additionalProperties": false,
         "properties": {
@@ -6417,6 +6656,33 @@
           "queued"
         ],
         "title": "ScanOut",
+        "type": "object"
+      },
+      "SignedListOut": {
+        "properties": {
+          "cose": {
+            "title": "Cose",
+            "type": "string"
+          },
+          "format": {
+            "enum": [
+              "PG-TL1",
+              "PG-RL1"
+            ],
+            "title": "Format",
+            "type": "string"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "format",
+          "version",
+          "cose"
+        ],
+        "title": "SignedListOut",
         "type": "object"
       },
       "SignedUrlOut": {
@@ -7959,6 +8225,76 @@
           "row_version"
         ],
         "title": "VaccinationAmend",
+        "type": "object"
+      },
+      "VaccinationCorrect": {
+        "additionalProperties": false,
+        "description": "A vet's correction of a verified record (the old record is kept as superseded).",
+        "properties": {
+          "administered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Administered On"
+          },
+          "lot_text": {
+            "anyOf": [
+              {
+                "maxLength": 40,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Text"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Id"
+          },
+          "reason": {
+            "maxLength": 500,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          },
+          "row_version": {
+            "title": "Row Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "row_version",
+          "reason"
+        ],
+        "title": "VaccinationCorrect",
         "type": "object"
       },
       "VaccinationCreate": {
@@ -15803,6 +16139,86 @@
         ]
       }
     },
+    "/api/v1/my/pets/{pet_id}/certificates": {
+      "get": {
+        "description": "Permission: the caller owns this pet. Verified vaccinations with their signed QR; owner-entered records are\nonly counted (never signed).",
+        "operationId": "certificates (signed)_my_certificates",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "pet_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Pet Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PetCertificatesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "My pet's signed vaccination certificates",
+        "tags": [
+          "certificates (signed)"
+        ]
+      }
+    },
     "/api/v1/my/pets/{pet_id}/found": {
       "post": {
         "description": "Permission: the pet's owner. Closes the conversations.",
@@ -17734,6 +18150,122 @@
         ]
       }
     },
+    "/api/v1/public/credentials/{credential_id}/photo": {
+      "get": {
+        "description": "Permission: public; the credential id comes from a scanned certificate. Only for active certificates; returns\nthe pet's photo if it has one, never anything about the owner or a location.",
+        "operationId": "certificates (signed)_credential_photo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "credential_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Credential Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialPhotoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Pet photo for comparison (online check)",
+        "tags": [
+          "certificates (signed)"
+        ]
+      }
+    },
+    "/api/v1/public/demo-certificates": {
+      "get": {
+        "description": "Permission: public, demo mode only. A genuine, an altered (one date changed, not re-signed) and a cancelled\ncertificate from the fictional demo clinics.",
+        "operationId": "certificates (signed)_demo_certificates",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DemoSamplesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Demo sample certificates (demo mode only)",
+        "tags": [
+          "certificates (signed)"
+        ]
+      }
+    },
     "/api/v1/public/found/{token}": {
       "get": {
         "description": "Permission: whoever holds the conversation link. Shows the pet's name and the messages, never the owner.",
@@ -17860,6 +18392,110 @@
         "summary": "Finder writes again",
         "tags": [
           "lost pets"
+        ]
+      }
+    },
+    "/api/v1/public/revocations": {
+      "get": {
+        "description": "Permission: public. Certificate ids that a clinic cancelled or replaced; signed by the platform root key.",
+        "operationId": "certificates (signed)_revocations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Signed list of cancelled certificates",
+        "tags": [
+          "certificates (signed)"
+        ]
+      }
+    },
+    "/api/v1/public/trust-list": {
+      "get": {
+        "description": "Permission: public. COSE_Sign1 signed by the platform root key (its public key is built into the app).\nRetired keys stay listed so older certificates still verify; revoked keys are marked revoked.",
+        "operationId": "certificates (signed)_trust_list",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedListOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Signed list of trusted clinic keys",
+        "tags": [
+          "certificates (signed)"
         ]
       }
     },
@@ -19457,6 +20093,103 @@
         ]
       }
     },
+    "/api/v1/vaccination-events/{event_id}/certificate": {
+      "post": {
+        "description": "Permission: veterinary reviewer of the record's organisation. Refused (409 not_verified) for records that no\nvet has verified, including owner-entered ones. An existing certificate is replaced (revoked) first.",
+        "operationId": "certificates (signed)_issue_certificate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Event Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Issue (or re-issue) the signed certificate for a verified record",
+        "tags": [
+          "certificates (signed)"
+        ]
+      }
+    },
     "/api/v1/vaccination-events/{event_id}/certificate-drafts": {
       "get": {
         "description": "Permission: clinic staff. Shown beside the image in the review workbench; never verifies anything.",
@@ -19555,6 +20288,113 @@
         "summary": "OCR drafts for a record's certificates",
         "tags": [
           "certificates"
+        ]
+      }
+    },
+    "/api/v1/vaccination-events/{event_id}/correction": {
+      "post": {
+        "description": "Permission: approved veterinary reviewer. A new verified record supersedes the old one; the old certificate is\nrevoked (pointing at the new one) and a new certificate is issued, in one transaction.",
+        "operationId": "certificates (signed)_correct",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Event Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VaccinationCorrect"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IssuedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Correct a verified record (vet); replaces its signed certificate",
+        "tags": [
+          "certificates (signed)"
         ]
       }
     },

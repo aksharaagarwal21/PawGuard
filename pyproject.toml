@@ -24,6 +24,7 @@ dev = [
   "hypothesis==6.168.4",
   "ruff==0.16.10",
   "mypy==2.4.0",
+  "pycose==1.1.0",
 ]
 
 [tool.ruff]

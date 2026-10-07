@@ -8,6 +8,7 @@ QR codes stop working at once. The card shows recorded vaccinations; it is not a
 import io
 import secrets
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -18,7 +19,7 @@ from sqlalchemy import text
 
 from pawguard_api.auth import Principal
 from pawguard_api.db import public_tx
-from pawguard_api.domain import petcare, reminders
+from pawguard_api.domain import credentials, petcare, reminders
 from pawguard_api.domain.common import record_audit
 from pawguard_api.errors import NotFound, Unprocessable
 from pawguard_api.pet_contracts import CardOut, PetStatusOut, PublicCardOut, PublicVaccinationOut
@@ -116,12 +117,24 @@ def public_card(token: str, *, with_photo: bool = True) -> PublicCardOut:
 
 # ---- PDF ---------------------------------------------------------------------------------------------------------
 
-_LATIN = str.maketrans({"—": "-", "–": "-", "‘": "'", "’": "'", "“": '"', "”": '"', "…": "..."})
+FONTS = Path(__file__).resolve().parent.parent / "fonts"  # Noto Sans (SIL Open Font License, fonts/OFL.txt)
+
+
+def _pdf(**kw: Any) -> FPDF:
+    """A PDF with Noto Sans embedded: Latin, Tamil and Devanagari (fallback fonts), shaped with HarfBuzz so Tamil and
+    Hindi names print correctly instead of "?"."""
+    pdf = FPDF(**kw)
+    for family, stem in (("Noto", "NotoSans"), ("NotoTamil", "NotoSansTamil"), ("NotoDeva", "NotoSansDevanagari")):
+        pdf.add_font(family, "", str(FONTS / f"{stem}-Regular.ttf"))
+        pdf.add_font(family, "B", str(FONTS / f"{stem}-Bold.ttf"))
+    pdf.set_fallback_fonts(["NotoTamil", "NotoDeva"])
+    pdf.set_text_shaping(True)
+    return pdf
 
 
 def _latin(s: str) -> str:
-    """The PDF uses a built-in Latin font: map common punctuation, replace anything else it cannot show."""
-    return s.translate(_LATIN).encode("latin-1", "replace").decode("latin-1")
+    """Kept for call sites: with Unicode fonts embedded, text is printed as is."""
+    return s
 
 
 STATUS_TEXT = {"up_to_date": "Up to date", "due_soon": "Due soon", "overdue": "Overdue",
@@ -132,29 +145,29 @@ def owner_card_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
     card = owner_card(p, animal_id, base_url, request_id=request_id)
     data = public_card(card.token, with_photo=False)
     url = _base(base_url) + card.url_path
-    pdf = FPDF(format="A5", orientation="portrait")
+    pdf = _pdf(format="A5", orientation="portrait")
     pdf.set_auto_page_break(auto=True, margin=12)
     pdf.add_page()
     pdf.set_title(_latin(f"Vaccination card - {data.pet_name}"))
     if data.is_demo:
-        pdf.set_font("Helvetica", "B", 9)
+        pdf.set_font("Noto", "B", 9)
         pdf.set_fill_color(230, 225, 245)
-        pdf.cell(0, 7, "DEMO DATA - fictional pet and clinic, not a real record", new_x="LMARGIN", new_y="NEXT",
+        pdf.cell(0, 7, "DEMO DATA — fictional pet and clinic, not a real record", new_x="LMARGIN", new_y="NEXT",
                  fill=True, align="C")
         pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 18)
+    pdf.set_font("Noto", "B", 18)
     pdf.cell(0, 10, _latin(data.pet_name), new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Helvetica", "", 10)
+    pdf.set_font("Noto", "", 10)
     pdf.cell(0, 6, _latin(f"{data.species.capitalize()} - {data.clinic_name}"), new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Helvetica", "B", 11)
+    pdf.set_font("Noto", "B", 11)
     pdf.cell(0, 8, _latin(f"Status: {STATUS_TEXT[data.status.status]}"), new_x="LMARGIN", new_y="NEXT")
     pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_font("Noto", "B", 9)
     widths = (62, 33, 33)
     for w, h in zip(widths, ("Vaccine (verified by vet)", "Given on", "Next due"), strict=True):
         pdf.cell(w, 7, h, border="B")
     pdf.ln()
-    pdf.set_font("Helvetica", "", 9)
+    pdf.set_font("Noto", "", 9)
     if not data.vaccinations:
         pdf.cell(0, 7, "No verified record.", new_x="LMARGIN", new_y="NEXT")
     for v in data.vaccinations:
@@ -166,16 +179,44 @@ def owner_card_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
     png = io.BytesIO()
     segno.make(url, error="m").save(png, kind="png", scale=8, border=2)
     png.seek(0)
-    pdf.image(png, w=40)
-    pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4.5, _latin(f"Scan to check the current status: {url}"), new_x="LMARGIN", new_y="NEXT")
+    top = pdf.get_y()
+    pdf.image(png, x=pdf.l_margin, y=top, w=40)
+    pdf.set_xy(pdf.l_margin, top + 41)
+    pdf.set_font("Noto", "B", 8)
+    pdf.cell(40, 4, "Scan for this pet's page", align="C")
+    signed = _signed_rabies(p, animal_id, request_id)
+    if signed:
+        pdf.image(credentials.qr_png(signed["qr_text"], scale=6), x=pdf.l_margin + 52, y=top, w=46)
+        pdf.set_xy(pdf.l_margin + 52, top + 47)
+        pdf.cell(46, 4, "Scan to verify this certificate", align="C")
+        pdf.set_xy(pdf.l_margin + 102, top)
+        pdf.set_font("Noto", "", 7.5)
+        pdf.multi_cell(0, 3.8, f"Signed by the clinic: {signed['vaccine']}, given {signed['given']}. "
+                               "Check it at /verify (works offline). The signature shows a registered clinic issued "
+                               "this record and that it was not changed — not that the pet is healthy.", align="L")
+    pdf.set_xy(pdf.l_margin, top + 54)
+    pdf.set_font("Noto", "", 8)
+    pdf.multi_cell(0, 4.5, f"Pet page (current status): {url}", new_x="LMARGIN", new_y="NEXT", align="L")
     pdf.ln(2)
-    pdf.set_font("Helvetica", "B", 9)
+    pdf.set_font("Noto", "B", 9)
     pdf.multi_cell(0, 5, DISCLAIMER, new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Helvetica", "", 8)
-    pdf.multi_cell(0, 4.5, "Only vaccinations verified by a vet are listed. PawGuard only reminds; your vet decides "
-                           "treatment.", new_x="LMARGIN", new_y="NEXT")
+    pdf.set_font("Noto", "", 8)
+    pdf.multi_cell(0, 4.5, "Only vaccinations verified by a vet are listed. Owner-entered (unverified) records are "
+                           "never signed. PawGuard only reminds; your vet decides treatment.",
+                   new_x="LMARGIN", new_y="NEXT")
     return bytes(pdf.output())
+
+
+def _signed_rabies(p: Principal, animal_id: UUID, request_id: str | None) -> dict[str, str] | None:
+    """The latest verified rabies vaccination's signed QR text, if one has been issued."""
+    ctx = petcare.owned_context(p, animal_id, request_id)
+    with ctx.tx() as db:
+        certs = credentials.pet_certificates(db, animal_id)
+    item = next((i for i in certs["items"] if i["event_id"] == certs["featured_event_id"]), None)
+    if not item or not item["qr_text"]:
+        return None
+    return {"qr_text": item["qr_text"], "vaccine": item["vaccine"] or "",
+            "given": f"{item['administered_on']:%d %b %Y}" if item["administered_on"] else "-"}
 
 
 def owner_tags_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_id: str | None = None) -> bytes:
@@ -186,12 +227,12 @@ def owner_tags_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
     url = _base(base_url) + card.url_path
     png = io.BytesIO()
     segno.make(url, error="q").save(png, kind="png", scale=10, border=1)
-    pdf = FPDF(format="A4", orientation="portrait")
+    pdf = _pdf(format="A4", orientation="portrait")
     pdf.set_auto_page_break(auto=False)
     pdf.add_page()
-    pdf.set_font("Helvetica", "B", 12)
+    pdf.set_font("Noto", "B", 12)
     pdf.cell(0, 7, _latin(f"PawGuard collar tags - {data.pet_name}"), new_x="LMARGIN", new_y="NEXT")
-    pdf.set_font("Helvetica", "", 8)
+    pdf.set_font("Noto", "", 8)
     pdf.multi_cell(0, 4, "Print at 100% scale, cut along the dashed lines and laminate. The QR code shows only the "
                          "pet's name, photo, clinic and vaccinations verified by a vet - never your contact details. "
                          "Making a new QR code in the app makes these tags stop working."
@@ -206,10 +247,10 @@ def owner_tags_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
             png.seek(0)
             pdf.image(png, x=x + 5.5, y=y + 3, w=34)
             pdf.set_xy(x, y + 39)
-            pdf.set_font("Helvetica", "B", 10)
+            pdf.set_font("Noto", "B", 10)
             pdf.cell(w, 5, _latin(data.pet_name)[:22], align="C")
             pdf.set_xy(x, y + 45)
-            pdf.set_font("Helvetica", "", 7)
+            pdf.set_font("Noto", "", 7)
             pdf.multi_cell(w, 3.4, "Scan for this pet's\nvaccination card\nPawGuard 360", align="C")
     pdf.set_dash_pattern()
     return bytes(pdf.output())

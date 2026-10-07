@@ -38,7 +38,7 @@ def _owner_url(database: str | None = None) -> str:
 
 @contextmanager
 def owner_conn(database: str | None = None) -> Iterator[Connection]:
-    engine = create_engine(_owner_url(database))
+    engine = create_engine(_owner_url(database), hide_parameters=True)
     try:
         with engine.begin() as conn:
             conn.execute(text("set search_path = app, extensions, public"))
@@ -467,3 +467,105 @@ def push_keys(rotate: bool = typer.Option(False, "--rotate", help="Replace exist
     typer.echo(f"Wrote VAPID keys to {env_path} (public key starts {public[:12]}…). Restart the API and worker.")
     if not current.get("PAWGUARD_VAPID_CONTACT"):
         typer.echo("Also set PAWGUARD_VAPID_CONTACT=mailto:you@example.com in .env.")
+
+
+# ---- certificate signing keys (ADR 0011) ---------------------------------------------------------------------------
+
+keys_app = typer.Typer(no_args_is_help=True, help="Certificate signing keys: root, master, clinic keys (ADR 0011).")
+app.add_typer(keys_app, name="keys")
+
+
+def _org_tx(c: Connection, org_id: str) -> None:
+    c.execute(text("select app.set_request_context(null, :o)"), {"o": org_id})
+
+
+@keys_app.command("init")
+def keys_init(directory: Path = typer.Option(REPO / "secrets", help="Where to write the key files (git-ignored)")
+              ) -> None:
+    """Create the master key, the root key (passphrase-encrypted) and its passphrase as files. Existing files are
+    kept. Prints only file paths and the root PUBLIC key — never a secret."""
+    import base64
+    import secrets as pysecrets
+
+    from pawguard_api.integrations import cose
+
+    directory.mkdir(parents=True, exist_ok=True)
+    master, phrase = directory / "signing-master.key", directory / "root-key.passphrase"
+    root = directory / "root-key.pem"
+    if not master.exists():
+        master.write_text(base64.b64encode(pysecrets.token_bytes(32)).decode("ascii"), encoding="utf-8")
+    if not phrase.exists():
+        phrase.write_text(pysecrets.token_urlsafe(32), encoding="utf-8")
+    if root.exists():
+        s = get_settings().model_copy(update={"root_key_file": str(root), "root_key_passphrase_file": str(phrase),
+                                              "root_key_passphrase": None})
+        public = cose.root_public_b64(s)
+    else:
+        public = cose.write_root_key(root, phrase.read_text(encoding="utf-8").strip())
+    typer.echo("Add these lines to .env (paths only; the files themselves are secrets and never committed):")
+    typer.echo(f"PAWGUARD_SIGNING_MASTER_KEY_FILE={master}")
+    typer.echo(f"PAWGUARD_ROOT_KEY_FILE={root}")
+    typer.echo(f"PAWGUARD_ROOT_KEY_PASSPHRASE_FILE={phrase}")
+    typer.echo(f"Root PUBLIC key (put in apps/web/src/lib/verify/root-key.ts): {public}")
+
+
+@keys_app.command("backfill")
+def keys_backfill(certificates: bool = typer.Option(True, help="Also sign verified records that have none")) -> None:
+    """Give every active organisation a signing key, and sign its verified records that have no certificate."""
+    from pawguard_api.domain import credentials
+
+    with owner_conn() as c:
+        orgs = c.execute(text("select id, name from app.organisations where activation_state = 'active' "
+                              "order by name")).all()
+    for org in orgs:
+        with owner_conn() as c:
+            _org_tx(c, str(org.id))
+            actor = credentials.Actor(org.id, None)
+            kid = credentials.ensure_key(c, actor)
+            n = credentials.backfill(c, actor) if certificates else 0
+        typer.echo(f"  {org.name}: key {kid}, {n} certificates issued")
+
+
+@keys_app.command("list")
+def keys_list() -> None:
+    """Key ids, organisations and status (public information only)."""
+    with owner_conn() as c:
+        for k in c.execute(text("select kid, org_name, status, valid_from, valid_to from app.trust_keys()")):
+            typer.echo(f"  {k.kid}  {k.status:8s}  {k.valid_from:%Y-%m-%d}  {k.org_name}")
+
+
+@keys_app.command("rotate")
+def keys_rotate(org: str = typer.Option(..., help="Organisation id"),
+                reissue: bool = typer.Option(False, help="Also re-sign this organisation's active certificates")
+                ) -> None:
+    """Retire the organisation's active key (it still verifies what it signed) and create a new one. Audited."""
+    from uuid import UUID
+
+    from pawguard_api.domain import credentials
+
+    with owner_conn() as c:
+        _org_tx(c, org)
+        actor = credentials.Actor(UUID(org), None)
+        kid = credentials.rotate_key(c, actor)
+        n = 0
+        if reissue:
+            events = c.execute(text("select event_id from app.vaccination_credentials where org_id = :o "
+                                    "and state = 'active'"), {"o": org}).scalars().all()
+            for e in events:
+                credentials.issue_replacing(c, actor, e)
+            n = len(events)
+    typer.echo(f"new active key {kid}; {n} certificates re-issued")
+
+
+@keys_app.command("revoke")
+def keys_revoke(kid: str = typer.Option(..., help="Key id to revoke"),
+                reason: str = typer.Option(..., help="Why (e.g. 'laptop stolen')")) -> None:
+    """Revoke a compromised key: its certificates then verify as 'issued by an untrusted clinic'. Audited.
+    Afterwards run `keys rotate --org <id> --reissue` to give the clinic a new key and new certificates."""
+    from uuid import UUID
+
+    from pawguard_api.domain import credentials
+
+    with owner_conn() as c:
+        ok = credentials.revoke_key(c, credentials.Actor(UUID(int=0), None), kid, reason)
+    typer.echo("revoked" if ok else "no such active key")

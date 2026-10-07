@@ -48,3 +48,19 @@ Browser ↔ Storage (single-object signed URLs) · Operators ↔ admin CLI (owne
 `'unsafe-inline'` scripts (Next.js bootstrap) · a compromised API process can set any context (RLS is defence in
 depth, not a substitute for API integrity) · owner credentials can bypass everything (operational control).
 - Offline field data in IndexedDB is readable by anyone with the unlocked device and browser profile; we rely on the opt-in warning, minimal fields, expiry and wipe rather than claiming encryption.
+
+## Signed vaccination certificates (ADR 0010/0011)
+
+| Threat | Control (status) |
+|---|---|
+| Forged QR (made-up clinic, edited date or pet) | COSE_Sign1/Ed25519 over the payload and protected header; any changed byte fails (✅ 40-position byte-flip browser test, every byte server test); unknown key id → "unknown or untrusted clinic"; trusted key id with another signature → "altered" (✅) |
+| Fake trust list (attacker adds their key) | Trust and revocation lists are signed by the root key compiled into the app; tampered or other-root lists are rejected (✅ tests); older lists never replace newer cached ones (anti-rollback) |
+| Stolen clinic private key | Keys sealed with AES-256-GCM under a master key outside the DB; `keys revoke` marks the key revoked → all its certificates verify as untrusted; `keys rotate --reissue` re-signs (✅ tested). Residual: verifiers offline since before the revocation keep trusting until they refresh (stale warning after 7 days) |
+| Stolen master key + database | Attacker could sign as any clinic → revoke and rotate every key, change the master key. Residual risk documented |
+| Compromised root key | Requires a new app build with a new root public key; no remote revocation of a compiled-in root. Production plan: offline root + short-lived list-signing key (not built) |
+| Replay of a cancelled certificate | Revocation list (root-signed, versioned in the same transaction) → "replaced or cancelled" (✅); offline verifiers see cancellations only after their last refresh (freshness time always shown) |
+| Real certificate shown for a different animal | Out of scope for cryptography: the result says "Check that this matches the animal in front of you" and shows pet details and, online, the photo on record |
+| Private keys leaking through APIs, logs, errors or the web bundle | Never returned or logged; SQL parameters hidden in errors; automated checks in API tests (responses + logs) and `scripts/check_bundle_secrets.py` (bundle) (✅) |
+| Decompression bomb / oversized QR | Text ≤ 2,000 characters, inflate capped at 4 KB, strict CBOR/COSE parsing (✅ tested both sides) |
+| Privacy of the QR | Payload has no owner name, phone, email, address, location or photo (✅ tested); pet photo fetched online only for active certificates |
+| WebAssembly needed by the QR reader | `'wasm-unsafe-eval'` (WebAssembly only; JavaScript `eval` stays blocked) is allowed **only** on `/[locale]/verify`; all other pages keep the stricter policy |

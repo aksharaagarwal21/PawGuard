@@ -48,6 +48,9 @@ Thumbs.db
 
 # Copied at build time from node_modules (scripts/copy-maplibre-worker.mjs)
 apps/web/public/vendor/maplibre/
+apps/web/public/vendor/zxing/
+# Signing keys (root key, master key) — never committed
+/secrets/
 
 # Derived research artefacts (embeddings, caches) — reproducible from manifests
 data/derived/

@@ -99,6 +99,14 @@ class Settings(BaseSettings):
     whatsapp_provider: str = "meta"
     twilio_whatsapp_from: str | None = None  # e.g. whatsapp:+1… (the sender of the successful trial request)
     twilio_content_sid: str | None = None  # HX… from the Twilio Console's WhatsApp try-out page
+    # Signed vaccination certificates (ADR 0010/0011). Master key seals clinic private keys (32 bytes, base64, or a
+    # file holding it); the root key file signs the trust and revocation lists. Neither is ever in the database.
+    signing_master_key: str | None = None
+    signing_master_key_file: str | None = None
+    root_key_file: str | None = None
+    root_key_passphrase: str | None = None
+    root_key_passphrase_file: str | None = None
+    verify_stale_after_days: int = 7  # the verifier warns when its cached lists are older than this
     # Certificate OCR: tesseract (local, eng+hin+tam) | gemini (demo organisations only) | off.
     ocr_engine: str = "tesseract"
     tesseract_cmd: str | None = None

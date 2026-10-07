@@ -33,6 +33,9 @@ const csp = [
   "form-action 'self'",
   "object-src 'none'",
 ].join("; ");
+// The certificate verifier's fallback QR reader is WebAssembly (ZXing). 'wasm-unsafe-eval' allows compiling
+// WebAssembly only — JavaScript eval stays blocked — and only on the verify page.
+const verifyCsp = csp.replace("script-src 'self' 'unsafe-inline'", "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'");
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -62,6 +65,7 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=()" },
         ],
       },
+      { source: "/:locale(en|ta|hi)/verify", headers: [{ key: "Content-Security-Policy", value: verifyCsp }] },
     ];
   },
 };

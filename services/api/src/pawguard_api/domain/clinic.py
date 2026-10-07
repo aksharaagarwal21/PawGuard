@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from pawguard_api.capabilities import Cap
 from pawguard_api.contracts import VaccinationCreate
 from pawguard_api.deps import OrgContext
-from pawguard_api.domain import reminders, vaccinations
+from pawguard_api.domain import credentials, reminders, vaccinations
 from pawguard_api.domain.common import record_audit
 from pawguard_api.errors import FieldError, Forbidden, NotFound, Unprocessable
 from pawguard_api.models import VaccinationEvent
@@ -139,6 +139,7 @@ def record_clinic_vaccination(db: Session, ctx: OrgContext, data: ClinicVaccinat
     event.verified_at = text("now()")
     db.flush()
     reminders.after_review(db, ctx.org_id, event, "verified", data.next_due_on)
+    credentials.try_issue(db, credentials.Actor(ctx.org_id, ctx.user_id, ctx.request_id), event_id)
     record_audit(db, ctx, "vaccination_event.recorded_at_clinic", "vaccination_event", event_id,
                  {"animal_id": str(data.animal_id), "next_due_source": event.next_review_source})
     return event_id

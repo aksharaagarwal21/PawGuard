@@ -30,7 +30,8 @@
     "organisation": "संगठन",
     "switchOrganisation": "संगठन बदलें",
     "animals": "पशु",
-    "tasks": "कार्य"
+    "tasks": "कार्य",
+    "verifyCertificate": "प्रमाणपत्र जाँचें"
   },
   "landing": {
     "headline": "लोगों की देखभाल। सामुदायिक पशुओं की सुरक्षा।",
@@ -57,5 +58,8 @@
     "veterinary_reviewer": "पशु-चिकित्सा समीक्षक",
     "programme_coordinator": "कार्यक्रम समन्वयक",
     "org_admin": "संगठन व्यवस्थापक"
+  },
+  "verify": {
+    "title": "टीकाकरण प्रमाणपत्र जाँचें"
   }
 }
