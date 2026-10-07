@@ -12,7 +12,9 @@ These checks assist the vet; they never verify or reject anything on their own, 
 
 import io
 import re
+import time
 from datetime import UTC, date, datetime, timedelta
+from types import SimpleNamespace
 from typing import Any
 from uuid import UUID
 
@@ -21,7 +23,7 @@ from sqlalchemy import text
 from pawguard_api.capabilities import Cap
 from pawguard_api.deps import OrgContext
 from pawguard_api.domain import certificates
-from pawguard_api.errors import Forbidden, NotFound
+from pawguard_api.errors import ApiError, Forbidden, NotFound
 from pawguard_api.integrations import cose, ocr
 from pawguard_api.logging import get_logger
 from pawguard_api.settings import get_settings
@@ -162,21 +164,29 @@ def compare(event: Any, read: dict[str, Any]) -> list[dict[str, Any]]:
     given: date | None = read.get("administered_on")
     if given is None:
         out.append(_check("date", "warn", "Date given: not found on the document — it may not be a vaccination "
-                                          "certificate."))
+                                          "certificate.", code="date_missing"))
     elif event.administered_on is None:
         out.append(_check("date", "info", f"Certificate shows the date given as {given:%d %b %Y}; none was entered."))
     elif given == event.administered_on:
         out.append(_check("date", "ok", f"Date given matches the certificate ({given:%d %b %Y})."))
     else:
         out.append(_check("date", "bad", f"Date given differs: certificate shows {given:%d %b %Y}, record says "
-                                         f"{event.administered_on:%d %b %Y}."))
+                                         f"{event.administered_on:%d %b %Y}.", code="date_differs",
+                          owner=f"The certificate shows the vaccine was given on {given:%d %b %Y}, but you entered "
+                                f"{event.administered_on:%d %b %Y}. Check the date."))
     product = read.get("product_text")
     entered = event.product_name or event.product_text
     if not product:
-        out.append(_check("vaccine", "warn", "Vaccine: not found on the document."))
+        out.append(_check("vaccine", "warn", "Vaccine: not found on the document.", code="vaccine_missing"))
     elif entered and (str(read.get("product_id")) == str(event.product_id) or _norm(product) in _norm(entered)
                       or _norm(entered).startswith(_norm(product)[:6])):
         out.append(_check("vaccine", "ok", f"Vaccine matches the certificate ({product})."))
+    elif read.get("product_id") and event.product_id and str(read["product_id"]) != str(event.product_id):
+        # The reading matched one of the clinic's own vaccines, and a different one was chosen: reliable enough to stop.
+        out.append(_check("vaccine", "bad", f"Vaccine differs: certificate shows “{product}”, record says "
+                                            f"“{entered}”.", code="vaccine_differs",
+                          owner=f"The certificate is for “{product}”, but you chose “{entered}”. Choose the vaccine "
+                                f"shown on the certificate."))
     else:
         out.append(_check("vaccine", "warn", f"Vaccine differs: certificate mentions “{product}”, record says "
                                              f"“{entered or 'not recorded'}”."))
@@ -203,17 +213,33 @@ select e.id, e.animal_id, e.administered_on, e.product_id, e.product_text, e.lot
  where e.id = :e"""
 
 
+_FILES = "select m.id, m.state, m.detected_mime, m.derivatives, m.sha256 from app.media_assets m"
+_NO_EVENT = UUID(int=0)
+
+
 def check_event(db: Any, ctx: OrgContext, event_id: UUID) -> dict[str, Any]:
     if not (ctx.can(Cap.VACCINATION_REVIEW) or ctx.can(Cap.ANIMAL_READ)):
         raise Forbidden("Clinic staff only.", code="staff_only")
     event = db.execute(text(_EVENT), {"e": event_id}).first()
     if event is None:
         raise NotFound("Vaccination record not found.", code="vaccination_event_not_found")
+    media_rows = db.execute(text(_FILES + """ join app.vaccination_evidence ve on ve.media_id = m.id
+                                             where ve.event_id = :e order by m.created_at"""), {"e": event_id}).all()
+    files = check_files(db, ctx, event, media_rows, event_id)
+    worst = {"bad": 3, "warn": 2, "unavailable": 1, "info": 0, "ok": 0}
+    level = max((worst[c["status"]] for f in files for c in f["checks"]), default=0)
+    for f in files:  # owner wording goes to the review page, which pre-fills the reason shown to the submitter
+        for c in f["checks"]:
+            c["owner_message"] = c.pop("owner", None)
+            c.pop("code", None)
+    return {"summary": {3: "problems", 2: "check", 1: "partial", 0: "consistent"}[level], "files": files}
+
+
+def check_files(db: Any, ctx: OrgContext, event: Any, media_rows: list[Any], event_id: UUID) -> list[dict[str, Any]]:
+    """The checks for each evidence file of a record — saved (`event_id`) or about to be submitted (`_NO_EVENT`).
+    `event` needs animal_id, animal_reference, administered_on, product_id/product_name/product_text, lot fields.
+    Checks the owner gate acts on carry a `code`, and an `owner` wording that names no other pet or record."""
     s = get_settings()
-    media_rows = db.execute(text("""
-        select m.id, m.state, m.detected_mime, m.derivatives, m.sha256
-          from app.vaccination_evidence ve join app.media_assets m on m.id = ve.media_id
-         where ve.event_id = :e order by m.created_at"""), {"e": event_id}).all()
     files = []
     for m in media_rows:
         checks: list[dict[str, Any]] = []
@@ -233,29 +259,44 @@ def check_event(db: Any, ctx: OrgContext, event_id: UUID) -> dict[str, Any]:
         except Exception as exc:  # QR reading is one pass of several; the others still run
             log.warning("evidence_qr_failed", error=type(exc).__name__)
             qr = None
+        signed_ok = False
         if qr and qr.strip().startswith(cose.PREFIX):
             result = verify_signed(db, qr)
             status, template = SIGNED_TEXT[result["status"]]
-            checks.append(_check("signature", status, template.format(clinic=result.get("clinic") or "a clinic"),
-                                 certificate=result.get("certificate")))
             cert = result.get("certificate")
+            signed_ok = result["status"] == "genuine"
+            gate = {"revoked": "The clinic has cancelled or replaced this certificate. Upload the current one.",
+                    "altered": "This certificate was changed after the clinic signed it.",
+                    "unknown_clinic": "This certificate was not issued by a registered clinic.",
+                    "key_revoked": "This certificate's clinic signature is no longer trusted.",
+                    "outside_validity": "This certificate's clinic signature is not valid."}.get(result["status"])
+            checks.append(_check("signature", status, template.format(clinic=result.get("clinic") or "a clinic"),
+                                 certificate=cert, **({"code": "signed_bad", "owner": gate} if gate else {})))
             if cert and result["status"] in ("genuine", "revoked"):
                 if cert["pet_reference"] != event.animal_reference:
+                    signed_ok = False
                     checks.append(_check("signature", "bad", f"The signed certificate is for another pet "
-                                                             f"({cert['pet_name'] or cert['pet_reference']})."))
+                                                             f"({cert['pet_name'] or cert['pet_reference']}).",
+                                         code="signed_other_pet", owner="This signed certificate is for a "
+                                                                        "different pet."))
                 elif event.administered_on and cert["given_on"] != event.administered_on.isoformat():
                     checks.append(_check("signature", "warn", "The signed certificate shows a different date given "
                                                               f"({cert['given_on']})."))
         elif qr and (card := _pet_card(db, qr)) is not None:
+            not_cert = ("This is a PawGuard pet card, not a vaccination certificate. Upload the certificate from "
+                        "your vet.")
             if card["animal_id"] != str(event.animal_id):
                 checks.append(_check("signature", "bad", f"This is the PawGuard pet card of another pet "
-                                                         f"({card['name']}), not a vaccination certificate."))
+                                                         f"({card['name']}), not a vaccination certificate.",
+                                     code="pet_card", owner=not_cert))
             else:
                 checks.append(_check("signature", "warn", "This is the pet's own PawGuard card, not a vaccination "
-                                                          "certificate from a vet."))
+                                                          "certificate from a vet.", code="pet_card", owner=not_cert))
         elif qr and "/card/" in qr:
             checks.append(_check("signature", "warn", "This document shows a PawGuard pet-card QR from another clinic "
-                                                      "or an old card — it is not a vaccination certificate."))
+                                                      "or an old card — it is not a vaccination certificate.",
+                                 code="pet_card", owner="This is a PawGuard pet card, not a vaccination certificate. "
+                                                        "Upload the certificate from your vet."))
         elif qr:
             checks.append(_check("signature", "info", "A QR code was found, but it is not a signed PawGuard "
                                                       "certificate."))
@@ -281,22 +322,69 @@ def check_event(db: Any, ctx: OrgContext, event_id: UUID) -> dict[str, Any]:
         if read is not None:
             engine = "Gemini" if read.get("engine") == "gemini" else "OCR"
             checks.append(_check("reading", "info", f"Read by {engine} — compare with the image before deciding."))
-            checks.extend(compare(event, read))
+            compared = compare(event, read)
+            checks.extend(compared)
+            codes = {c.get("code") for c in compared}
+            if not signed_ok and {"date_missing", "vaccine_missing"} <= codes:
+                checks.append(_check("reading", "warn", "Neither a vaccination date nor a vaccine name was found.",
+                                     code="not_certificate",
+                                     owner="We couldn't find a vaccination date or a vaccine name on this file, so it "
+                                           "doesn't look like a vaccination certificate. Upload a clear photo or PDF "
+                                           "of the certificate page."))
         # 3. The same file used for another record
         if m.sha256:
             reused = db.execute(text("""
-                select distinct a.reference_code, e2.administered_on from app.media_assets m2
+                select distinct a.reference_code, e2.administered_on, (e2.animal_id <> :a) as other_pet
+                  from app.media_assets m2
                   join app.vaccination_evidence ve2 on ve2.media_id = m2.id
                   join app.animal_vaccination_events e2 on e2.id = ve2.event_id
                   join app.animals a on a.id = e2.animal_id
                  where m2.sha256 = :h and m2.id <> :m and ve2.event_id <> :e limit 5"""),
-                                {"h": m.sha256, "m": m.id, "e": event_id}).all()
+                                {"h": m.sha256, "m": m.id, "e": event_id, "a": event.animal_id}).all()
             if reused:
                 refs = ", ".join(r.reference_code for r in reused)
-                checks.append(_check("reuse", "bad", f"The same file was already used as evidence for {refs}."))
+                other = any(r.other_pet for r in reused)
+                checks.append(_check("reuse", "bad", f"The same file was already used as evidence for {refs}.",
+                                     **({"code": "reused_other_pet",
+                                         "owner": "This file was already used as the certificate for a different "
+                                                  "pet. Upload this pet's own certificate."} if other else {})))
             else:
                 checks.append(_check("reuse", "ok", "This file has not been used for any other record."))
         files.append({"media_id": m.id, "kind": kind, "checks": checks})
-    worst = {"bad": 3, "warn": 2, "unavailable": 1, "info": 0, "ok": 0}
-    level = max((worst[c["status"]] for f in files for c in f["checks"]), default=0)
-    return {"summary": {3: "problems", 2: "check", 1: "partial", 0: "consistent"}[level], "files": files}
+    return files
+
+
+# ---- the owner gate ------------------------------------------------------------------------------------------------
+
+GATE_CODES = {"signed_bad", "signed_other_pet", "pet_card", "not_certificate", "date_differs", "vaccine_differs",
+              "reused_other_pet"}
+
+
+def gate_owner_submission(db: Any, ctx: OrgContext, animal_id: UUID, administered_on: date, product_id: UUID | None,
+                          product_text: str | None, media_ids: list[UUID]) -> list[str]:
+    """Before an owner's record reaches the vet: the reasons (owner wording) it can't be accepted, or []. Only clear
+    failures stop it — another pet's card or certificate, a changed or cancelled signed certificate, a file with no
+    vaccination date or vaccine on it, a date that differs from the certificate, or a file already used for another
+    pet. Anything uncertain still goes to the vet, who decides."""
+    animal = db.execute(text("select id, reference_code from app.animals where id = :a"), {"a": animal_id}).one()
+    product_name = db.execute(text("select name from app.vaccine_products where id = :p"),
+                              {"p": product_id}).scalar() if product_id else None
+    record = SimpleNamespace(animal_id=animal.id, animal_reference=animal.reference_code,
+                             administered_on=administered_on, product_id=product_id, product_name=product_name,
+                             product_text=product_text, lot_number=None, lot_text=None)
+    rows = db.execute(text(_FILES + " where m.id = any(:ids) order by m.created_at"), {"ids": list(media_ids)}).all()
+    for _ in range(15):  # the upload scan takes a few seconds; never let an unchecked file through
+        if all(r.state == "approved" for r in rows):
+            break
+        time.sleep(1)
+        rows = db.execute(text(_FILES + " where m.id = any(:ids) order by m.created_at"),
+                          {"ids": list(media_ids)}).all()
+    else:
+        raise ApiError("The certificate is still being checked — send it again in a few seconds.",
+                       code="media_not_ready", status_code=409)
+    reasons: list[str] = []
+    for f in check_files(db, ctx, record, rows, _NO_EVENT):
+        for c in f["checks"]:
+            if c.get("code") in GATE_CODES and c.get("owner") and c["owner"] not in reasons:
+                reasons.append(c["owner"])
+    return reasons

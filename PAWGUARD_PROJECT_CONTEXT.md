@@ -872,3 +872,18 @@ empty — add points with details; (3) remove "demo / fictional" wording everywh
   "(Sample data — not for real medical use.)". All 34 active sample certificates were re-signed (`issue_replacing`) so
   QR payloads carry the new names; Bruno's rabies record re-issued once more so the "cancelled" sample also shows them;
   trust list version bumped. Tests and `docs/DEMO_GUIDE.md` updated to the new names.
+
+### 21.9 Automatic evidence gate for owner uploads (7 Oct 2026)
+User asked that clearly wrong uploads never reach the vet, with failures shown at upload time, and that owner and
+vet are linked end to end. The vet still makes the final "Verified" decision (the app's core promise).
+* `evidence_check.check_files()` is shared by the vet's check and `gate_owner_submission()`, which runs inside
+  `petcare._submit_owner_record` before anything is saved. It refuses (422 `evidence_rejected`, field
+  `certificate_media_ids`, owner wording that names no other pet or record) on: another pet's or the pet's own
+  PawGuard card, a changed/cancelled/untrusted signed certificate, a signed certificate for another pet, a file with
+  neither a vaccination date nor a vaccine name, a date different from the certificate, a different clinic vaccine
+  than the certificate shows, or a file already used for a different pet. Uncertain results still go to the vet. It
+  waits up to 15 s for upload scanning, then 409 `media_not_ready`.
+* Owner form (`owner-record-form.tsx`): certificate read automatically after upload (retries while the scan runs; PDFs
+  read from page 1), vaccine and date pre-filled; a refusal returns to the certificate step with the reasons.
+* Vet (`review-actions.tsx`): "Request correction"/"Reject" pre-fill the reason from the check's `owner_message`s.
+* Per-pet sample certificates: `apps/web/public/demo/certificate-{bruno,misty,coco}.jpg` (marked SAMPLE, 06 Oct 2026).

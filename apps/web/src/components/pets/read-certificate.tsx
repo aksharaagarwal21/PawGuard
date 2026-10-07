@@ -29,15 +29,32 @@ export function ReadCertificate({ mediaId, onDraft }: { mediaId: string | undefi
     return () => cancelAnimationFrame(raf);
   }, []);
 
+  // Read each new certificate as soon as it is uploaded: the form pre-fills, the owner checks it.
+  const [autoRead, setAutoRead] = useState<string | null>(null);
+  useEffect(() => {
+    if (!available || !mediaId || autoRead === mediaId) return;
+    const id = window.setTimeout(() => {
+      setAutoRead(mediaId);
+      void read();
+    }, 0);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `read` is recreated each render; mediaId drives this
+  }, [available, mediaId, autoRead]);
+
   if (!available || !mediaId) return null;
 
-  async function read() {
+  async function read(attempt = 0) {
     if (!mediaId) return;
     setBusy(true);
     setError(null);
     const { data, error: apiError } = await browserApi.POST("/api/v1/my/certificates/{media_id}/read", {
       params: { path: { media_id: mediaId } },
     });
+    if (!data && parseApiError(apiError).code === "media_not_ready" && attempt < 20) {
+      // The server is still checking the upload (a few seconds): try again shortly.
+      window.setTimeout(() => void read(attempt + 1), 1500);
+      return;
+    }
     setBusy(false);
     if (!data) {
       const p = parseApiError(apiError);
@@ -51,7 +68,7 @@ export function ReadCertificate({ mediaId, onDraft }: { mediaId: string | undefi
   const fmt = (d: string | null | undefined) => (d ? formatPartialDate(d, "day", locale, "") : null);
   return (
     <div className="space-y-2 rounded-control border border-dashed border-control p-3">
-      <Button type="button" size="sm" variant="secondary" onClick={read} disabled={busy}>
+      <Button type="button" size="sm" variant="secondary" onClick={() => void read()} disabled={busy}>
         <ScanText aria-hidden className="size-4" />
         {busy ? t("reading") : t("read")}
       </Button>

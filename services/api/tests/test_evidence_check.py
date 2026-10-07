@@ -42,3 +42,10 @@ def test_card_link_pattern():
     token = "x" * 40
     assert CARD_LINK.search(f"https://example.org/en/card/{token}").group(1) == token
     assert CARD_LINK.search("https://example.org/en/card/short") is None
+
+
+def test_a_different_clinic_vaccine_is_a_clear_mismatch():
+    read = {"administered_on": date(2026, 9, 1), "product_text": "Rabies vaccine", "product_id": "p-rabies"}
+    checks = compare(_event(product_id="p-dhppi", product_name="DHPPi combination"), read)
+    vaccine = next(c for c in checks if c["kind"] == "vaccine")
+    assert vaccine["status"] == "bad" and vaccine["code"] == "vaccine_differs" and "Rabies vaccine" in vaccine["owner"]

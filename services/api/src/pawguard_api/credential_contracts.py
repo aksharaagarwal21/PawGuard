@@ -78,6 +78,7 @@ class EvidenceCheckItemOut(Out):
     status: Literal["ok", "warn", "bad", "info", "unavailable"]
     message: str
     certificate: SignedSummaryOut | None = None
+    owner_message: str | None = None  # wording safe to show the submitter (names no other pet or record)
 
 
 class EvidenceFileOut(Out):

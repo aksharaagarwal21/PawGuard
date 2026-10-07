@@ -2860,6 +2860,17 @@
             "title": "Message",
             "type": "string"
           },
+          "owner_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Message"
+          },
           "status": {
             "enum": [
               "ok",
@@ -2876,7 +2887,8 @@
           "kind",
           "status",
           "message",
-          "certificate"
+          "certificate",
+          "owner_message"
         ],
         "title": "EvidenceCheckItemOut",
         "type": "object"

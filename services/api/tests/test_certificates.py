@@ -83,7 +83,8 @@ def test_owner_reads_own_certificate_into_a_draft(client, owner, owner_engine):
 def test_refusals(client, owner, owner_engine, monkeypatch):
     pdf = _media(owner_engine, owner.org, owner.a, mime="application/pdf")
     r = client.post(f"/api/v1/my/certificates/{pdf}/read", headers=_h(owner.tok["a"]))
-    assert r.status_code == 422 and r.json()["error"]["code"] == "pdf_not_supported"
+    # PDFs are read from page 1 now; this test PDF has no stored file, so it can't be read.
+    assert r.status_code == 422 and r.json()["error"]["code"] == "no_display_copy"
     pending = _media(owner_engine, owner.org, owner.a, state="validating")
     r = client.post(f"/api/v1/my/certificates/{pending}/read", headers=_h(owner.tok["a"]))
     assert r.status_code == 409 and r.json()["error"]["code"] == "media_not_ready"

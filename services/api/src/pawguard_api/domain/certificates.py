@@ -65,19 +65,15 @@ def read_own(p: Principal, media_id: UUID, request_id: str | None = None) -> dic
 def _read(db: Any, ctx: OrgContext, media: Any, s: Any) -> dict[str, Any]:
     if media.purpose != "vaccination_evidence":
         raise ApiError("This file isn't a certificate.", code="not_a_certificate", status_code=422)
-    if media.detected_mime == "application/pdf":
-        raise ApiError("PDF certificates can't be read automatically yet — type the details, or upload a photo.",
-                       code="pdf_not_supported", status_code=422)
     if media.state != "approved":
         raise ApiError("The file is still being checked — try again in a few seconds.", code="media_not_ready",
                        status_code=409)
-    key = (media.derivatives or {}).get("display")
-    if not key:
-        raise ApiError("This file can't be read.", code="no_display_copy", status_code=422)
-    _rate_limit(str(ctx.user_id))
-    from pawguard_api.integrations.storage import get_storage
+    from pawguard_api.domain.evidence_check import page_image  # photo display copy, or page 1 of a PDF
 
-    image = get_storage().download(key, MAX_BYTES)
+    _rate_limit(str(ctx.user_id))
+    image = page_image(media)
+    if not image:
+        raise ApiError("This file can't be read.", code="no_display_copy", status_code=422)
     return draft_from_image(db, ctx, media.id, image, s)
 
 

@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 from sqlalchemy import text
 
+from pawguard_api.domain import evidence_check
 from pawguard_api.domain.reminders import (
     Record,
     current_reminder,
@@ -176,6 +177,36 @@ def test_owner_record_is_unverified_and_owner_cannot_verify(client, clinic, owne
     assert bad.status_code == 422
     # Owner B cannot add a record to owner A's pet.
     assert _owner_record(client, clinic, owner_engine, pet, who="owner_b").status_code == 404
+
+
+def test_clear_evidence_failures_never_reach_the_vet(client, clinic, owner_engine, monkeypatch):
+    """The automatic check stops clear failures at submission, in wording that names no other pet; anything
+    uncertain still goes to the vet, who decides."""
+    pet = _pet(client, clinic)
+    seen = {}
+
+    def card_of_another_pet(db, ctx, record, rows, event_id):
+        seen.update(animal=record.animal_id, event=event_id, files=len(rows))
+        return [{"media_id": rows[0].id, "kind": "photo", "checks": [
+            {"kind": "signature", "status": "bad", "message": "PawGuard pet card of another pet (Laxmi)",
+             "code": "pet_card", "owner": "This is a PawGuard pet card, not a vaccination certificate."}]}]
+
+    monkeypatch.setattr(evidence_check, "check_files", card_of_another_pet)
+    r = _owner_record(client, clinic, owner_engine, pet)
+    assert r.status_code == 422 and r.json()["error"]["code"] == "evidence_rejected", r.text
+    message = r.json()["error"]["fields"][0]["message"]
+    assert "pet card" in message and "Laxmi" not in message
+    assert seen == {"animal": uuid.UUID(pet["id"]), "event": evidence_check._NO_EVENT, "files": 1}
+    detail = client.get(f"/api/v1/my/pets/{pet['id']}", headers=_h(clinic.tokens["owner_a"])).json()
+    assert detail["timeline"] == [] and detail["awaiting_verification"] == 0  # nothing saved, nothing to review
+
+    def only_uncertain(db, ctx, record, rows, event_id):
+        return [{"media_id": rows[0].id, "kind": "photo", "checks": [
+            {"kind": "date", "status": "warn", "message": "Date given: not found", "code": "date_missing"},
+            {"kind": "reuse", "status": "bad", "message": "Used before for this pet's record PG-1"}]}]
+
+    monkeypatch.setattr(evidence_check, "check_files", only_uncertain)
+    assert _owner_record(client, clinic, owner_engine, pet).status_code == 201
 
 
 def test_vet_due_date_creates_reminders_and_rescheduling_replaces_them(client, clinic, owner_engine):

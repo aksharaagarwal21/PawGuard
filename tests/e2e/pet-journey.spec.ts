@@ -12,7 +12,8 @@ import { DEMO, signIn } from "./helpers";
  */
 test.skip(({ isMobile }) => isMobile, "journey changes demo data, so it runs once (desktop project; it covers 390 px itself)");
 
-const CERT = path.resolve(import.meta.dirname, "../fixtures/synthetic-certificate.jpg");
+// Coco's own sample certificate: the automatic check refuses a file used for another pet or with no vaccine on it.
+const CERT = path.resolve(import.meta.dirname, "../../apps/web/public/demo/certificate-coco.jpg");
 
 function inDays(days: number): string {
   const d = new Date(Date.now() + days * 86_400_000);

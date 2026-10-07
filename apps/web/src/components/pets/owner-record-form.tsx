@@ -51,9 +51,13 @@ export function OwnerRecordForm({
   const [certs, setCerts] = useState<string[]>([]);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [busy, setBusy] = useState(false);
+  const [rejected, setRejected] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [step, setStep] = useState(0);
-  const onCerts = useCallback((ids: string[]) => setCerts(ids), []);
+  const onCerts = useCallback((ids: string[]) => {
+    setCerts(ids);
+    setRejected(null);
+  }, []);
   // OCR draft from the certificate: pre-fills vaccine and date for the person to check.
   function applyDraft(d: CertificateDraft) {
     const match = d.product_id ? products.find((p) => p.id === d.product_id) : undefined;
@@ -103,9 +107,17 @@ export function OwnerRecordForm({
     setBusy(false);
     if (error) {
       const parsed = parseApiError(error);
+      if (parsed.code === "evidence_rejected") {
+        // The automatic check stopped it before it reached the vet: back to the certificate, with the reasons.
+        setRejected(parsed.fields.certificate_media_ids ?? parsed.message);
+        setErrors({});
+        if (stepped) setStep(1);
+        return;
+      }
       setErrors(Object.keys(parsed.fields).length ? parsed.fields : { form: parsed.message || tc("tryAgainLater") });
       return;
     }
+    setRejected(null);
     setSaved(true);
     onDone?.();
     router.refresh();
@@ -158,6 +170,12 @@ export function OwnerRecordForm({
         {errors.certificate_media_ids ? (
           <p className="text-sm font-semibold text-urgent">{errors.certificate_media_ids}</p>
         ) : null}
+        {rejected ? (
+          <Notice tone="urgent" title={t("rejectedTitle")} live="alert">
+            <p>{rejected}</p>
+            <p className="mt-1 text-sm">{t("rejectedNext")}</p>
+          </Notice>
+        ) : null}
         <Uploader purpose="vaccination_evidence" allowPdf multiple idPrefix={`${prefix}-cert`} orgId={clinicOrgId} onChange={onCerts} />
         <ReadCertificate mediaId={certs[0]} onDraft={applyDraft} />
       </fieldset>
@@ -179,7 +197,7 @@ export function OwnerRecordForm({
           </Button>
         ) : null}
         <Button type="submit" disabled={busy}>
-          {stepped && step < 2 ? tc("continue") : busy ? t("saving") : reminder ? t("submitDone") : t("submit")}
+          {stepped && step < 2 ? tc("continue") : busy ? t("checking") : reminder ? t("submitDone") : t("submit")}
         </Button>
       </div>
     </form>

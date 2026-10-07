@@ -21,9 +21,10 @@ from pawguard_api.capabilities import Cap
 from pawguard_api.contracts import AnimalCreate, ObservationCreate, VaccinationCreate
 from pawguard_api.db import user_tx
 from pawguard_api.deps import OrgContext, load_org_context
-from pawguard_api.domain import animals, reminders, vaccinations
+from pawguard_api.domain import animals, evidence_check, reminders, vaccinations
 from pawguard_api.domain.common import record_audit
 from pawguard_api.errors import FieldError, Forbidden, NotFound, Unprocessable
+from pawguard_api.logging import get_logger
 from pawguard_api.models import Animal, AnimalCaregiver, MediaAsset
 from pawguard_api.pet_contracts import (
     ClinicOut,
@@ -36,6 +37,8 @@ from pawguard_api.pet_contracts import (
     ReminderPreviewOut,
     TimelineEntryOut,
 )
+
+log = get_logger(__name__)
 
 LIVE_OWNER = """c.relationship = 'owner' and c.linked_user_id = :u
                 and (c.valid_to is null or c.valid_to > current_date)"""
@@ -237,6 +240,13 @@ def _submit_owner_record(db: Session, ctx: OrgContext, animal_id: UUID, data: Ow
                             fields=[FieldError(field="administered_on", code="date_in_future",
                                                message="Date is in the future.")])
     _own_media(db, ctx, data.certificate_media_ids, "certificate_media_ids")
+    reasons = evidence_check.gate_owner_submission(db, ctx, animal_id, data.administered_on, data.product_id,
+                                                   data.product_text, data.certificate_media_ids)
+    if reasons:  # clear failures never reach the vet's queue; the owner sees why at once
+        log.info("owner_evidence_rejected", reasons=len(reasons))
+        raise Unprocessable("This certificate can't be sent to your vet.", code="evidence_rejected",
+                            fields=[FieldError(field="certificate_media_ids", code="evidence_rejected",
+                                               message=" ".join(reasons))])
     return vaccinations.submit(db, elevated(ctx, Cap.VACCINATION_SUBMIT), VaccinationCreate(
         animal_id=animal_id, date_precision="day", administered_on=data.administered_on,
         product_id=data.product_id, product_text=None if data.product_id else data.product_text,

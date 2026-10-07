@@ -31,6 +31,34 @@ export function ReviewActions({
   const [nextDue, setNextDue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [prefilled, setPrefilled] = useState(false);
+
+  /** Correction or rejection: start the reason from the AI evidence check's findings (wording safe to show the
+   *  submitter — it never names another pet or record). The vet edits or replaces it. */
+  async function open(kind: Exclude<Outcome, "verified">) {
+    setError(null);
+    setReason("");
+    setPrefilled(false);
+    setOutcome(kind);
+    const { data } = await browserApi.GET("/api/v1/vaccination-events/{event_id}/evidence-check", {
+      params: { path: { event_id: eventId } },
+    });
+    if (!data) return;
+    const lines: string[] = [];
+    for (const f of data.files)
+      for (const c of f.checks) {
+        // Owner-safe wording first; otherwise only a field the certificate shows differently (never "not found"
+        // lines, which the combined "doesn't look like a certificate" line already covers).
+        const line =
+          c.owner_message ??
+          (["date", "vaccine", "batch"].includes(c.kind) && c.message.includes("differs") ? c.message : null);
+        if (line && !lines.includes(line)) lines.push(line);
+      }
+    if (!lines.length) return;
+    const text = [t("prefillIntro"), ...lines.map((l) => `• ${l}`), t("prefillOutro")].join("\n");
+    setReason((current) => (current.trim() ? current : text));
+    setPrefilled(true);
+  }
 
   async function submit() {
     if (!outcome) return;
@@ -68,10 +96,10 @@ export function ReviewActions({
   return (
     <div className="sticky bottom-20 flex flex-wrap gap-3 rounded-card border border-divider bg-surface p-4 shadow-card md:bottom-4">
       <Button onClick={() => { setError(null); setReason(""); setNextDue(suggestedNextDue ?? ""); setOutcome("verified"); }}>{t("verify")}</Button>
-      <Button variant="secondary" onClick={() => { setError(null); setReason(""); setOutcome("needs_correction"); }}>
+      <Button variant="secondary" onClick={() => void open("needs_correction")}>
         {t("requestCorrection")}
       </Button>
-      <Button variant="danger" onClick={() => { setError(null); setReason(""); setOutcome("rejected"); }}>
+      <Button variant="danger" onClick={() => void open("rejected")}>
         {t("reject")}
       </Button>
       <Dialog
@@ -92,8 +120,13 @@ export function ReviewActions({
         }
       >
         {outcome && outcome !== "verified" ? (
-          <Field id="review-reason" label={t("reasonLabel")} error={error ?? undefined}>
-            {(aria) => <Textarea {...aria} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} />}
+          <Field
+            id="review-reason"
+            label={t("reasonLabel")}
+            hint={prefilled ? t("prefillHint") : undefined}
+            error={error ?? undefined}
+          >
+            {(aria) => <Textarea {...aria} rows={7} value={reason} onChange={(e) => setReason(e.target.value)} maxLength={2000} />}
           </Field>
         ) : (
           <>

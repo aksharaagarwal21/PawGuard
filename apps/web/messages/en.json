@@ -654,7 +654,10 @@
     "staleRow": "Someone else reviewed or changed this record. The queue has been refreshed.",
     "nextDueLabel": "Next due date",
     "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a standard schedule, that date is used and labelled “Standard schedule — confirm with your vet”.",
-    "nextDueFromCertificate": "Pre-filled from the certificate draft — check it."
+    "nextDueFromCertificate": "Pre-filled from the certificate draft — check it.",
+    "prefillIntro": "Our automatic check found problems with the certificate you sent:",
+    "prefillOutro": "Please upload the vaccination certificate from your vet for this pet.",
+    "prefillHint": "Pre-filled from the AI evidence check. Edit it before sending."
   },
   "tasks": {
     "title": "Tasks",
@@ -1457,7 +1460,10 @@
       "givenByHint": "The vet or clinic named on the certificate.",
       "certificateCount": "{count, plural, =0 {None} one {# file} other {# files}}",
       "savedNext": "Until a vet at {clinic} checks it, it shows as “Waiting for vet”.",
-      "savedNextGeneric": "Until the clinic's vet checks it, it shows as “Waiting for vet”."
+      "savedNextGeneric": "Until the clinic's vet checks it, it shows as “Waiting for vet”.",
+      "checking": "Checking the certificate…",
+      "rejectedTitle": "This certificate wasn't sent to your vet",
+      "rejectedNext": "Nothing was saved. Remove this file, upload the right certificate, and send it again."
     },
     "card": {
       "open": "Vaccination card (QR)",

@@ -3623,6 +3623,8 @@ export interface components {
             kind: "file" | "signature" | "reading" | "date" | "vaccine" | "batch" | "reuse";
             /** Message */
             message: string;
+            /** Owner Message */
+            owner_message: string | null;
             /**
              * Status
              * @enum {string}
