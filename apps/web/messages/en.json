@@ -1798,12 +1798,15 @@
       "turnOn": "Turn on notifications on this device",
       "turnOff": "Turn off on this device",
       "onHere": "On for this device.",
-      "failed": "Notifications couldn't be turned on — try again.",
+      "failed": "Notifications couldn't be turned on. Allow notifications for this site when the browser asks, then try again.",
       "state": {
         "unsupported": "This browser can't show notifications. Try Chrome on Android, or a current desktop browser.",
         "ios-install": "On iPhone or iPad: tap Share → Add to Home Screen, then open PawGuard from that icon and turn notifications on there (iOS 16.4 or later).",
         "denied": "Notifications are blocked for this site. Allow them in your browser's site settings, then reload."
-      }
+      },
+      "turningOn": "Turning on…",
+      "brave": "Brave blocked the browser's push service. Open brave://settings/privacy, turn on \"Use Google services for push messaging\", reload this page and try again — or use Chrome or Edge.",
+      "braveHint": "Using Brave? Turn on \"Use Google services for push messaging\" in brave://settings/privacy first."
     },
     "whatsapp": {
       "title": "WhatsApp",

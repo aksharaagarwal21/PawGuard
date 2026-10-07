@@ -22,7 +22,9 @@ const isDev = process.env.NODE_ENV !== "production";
 // is added (tracked for Phase 14). Everything else is restricted to this origin plus Storage and map tiles.
 const csp = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  // 'wasm-unsafe-eval': the certificate verifier's QR reader is WebAssembly. It allows compiling WebAssembly only
+  // (JavaScript eval stays blocked) and must be site-wide: in-app navigation keeps the first page's policy.
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${supabasePublic} ${tileOrigin}`.trim(),
   "font-src 'self'",
@@ -33,9 +35,6 @@ const csp = [
   "form-action 'self'",
   "object-src 'none'",
 ].join("; ");
-// The certificate verifier's fallback QR reader is WebAssembly (ZXing). 'wasm-unsafe-eval' allows compiling
-// WebAssembly only — JavaScript eval stays blocked — and only on the verify page.
-const verifyCsp = csp.replace("script-src 'self' 'unsafe-inline'", "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'");
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -62,14 +61,10 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=()" },
+          // Microphone for voice questions to the assistant: our own pages only, and the browser still asks the
+          // person. Site-wide because in-app navigation keeps the policy of the first page loaded.
+          { key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=(self)" },
         ],
-      },
-      { source: "/:locale(en|ta|hi)/verify", headers: [{ key: "Content-Security-Policy", value: verifyCsp }] },
-      // Voice questions on the assistant page need the microphone; every other page keeps it switched off.
-      {
-        source: "/:locale(en|ta|hi)/app/assistant",
-        headers: [{ key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=(self)" }],
       },
     ];
   },

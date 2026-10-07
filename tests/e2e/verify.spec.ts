@@ -94,7 +94,10 @@ test("a photo of the QR code is read in the browser (WebAssembly fallback reader
     ctx.drawImage(img, 50, 50, 500, 500);
     return canvas.toDataURL("image/png").split(",")[1];
   });
-  await page.goto("/en/verify");
+  // Arrive through the header link (in-app navigation keeps the first page's security policies).
+  await page.goto("/en");
+  await page.getByRole("link", { name: "Verify a certificate" }).first().click();
+  await page.waitForURL(/\/en\/verify$/);
   await expect(page.getByTestId("lists-freshness")).toContainText("last updated");
   await page.locator('input[type="file"]').setInputFiles({ name: "qr.png", mimeType: "image/png", buffer: Buffer.from(png, "base64") });
   await expect(page.getByTestId("verify-result").locator("[data-result=genuine]")).toBeVisible({ timeout: 30_000 });

@@ -63,7 +63,7 @@ depth, not a substitute for API integrity) · owner credentials can bypass every
 | Private keys leaking through APIs, logs, errors or the web bundle | Never returned or logged; SQL parameters hidden in errors; automated checks in API tests (responses + logs) and `scripts/check_bundle_secrets.py` (bundle) (✅) |
 | Decompression bomb / oversized QR | Text ≤ 2,000 characters, inflate capped at 4 KB, strict CBOR/COSE parsing (✅ tested both sides) |
 | Privacy of the QR | Payload has no owner name, phone, email, address, location or photo (✅ tested); pet photo fetched online only for active certificates |
-| WebAssembly needed by the QR reader | `'wasm-unsafe-eval'` (WebAssembly only; JavaScript `eval` stays blocked) is allowed **only** on `/[locale]/verify`; all other pages keep the stricter policy |
+| WebAssembly needed by the QR reader; microphone for voice questions | `'wasm-unsafe-eval'` (WebAssembly only; JavaScript `eval` stays blocked) and `microphone=(self)` are site-wide, because in-app navigation keeps the first page's policies (a per-page policy silently blocked both features). The microphone still needs the person's permission prompt; no third-party origin may use it |
 
 ## "This pet bit someone" check
 
