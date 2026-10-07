@@ -29,7 +29,9 @@ export default async function MyPetsPage({ params }: { params: Promise<{ locale:
   const ctx = await pageContext();
   const t = await getTranslations("pets");
   const tn = await getTranslations("pets.next");
-  const { data, error } = await ctx.api.GET("/api/v1/my/pets");
+  const [{ data, error }, bitesRes] = await Promise.all([ctx.api.GET("/api/v1/my/pets"), ctx.api.GET("/api/v1/my/bites")]);
+  const tb = await getTranslations("bite.owner");
+  const openBites = (bitesRes.data ?? []).filter((c) => !c.observation.ended);
   const pets = data ?? [];
   const count = (s: string) => pets.filter((p) => p.status.status === s).length;
   const name = ctx.me.preferred_name;
@@ -56,6 +58,15 @@ export default async function MyPetsPage({ params }: { params: Promise<{ locale:
           </Link>
         </Button>
       </div>
+
+      {openBites.map((c) => (
+        <Notice key={c.period_id} tone="urgent" data-testid="bite-banner">
+          <p className="font-semibold">{tb("banner", { pet: c.pet_name })}</p>
+          <Link href="/app/bites" className="font-semibold">
+            {tb("open")}
+          </Link>
+        </Notice>
+      ))}
 
       {error ? <Notice tone="urgent">{t("loadFailed")}</Notice> : null}
 

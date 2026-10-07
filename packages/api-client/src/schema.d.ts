@@ -350,6 +350,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/clinic/bites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bite reports for this clinic's pets
+         * @description Permission: clinic staff. Changes reported, missed days and disputes first. No reporter contact details.
+         */
+        get: operations["bite check_clinic_bites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/clinic/bites/{period_id}/exams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Record a vet examination during observation
+         * @description Permission: approved veterinary reviewer. Shown as "Vet-recorded" for today's observation day.
+         */
+        post: operations["bite check_vet_exam"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/clinic/dashboard": {
         parameters: {
             query?: never;
@@ -1004,6 +1044,87 @@ export interface paths {
          *     list. 20 questions an hour per person.
          */
         post: operations["assistant_ask"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/bites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bite reports about my pets
+         * @description Permission: pet owner (own pets only). Reporters' contact details appear only if they chose to share them.
+         */
+        get: operations["bite check_my_bites"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/bites/{period_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One bite report and its daily updates
+         * @description Permission: pet owner (own pets only).
+         */
+        get: operations["bite check_my_bite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/bites/{period_id}/checkins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Today's update on my pet
+         * @description Permission: pet owner. One update per day (changing it the same day replaces it). Anything other than
+         *     "normal" is flagged at once for the reporter, the doctor link and the clinic.
+         */
+        post: operations["bite check_checkin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/my/bites/{period_id}/dispute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dispute a bite report
+         * @description Permission: pet owner. The clinic sees the dispute; daily updates are still needed.
+         */
+        post: operations["bite check_dispute"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1709,6 +1830,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/public/bites/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Private bite report page (reporter/doctor)
+         * @description Permission: the private link's token. Expired or turned-off links return 404. Every view is logged.
+         */
+        get: operations["bite check_share_view"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/bites/{token}/doctor-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make a read-only link for a doctor (30 days)
+         * @description Permission: the reporter's private link. At most 5 active doctor links; each expires after 30 days.
+         */
+        post: operations["bite check_doctor_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/bites/{token}/doctor-links/revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Turn off all doctor links
+         * @description Permission: the reporter's private link. Turned-off links stop working at once.
+         */
+        post: operations["bite check_revoke_doctor_links"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/public/cards/{token}": {
         parameters: {
             query?: never;
@@ -1724,6 +1905,49 @@ export interface paths {
         get: operations["public_get_card"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/cards/{token}/bite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Bite mode: the pet's vaccination proof
+         * @description Permission: public (the card's random token). Pet name, species, clinic contact and the latest verified rabies
+         *     record with its signed certificate — nothing about the owner or any location.
+         */
+        get: operations["bite check_bite_pet"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/cards/{token}/bites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report a bite (no account)
+         * @description Permission: public. Starts the 10-day observation (or joins it if the same bite was already reported) and
+         *     returns a private tracking link once. Limits: 3 per client per hour, 5 per pet per day. The email is kept only
+         *     with consent, sealed, and never shown to the owner unless the reporter chose to share it.
+         */
+        post: operations["bite check_report_bite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2777,6 +3001,91 @@ export interface components {
             /** Vaccine */
             vaccine: string;
         };
+        /** BiteObservationOut */
+        BiteObservationOut: {
+            /**
+             * Bite Date
+             * Format: date
+             */
+            bite_date: string;
+            /** Current Day */
+            current_day: number;
+            /** Ended */
+            ended: boolean;
+            /** Length Days */
+            length_days: number;
+            /** Missed Days */
+            missed_days: number;
+            /** Policy Note */
+            policy_note: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "completed" | "completed_with_gaps" | "change_reported";
+            /** Timeline */
+            timeline: components["schemas"]["TimelineDayOut"][];
+            /** Urgent */
+            urgent: boolean;
+        };
+        /** BitePetOut */
+        BitePetOut: {
+            /** Clinic Email */
+            clinic_email: string | null;
+            /** Clinic Name */
+            clinic_name: string;
+            /** Clinic Phone */
+            clinic_phone: string | null;
+            /** Is Demo */
+            is_demo: boolean;
+            /** Pet Name */
+            pet_name: string;
+            rabies: components["schemas"]["RabiesRecordOut"] | null;
+            /** Species */
+            species: string;
+        };
+        /** BiteReportCreatedOut */
+        BiteReportCreatedOut: {
+            /** Contact Saved */
+            contact_saved: boolean;
+            /** Duplicate */
+            duplicate: boolean;
+            /** Reference */
+            reference: string;
+            /** Tracking Path */
+            tracking_path: string;
+        };
+        /** BiteReportIn */
+        BiteReportIn: {
+            /** Area */
+            area?: string | null;
+            /**
+             * Bite Date
+             * Format: date
+             */
+            bite_date: string;
+            /** Bite Time */
+            bite_time?: string | null;
+            /**
+             * Bitten
+             * @enum {string}
+             */
+            bitten: "person" | "animal";
+            /**
+             * Consent Share With Owner
+             * @default false
+             */
+            consent_share_with_owner?: boolean;
+            /**
+             * Consent Updates
+             * @default false
+             */
+            consent_updates?: boolean;
+            /** Contact Email */
+            contact_email?: string | null;
+            /** Note */
+            note?: string | null;
+        };
         /**
          * BoxIn
          * @description Pixel box in the oriented original image (as returned by the analysis endpoint).
@@ -3001,6 +3310,35 @@ export interface components {
             /** Whatsapp */
             whatsapp: boolean;
         };
+        /** CheckinIn */
+        CheckinIn: {
+            /** Note */
+            note?: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "normal" | "not_eating" | "unusual_behaviour" | "missing" | "died" | "other";
+        };
+        /** ClinicBiteCaseOut */
+        ClinicBiteCaseOut: {
+            /** Disputed */
+            disputed: boolean;
+            /** Last Update */
+            last_update: string | null;
+            observation: components["schemas"]["BiteObservationOut"];
+            /**
+             * Period Id
+             * Format: uuid
+             */
+            period_id: string;
+            /** Pet Name */
+            pet_name: string;
+            /** Possible Duplicate */
+            possible_duplicate: boolean;
+            /** Reports */
+            reports: number;
+        };
         /** ClinicDashboardOut */
         ClinicDashboardOut: {
             /** Awaiting Verification */
@@ -3195,6 +3533,31 @@ export interface components {
             x: number;
             /** Y */
             y: number;
+        };
+        /** DisputeIn */
+        DisputeIn: {
+            /** Reason */
+            reason: string;
+        };
+        /** DoctorLinkOut */
+        DoctorLinkOut: {
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Views */
+            views: number;
         };
         /** EnvironmentOut */
         EnvironmentOut: {
@@ -3926,6 +4289,16 @@ export interface components {
             /** Message */
             message: string;
         };
+        /** NewDoctorLinkOut */
+        NewDoctorLinkOut: {
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Path */
+            path: string;
+        };
         /** NotificationSettingsIn */
         NotificationSettingsIn: {
             /**
@@ -4156,6 +4529,54 @@ export interface components {
             action: "start" | "complete" | "block";
             /** Note */
             note?: string | null;
+        };
+        /** OwnerCaseOut */
+        OwnerCaseOut: {
+            /**
+             * Animal Id
+             * Format: uuid
+             */
+            animal_id: string;
+            /** Clinic Email */
+            clinic_email: string | null;
+            /** Clinic Name */
+            clinic_name: string;
+            /** Clinic Phone */
+            clinic_phone: string | null;
+            /** Disputed */
+            disputed: boolean;
+            observation: components["schemas"]["BiteObservationOut"];
+            /**
+             * Period Id
+             * Format: uuid
+             */
+            period_id: string;
+            /** Pet Name */
+            pet_name: string;
+            /** Reports */
+            reports: components["schemas"]["OwnerReportOut"][];
+            /** Today Needed */
+            today_needed: boolean;
+        };
+        /** OwnerReportOut */
+        OwnerReportOut: {
+            /** Area */
+            area: string | null;
+            /** Bite Time */
+            bite_time: string | null;
+            /**
+             * Bitten
+             * @enum {string}
+             */
+            bitten: "person" | "animal";
+            /** Contact */
+            contact: string | null;
+            /** Possible Duplicate */
+            possible_duplicate: boolean;
+            /** Reference */
+            reference: string;
+            /** Status */
+            status: string;
         };
         /** OwnerVaccinationIn */
         OwnerVaccinationIn: {
@@ -4619,6 +5040,17 @@ export interface components {
             /** Warnings */
             warnings: string[];
         };
+        /** RabiesRecordOut */
+        RabiesRecordOut: {
+            /** Certificate */
+            certificate: string | null;
+            /** Given On */
+            given_on: string | null;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Vaccine */
+            vaccine: string | null;
+        };
         /** ReminderOut */
         ReminderOut: {
             /** Clinic Name */
@@ -4716,10 +5148,58 @@ export interface components {
              */
             reviewer_user_id: string;
         };
+        /** RevokedOut */
+        RevokedOut: {
+            /** Revoked */
+            revoked: number;
+        };
         /** ScanOut */
         ScanOut: {
             /** Queued */
             queued: number;
+        };
+        /** ShareViewOut */
+        ShareViewOut: {
+            /**
+             * Bite Date
+             * Format: date
+             */
+            bite_date: string;
+            /** Bite Time */
+            bite_time: string | null;
+            /**
+             * Bitten
+             * @enum {string}
+             */
+            bitten: "person" | "animal";
+            /** Clinic Email */
+            clinic_email: string | null;
+            /** Clinic Name */
+            clinic_name: string;
+            /** Clinic Phone */
+            clinic_phone: string | null;
+            /** Doctor Links */
+            doctor_links: components["schemas"]["DoctorLinkOut"][] | null;
+            /**
+             * Expires At
+             * Format: date-time
+             */
+            expires_at: string;
+            /** Is Demo */
+            is_demo: boolean;
+            observation: components["schemas"]["BiteObservationOut"];
+            /** Pet Name */
+            pet_name: string;
+            /**
+             * Purpose
+             * @enum {string}
+             */
+            purpose: "reporter" | "doctor";
+            rabies: components["schemas"]["RabiesRecordOut"] | null;
+            /** Reference */
+            reference: string;
+            /** Species */
+            species: string;
         };
         /** SignedListOut */
         SignedListOut: {
@@ -5082,6 +5562,25 @@ export interface components {
              * @enum {string}
              */
             channel: "email" | "push" | "whatsapp" | "call";
+        };
+        /** TimelineDayOut */
+        TimelineDayOut: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Day */
+            day: number;
+            /** Owner State */
+            owner_state: ("normal" | "not_eating" | "unusual_behaviour" | "missing" | "died" | "other") | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "normal" | "change" | "no_update" | "awaiting";
+            /** Vet State */
+            vet_state: ("normal" | "not_eating" | "unusual_behaviour" | "missing" | "died" | "other") | null;
         };
         /** TimelineEntryOut */
         TimelineEntryOut: {
@@ -6611,6 +7110,112 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PlanOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_clinic_bites": {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicBiteCaseOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_vet_exam": {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ClinicBiteCaseOut"];
                 };
             };
             /** @description Unauthorized */
@@ -8472,6 +9077,216 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AssistantOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_my_bites": {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerCaseOut"][];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_my_bite": {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerCaseOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_checkin": {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckinIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerCaseOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_dispute": {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path: {
+                period_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DisputeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OwnerCaseOut"];
                 };
             };
             /** @description Unauthorized */
@@ -10423,6 +11238,153 @@ export interface operations {
             };
         };
     };
+    "bite check_share_view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareViewOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_doctor_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NewDoctorLinkOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_revoke_doctor_links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevokedOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     public_get_card: {
         parameters: {
             query?: never;
@@ -10441,6 +11403,108 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PublicCardOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_bite_pet": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BitePetOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "bite check_report_bite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BiteReportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BiteReportCreatedOut"];
                 };
             };
             /** @description Unauthorized */

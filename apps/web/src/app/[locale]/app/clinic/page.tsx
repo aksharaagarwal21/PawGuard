@@ -6,6 +6,7 @@ import { Card, Notice, StatusChip } from "@pawguard/ui";
 import { PageBody } from "@/components/page-header";
 import { ClinicBoard } from "@/components/pets/clinic-board";
 import { ClinicRecordForm } from "@/components/pets/clinic-record-form";
+import { ClinicBites } from "@/components/bite/clinic-bites";
 import { MessagesPanel } from "@/components/notify/messages-panel";
 import { WhatsAppDemo } from "@/components/notify/whatsapp-demo";
 import { DemoClockControl } from "@/components/pets/demo-clock";
@@ -75,6 +76,8 @@ export default async function ClinicPage({ params }: { params: Promise<{ locale:
           <ClinicRecordForm pets={d.pets} products={d.products} today={realToday} />
         </section>
       ) : null}
+
+      <ClinicBites canReview={canReview} />
 
       {messages.data ? <MessagesPanel data={messages.data} tz={ctx.tz} demo={d.demo_clock_available} /> : null}
 

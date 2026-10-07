@@ -41,4 +41,22 @@ export const PUBLIC_SOURCES: PublicSource[] = [
     checked: "2026-10-05",
     reviewStatus: "unreviewed",
   },
+  {
+    id: "S30",
+    title: "Frequently asked questions about rabies for the General Public (14 February 2018)",
+    publisher: "World Health Organization",
+    url: "https://www.who.int/docs/default-source/ntds/rabies/rabies-general-public-faqs.pdf",
+    usedFor: "Bite mode: wash about 15 minutes with soap and water; go to a health facility as soon as possible; keep the biting animal under observation for 10 days; avoid irritants such as chili powder and plant juices.",
+    checked: "2026-10-07",
+    reviewStatus: "unreviewed",
+  },
+  {
+    id: "S31",
+    title: "National Action Plan for Dog Mediated Rabies Elimination from India by 2030",
+    publisher: "National Centre for Disease Control, MoHFW, Government of India",
+    url: "https://rabiesfreeindia.mohfw.gov.in/assets/Nrcp_img/NationalActiopPlan.pdf",
+    usedFor: "Bite mode: wash the wound immediately with plenty of soap and water; consult a doctor immediately; do not apply chillies, mustard oil or other irritants (p. 131); signs within 10 days after exposure (p. 90).",
+    checked: "2026-10-07",
+    reviewStatus: "unreviewed",
+  },
 ];

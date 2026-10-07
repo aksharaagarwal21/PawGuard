@@ -143,9 +143,13 @@ def seal(private_raw: bytes, kid: str, s: Settings) -> bytes:
     return nonce + AESGCM(master_key(s)).encrypt(nonce, private_raw, kid.encode("ascii"))
 
 
+def unseal_bytes(sealed: bytes, aad: str, s: Settings) -> bytes:
+    """Open anything sealed with `seal` (clinic private keys; bite reporters' contact emails)."""
+    return AESGCM(master_key(s)).decrypt(sealed[:12], sealed[12:], aad.encode("ascii"))
+
+
 def unseal(sealed: bytes, kid: str, s: Settings) -> Ed25519PrivateKey:
-    raw = AESGCM(master_key(s)).decrypt(sealed[:12], sealed[12:], kid.encode("ascii"))
-    return Ed25519PrivateKey.from_private_bytes(raw)
+    return Ed25519PrivateKey.from_private_bytes(unseal_bytes(sealed, kid, s))
 
 
 @lru_cache(maxsize=4)

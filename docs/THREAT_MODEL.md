@@ -64,3 +64,16 @@ depth, not a substitute for API integrity) · owner credentials can bypass every
 | Decompression bomb / oversized QR | Text ≤ 2,000 characters, inflate capped at 4 KB, strict CBOR/COSE parsing (✅ tested both sides) |
 | Privacy of the QR | Payload has no owner name, phone, email, address, location or photo (✅ tested); pet photo fetched online only for active certificates |
 | WebAssembly needed by the QR reader | `'wasm-unsafe-eval'` (WebAssembly only; JavaScript `eval` stays blocked) is allowed **only** on `/[locale]/verify`; all other pages keep the stricter policy |
+
+## "This pet bit someone" check
+
+| Threat | Control (status) |
+|---|---|
+| Fake or malicious bite reports (to harass an owner) | No public listing of reports anywhere; 3 reports per client per hour and 5 per pet per day; a second report of the same pet and day joins the same observation and is flagged "possible duplicate"; the owner can dispute (clinic sees the flag; observation continues); no reporter details reach the owner unless the reporter chose to share them (✅ tested). Not built: staff moderation queue (disputes are flagged on the clinic dashboard instead) |
+| Harassment of owners / doxxing through bite mode | Bite mode, reporter and doctor pages show the pet, clinic and records only — never the owner's name, phone, email, address or location (✅ API + browser tests) |
+| Reporter's contact exposed | Stored only with consent to updates, sealed with AES-GCM under the master key (reference as associated data); the clinic view never shows it; the owner sees it only with the reporter's separate consent (✅ tested) |
+| Share links leaking | 256-bit random tokens, only SHA-256 hashes stored; the reporter link expires 60 days after the bite, doctor links after 30 days; the reporter can turn all doctor links off; revoked or expired links return the same 404 with no data; every view is logged; pages are `noindex` with `Referrer-Policy: no-referrer` (✅ tested). Residual: anyone holding a live link can read it — the page says "Keep this link private" |
+| Missed updates read as "fine" | A day without an update is "No update" everywhere; the period ends as "completed_with_gaps" and is flagged for the vet (✅ tested) |
+| Wording that suggests skipping care | First aid first on every bite page; "See a doctor today, whatever this pet's vaccination status"; forbidden words ("safe", "rabies-free", "no treatment needed") checked automatically in API tests and browser tests across bite pages and languages (✅) |
+| Rate-limit bypass via a spoofed client address | The client address is set by our own gateway from the proxy header (browser values are overwritten); only its hash is stored. Residual: many IPs can still send reports; the per-pet daily limit caps the impact |
+

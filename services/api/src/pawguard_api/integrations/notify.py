@@ -54,6 +54,25 @@ def compose(info: dict[str, Any], s: Settings) -> Message:
                 f"and reply:\n{lost_link}\n\nYour name, phone and email are not shared with them unless you "
                 f"choose to.{demo}")
         return Message(f"Message about {pet}", text, short, lost_link)
+    if info["kind"] in ("bite_alert", "bite_closed"):
+        pet = info.get("pet") or "your pet"
+        sex = info.get("pet_sex")
+        them = "him" if sex == "male" else "her" if sex == "female" else "them"
+        days = info.get("observation_days") or 10
+        when = _when(date.fromisoformat(str(info["bite_date"]))) if info.get("bite_date") else "recently"
+        bites_link = f"{s.public_app_url}/en/app/bites"
+        if info["kind"] == "bite_alert":
+            short = (f"{pet} was reported in a bite on {when}. Please keep {them} under observation for {days} days "
+                     "and contact your vet today.")
+            body = (f"Hello,\n\n{short}\n\nOpen PawGuard to record a short update every day (it takes a few "
+                    f"seconds):\n{bites_link}\n\nThe person who reported it is not shown to you unless they chose to "
+                    f"share their contact.{demo}")
+            return Message(f"{pet} was reported in a bite — please contact your vet today", body, short, bites_link)
+        outcome = {"completed": "you reported no changes", "completed_with_gaps": "some days had no update",
+                   "change_reported": "a change was reported"}.get(str(info.get("observation_status")), "it has ended")
+        short = f"The {days}-day observation for {pet} after the bite on {when} has ended: {outcome}."
+        return Message(f"Observation ended for {pet}", f"Hello,\n\n{short} Your clinic can see it in PawGuard.\n\n"
+                       f"{bites_link}{demo}", short, bites_link)
     if info["kind"] == "demo_reminder":
         short = f"PawGuard demo: {info.get('pet') or 'Biscuit'} (fictional pet) has a vaccination reminder."
         return Message("PawGuard demo reminder", f"Hello,\n\n{short}\n\n{link}{demo}", short, link)

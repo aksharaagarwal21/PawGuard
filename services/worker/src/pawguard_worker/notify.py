@@ -34,6 +34,15 @@ def queue_due() -> int:
         return int(c.execute(text("select app.queue_due_notifications(:c)"), {"c": needs_confirmation}).scalar() or 0)
 
 
+def close_bite_observations() -> int:
+    """End observation periods whose last day has passed and send the closing notices (owner channels via the queue,
+    consenting reporters by email)."""
+    from pawguard_api.domain import bites
+
+    with worker_engine().begin() as c:
+        return bites.close_and_notify(c)
+
+
 def has_ready() -> bool:
     """Read-only check used by the dispatcher before publishing a drain task."""
     with worker_engine().begin() as c:

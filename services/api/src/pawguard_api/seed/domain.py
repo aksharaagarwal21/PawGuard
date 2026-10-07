@@ -301,4 +301,7 @@ def seed_domain(c: Connection, users: dict[str, UUID]) -> dict[str, object]:
     out["hillview"] = seed_org(c, "hillview", users, n_animals=12, volunteer="hill_volunteer", vet="hill_vet",
                                coordinator=None)
     out["pet_clinics"] = seed_pets(c, users)
+    from pawguard_api.seed.bites import seed_bites
+
+    out["bite_cases"] = seed_bites(c, users)
     return out

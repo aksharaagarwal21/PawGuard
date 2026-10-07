@@ -1108,6 +1108,243 @@
         "title": "AwaitingRowOut",
         "type": "object"
       },
+      "BiteObservationOut": {
+        "properties": {
+          "bite_date": {
+            "format": "date",
+            "title": "Bite Date",
+            "type": "string"
+          },
+          "current_day": {
+            "title": "Current Day",
+            "type": "integer"
+          },
+          "ended": {
+            "title": "Ended",
+            "type": "boolean"
+          },
+          "length_days": {
+            "title": "Length Days",
+            "type": "integer"
+          },
+          "missed_days": {
+            "title": "Missed Days",
+            "type": "integer"
+          },
+          "policy_note": {
+            "title": "Policy Note",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "completed",
+              "completed_with_gaps",
+              "change_reported"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/TimelineDayOut"
+            },
+            "title": "Timeline",
+            "type": "array"
+          },
+          "urgent": {
+            "title": "Urgent",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bite_date",
+          "length_days",
+          "status",
+          "policy_note",
+          "current_day",
+          "ended",
+          "timeline",
+          "urgent",
+          "missed_days"
+        ],
+        "title": "BiteObservationOut",
+        "type": "object"
+      },
+      "BitePetOut": {
+        "properties": {
+          "clinic_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic Email"
+          },
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "clinic_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic Phone"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "rabies": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RabiesRecordOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "species": {
+            "title": "Species",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pet_name",
+          "species",
+          "clinic_name",
+          "clinic_email",
+          "clinic_phone",
+          "is_demo",
+          "rabies"
+        ],
+        "title": "BitePetOut",
+        "type": "object"
+      },
+      "BiteReportCreatedOut": {
+        "properties": {
+          "contact_saved": {
+            "title": "Contact Saved",
+            "type": "boolean"
+          },
+          "duplicate": {
+            "title": "Duplicate",
+            "type": "boolean"
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "tracking_path": {
+            "title": "Tracking Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference",
+          "tracking_path",
+          "duplicate",
+          "contact_saved"
+        ],
+        "title": "BiteReportCreatedOut",
+        "type": "object"
+      },
+      "BiteReportIn": {
+        "additionalProperties": false,
+        "properties": {
+          "area": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "bite_date": {
+            "format": "date",
+            "title": "Bite Date",
+            "type": "string"
+          },
+          "bite_time": {
+            "anyOf": [
+              {
+                "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bite Time"
+          },
+          "bitten": {
+            "enum": [
+              "person",
+              "animal"
+            ],
+            "title": "Bitten",
+            "type": "string"
+          },
+          "consent_share_with_owner": {
+            "default": false,
+            "title": "Consent Share With Owner",
+            "type": "boolean"
+          },
+          "consent_updates": {
+            "default": false,
+            "title": "Consent Updates",
+            "type": "boolean"
+          },
+          "contact_email": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact Email"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          }
+        },
+        "required": [
+          "bite_date",
+          "bitten"
+        ],
+        "title": "BiteReportIn",
+        "type": "object"
+      },
       "BoxIn": {
         "additionalProperties": false,
         "description": "Pixel box in the oriented original image (as returned by the analysis endpoint).",
@@ -1872,6 +2109,91 @@
         "title": "ChannelsAvailableOut",
         "type": "object"
       },
+      "CheckinIn": {
+        "additionalProperties": false,
+        "properties": {
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "state": {
+            "enum": [
+              "normal",
+              "not_eating",
+              "unusual_behaviour",
+              "missing",
+              "died",
+              "other"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "CheckinIn",
+        "type": "object"
+      },
+      "ClinicBiteCaseOut": {
+        "properties": {
+          "disputed": {
+            "title": "Disputed",
+            "type": "boolean"
+          },
+          "last_update": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Update"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/BiteObservationOut"
+          },
+          "period_id": {
+            "format": "uuid",
+            "title": "Period Id",
+            "type": "string"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "possible_duplicate": {
+            "title": "Possible Duplicate",
+            "type": "boolean"
+          },
+          "reports": {
+            "title": "Reports",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "period_id",
+          "pet_name",
+          "observation",
+          "reports",
+          "possible_duplicate",
+          "disputed",
+          "last_update"
+        ],
+        "title": "ClinicBiteCaseOut",
+        "type": "object"
+      },
       "ClinicDashboardOut": {
         "properties": {
           "awaiting_verification": {
@@ -2387,6 +2709,53 @@
           "h"
         ],
         "title": "DetectionOut",
+        "type": "object"
+      },
+      "DisputeIn": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "maxLength": 500,
+            "minLength": 10,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "DisputeIn",
+        "type": "object"
+      },
+      "DoctorLinkOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "views": {
+            "title": "Views",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "expires_at",
+          "created_at",
+          "views"
+        ],
+        "title": "DoctorLinkOut",
         "type": "object"
       },
       "EnvironmentOut": {
@@ -4351,6 +4720,25 @@
         "title": "MessageIn",
         "type": "object"
       },
+      "NewDoctorLinkOut": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "expires_at"
+        ],
+        "title": "NewDoctorLinkOut",
+        "type": "object"
+      },
       "NotificationSettingsIn": {
         "additionalProperties": false,
         "properties": {
@@ -5109,6 +5497,150 @@
           "action"
         ],
         "title": "OfflineTaskPayload",
+        "type": "object"
+      },
+      "OwnerCaseOut": {
+        "properties": {
+          "animal_id": {
+            "format": "uuid",
+            "title": "Animal Id",
+            "type": "string"
+          },
+          "clinic_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic Email"
+          },
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "clinic_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic Phone"
+          },
+          "disputed": {
+            "title": "Disputed",
+            "type": "boolean"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/BiteObservationOut"
+          },
+          "period_id": {
+            "format": "uuid",
+            "title": "Period Id",
+            "type": "string"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/OwnerReportOut"
+            },
+            "title": "Reports",
+            "type": "array"
+          },
+          "today_needed": {
+            "title": "Today Needed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "period_id",
+          "animal_id",
+          "pet_name",
+          "clinic_name",
+          "clinic_email",
+          "clinic_phone",
+          "observation",
+          "reports",
+          "disputed",
+          "today_needed"
+        ],
+        "title": "OwnerCaseOut",
+        "type": "object"
+      },
+      "OwnerReportOut": {
+        "properties": {
+          "area": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "bite_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bite Time"
+          },
+          "bitten": {
+            "enum": [
+              "person",
+              "animal"
+            ],
+            "title": "Bitten",
+            "type": "string"
+          },
+          "contact": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact"
+          },
+          "possible_duplicate": {
+            "title": "Possible Duplicate",
+            "type": "boolean"
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reference",
+          "bite_time",
+          "bitten",
+          "area",
+          "status",
+          "possible_duplicate",
+          "contact"
+        ],
+        "title": "OwnerReportOut",
         "type": "object"
       },
       "OwnerVaccinationIn": {
@@ -6423,6 +6955,64 @@
         "title": "QualityOut",
         "type": "object"
       },
+      "RabiesRecordOut": {
+        "properties": {
+          "certificate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Certificate"
+          },
+          "given_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Given On"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "vaccine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vaccine"
+          }
+        },
+        "required": [
+          "vaccine",
+          "given_on",
+          "next_due_on",
+          "certificate"
+        ],
+        "title": "RabiesRecordOut",
+        "type": "object"
+      },
       "ReminderOut": {
         "properties": {
           "clinic_name": {
@@ -6645,6 +7235,19 @@
         "title": "ReviewOut",
         "type": "object"
       },
+      "RevokedOut": {
+        "properties": {
+          "revoked": {
+            "title": "Revoked",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "revoked"
+        ],
+        "title": "RevokedOut",
+        "type": "object"
+      },
       "ScanOut": {
         "properties": {
           "queued": {
@@ -6656,6 +7259,135 @@
           "queued"
         ],
         "title": "ScanOut",
+        "type": "object"
+      },
+      "ShareViewOut": {
+        "properties": {
+          "bite_date": {
+            "format": "date",
+            "title": "Bite Date",
+            "type": "string"
+          },
+          "bite_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bite Time"
+          },
+          "bitten": {
+            "enum": [
+              "person",
+              "animal"
+            ],
+            "title": "Bitten",
+            "type": "string"
+          },
+          "clinic_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic Email"
+          },
+          "clinic_name": {
+            "title": "Clinic Name",
+            "type": "string"
+          },
+          "clinic_phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic Phone"
+          },
+          "doctor_links": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/DoctorLinkOut"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Doctor Links"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "is_demo": {
+            "title": "Is Demo",
+            "type": "boolean"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/BiteObservationOut"
+          },
+          "pet_name": {
+            "title": "Pet Name",
+            "type": "string"
+          },
+          "purpose": {
+            "enum": [
+              "reporter",
+              "doctor"
+            ],
+            "title": "Purpose",
+            "type": "string"
+          },
+          "rabies": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RabiesRecordOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reference": {
+            "title": "Reference",
+            "type": "string"
+          },
+          "species": {
+            "title": "Species",
+            "type": "string"
+          }
+        },
+        "required": [
+          "purpose",
+          "reference",
+          "bite_date",
+          "bite_time",
+          "bitten",
+          "pet_name",
+          "species",
+          "clinic_name",
+          "clinic_email",
+          "clinic_phone",
+          "is_demo",
+          "expires_at",
+          "observation",
+          "rabies",
+          "doctor_links"
+        ],
+        "title": "ShareViewOut",
         "type": "object"
       },
       "SignedListOut": {
@@ -7811,6 +8543,76 @@
           "channel"
         ],
         "title": "TestMessageIn",
+        "type": "object"
+      },
+      "TimelineDayOut": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "day": {
+            "title": "Day",
+            "type": "integer"
+          },
+          "owner_state": {
+            "anyOf": [
+              {
+                "enum": [
+                  "normal",
+                  "not_eating",
+                  "unusual_behaviour",
+                  "missing",
+                  "died",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner State"
+          },
+          "status": {
+            "enum": [
+              "normal",
+              "change",
+              "no_update",
+              "awaiting"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "vet_state": {
+            "anyOf": [
+              {
+                "enum": [
+                  "normal",
+                  "not_eating",
+                  "unusual_behaviour",
+                  "missing",
+                  "died",
+                  "other"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vet State"
+          }
+        },
+        "required": [
+          "day",
+          "date",
+          "status",
+          "owner_state",
+          "vet_state"
+        ],
+        "title": "TimelineDayOut",
         "type": "object"
       },
       "TimelineEntryOut": {
@@ -11581,6 +12383,204 @@
         ]
       }
     },
+    "/api/v1/clinic/bites": {
+      "get": {
+        "description": "Permission: clinic staff. Changes reported, missed days and disputes first. No reporter contact details.",
+        "operationId": "bite check_clinic_bites",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ClinicBiteCaseOut"
+                  },
+                  "title": "Response Bite Check Clinic Bites",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Bite reports for this clinic's pets",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/clinic/bites/{period_id}/exams": {
+      "post": {
+        "description": "Permission: approved veterinary reviewer. Shown as \"Vet-recorded\" for today's observation day.",
+        "operationId": "bite check_vet_exam",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Period Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicBiteCaseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Record a vet examination during observation",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
     "/api/v1/clinic/dashboard": {
       "get": {
         "description": "Permission: ``animal.read``. This clinic's registered pets only: due this week, overdue, awaiting\nverification. Counts describe pets registered in this app, not population coverage.",
@@ -14848,6 +15848,340 @@
         ]
       }
     },
+    "/api/v1/my/bites": {
+      "get": {
+        "description": "Permission: pet owner (own pets only). Reporters' contact details appear only if they chose to share them.",
+        "operationId": "bite check_my_bites",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/OwnerCaseOut"
+                  },
+                  "title": "Response Bite Check My Bites",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Bite reports about my pets",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/my/bites/{period_id}": {
+      "get": {
+        "description": "Permission: pet owner (own pets only).",
+        "operationId": "bite check_my_bite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Period Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnerCaseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "One bite report and its daily updates",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/my/bites/{period_id}/checkins": {
+      "post": {
+        "description": "Permission: pet owner. One update per day (changing it the same day replaces it). Anything other than\n\"normal\" is flagged at once for the reporter, the doctor link and the clinic.",
+        "operationId": "bite check_checkin",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Period Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckinIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnerCaseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Today's update on my pet",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/my/bites/{period_id}/dispute": {
+      "post": {
+        "description": "Permission: pet owner. The clinic sees the dispute; daily updates are still needed.",
+        "operationId": "bite check_dispute",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "period_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Period Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DisputeIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OwnerCaseOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Dispute a bite report",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
     "/api/v1/my/certificates/{media_id}/read": {
       "post": {
         "description": "Permission: the person who uploaded the certificate. Reads the photo (not PDFs) with OCR and returns a draft —\ndates, matched vaccine, batch — to check before saving. The full text is not stored. 20 reads an hour.",
@@ -17951,6 +19285,195 @@
         ]
       }
     },
+    "/api/v1/public/bites/{token}": {
+      "get": {
+        "description": "Permission: the private link's token. Expired or turned-off links return 404. Every view is logged.",
+        "operationId": "bite check_share_view",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareViewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Private bite report page (reporter/doctor)",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/public/bites/{token}/doctor-links": {
+      "post": {
+        "description": "Permission: the reporter's private link. At most 5 active doctor links; each expires after 30 days.",
+        "operationId": "bite check_doctor_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewDoctorLinkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Make a read-only link for a doctor (30 days)",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/public/bites/{token}/doctor-links/revoke": {
+      "post": {
+        "description": "Permission: the reporter's private link. Turned-off links stop working at once.",
+        "operationId": "bite check_revoke_doctor_links",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Turn off all doctor links",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
     "/api/v1/public/cards/{token}": {
       "get": {
         "description": "Permission: public. Unknown and revoked tokens both return 404. Shows the pet's name, species, photo, clinic\nname and verified vaccinations only — nothing about the owner or any location.",
@@ -18011,6 +19534,142 @@
         "summary": "Public vaccination card",
         "tags": [
           "public"
+        ]
+      }
+    },
+    "/api/v1/public/cards/{token}/bite": {
+      "get": {
+        "description": "Permission: public (the card's random token). Pet name, species, clinic contact and the latest verified rabies\nrecord with its signed certificate — nothing about the owner or any location.",
+        "operationId": "bite check_bite_pet",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BitePetOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Bite mode: the pet's vaccination proof",
+        "tags": [
+          "bite check"
+        ]
+      }
+    },
+    "/api/v1/public/cards/{token}/bites": {
+      "post": {
+        "description": "Permission: public. Starts the 10-day observation (or joins it if the same bite was already reported) and\nreturns a private tracking link once. Limits: 3 per client per hour, 5 per pet per day. The email is kept only\nwith consent, sealed, and never shown to the owner unless the reporter chose to share it.",
+        "operationId": "bite check_report_bite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "title": "Token",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BiteReportIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BiteReportCreatedOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Report a bite (no account)",
+        "tags": [
+          "bite check"
         ]
       }
     },

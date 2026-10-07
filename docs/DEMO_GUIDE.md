@@ -99,6 +99,28 @@ Certificate to upload: `C:\PawGuard\tests\fixtures\synthetic-certificate.jpg` (a
 | 6 | **Clinic** → **+7 days** | Misty moves to **Due this week**; then **Back to the real date** | "A demo-only clock shows how reminders progress; stored dates never change." |
 | 7 | Sign in as Neha → Coco → **Vaccination card (QR)** → open the link | Coco **Up to date**, verified vaccinations only, "This card shows recorded vaccinations. It is not a health guarantee." | "A groomer or boarding kennel can scan it. The owner can replace or turn off the QR code." |
 
+## 3b. Signed certificates + "This pet bit someone" — two-minute script
+
+Before the demo: open `/en/verify` once on the phone while online (it then works offline), and on the laptop open
+`/en/verify/samples` (demo mode only). Sign in on the phone's second tab as Neha once, open Bruno → Vaccination card
+(this creates the collar QR), then sign out.
+
+| # | Do | Say |
+|---|---|---|
+| 1 | Phone: `/en/verify` → **Scan with camera** → scan the **Genuine** sample on the laptop | "Bruno's rabies certificate is signed by the clinic's key. The phone checks the signature itself — green: issued by Lotus Pet Clinic, not changed. It tells us to check the animal matches." |
+| 2 | Scan the **Altered** sample | "Same certificate, one date changed by one day — red: changed or not issued by a registered clinic." |
+| 3 | Turn on airplane mode; scan Genuine, Altered and **Cancelled** again | "No connection needed — the trust list and cancellations are cached and root-signed. The cancelled one shows amber." Turn airplane mode off. |
+| 4 | Scan Bruno's collar QR (or open his card) → red **Did this pet bite someone? Get help now** | "Bite mode. First aid comes first, before anything else — wash 15 minutes, see a doctor today whatever the vaccination status, no home remedies, call 112." Switch the language to Tamil or Hindi. |
+| 5 | Scroll: the record shows "Signed certificate checked" | "The doctor sees the rabies record with the signature check — and the doctor decides the treatment." |
+| 6 | Fill **Report this bite** (date, person) → **Send report** → copy the private link | "No account, no photo. The reporter gets a private link; the owner never sees the reporter's details." |
+| 7 | Laptop: sign in as Neha → banner "Bruno was reported in a bite" → **Bite reports** → tap **Normal** → Save | "The owner was alerted on her channel and records one tap a day for 10 days. Day 2 shows **No update** — we never assume the pet is fine. Misty shows a change: 'Contact your vet now'." |
+| 8 | Reporter link → **Make a doctor link** → open it | "A read-only page for the doctor, expiring in 30 days, revocable, every view logged. Urgent changes show a red banner: tell your doctor right away." |
+
+Fixed demo reporter links (fictional data only): `/en/bite/pawguard-demo-reporter-link-bruno-0001` (day 4, one missed
+day) and `/en/bite/pawguard-demo-reporter-link-misty-0002` (urgent "unusual behaviour").
+Honest limits to say: wording is pending clinical review (Tamil/Hindi are draft translations); the signature proves the
+record's origin, not the pet's health or identity; offline verifiers only know cancellations up to their last refresh.
+
 ## 3. Three-minute walkthrough (community dog programmes)
 
 | # | Do (exact clicks and inputs) | You should see | Say |

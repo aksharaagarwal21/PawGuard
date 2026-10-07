@@ -801,6 +801,42 @@ tracking page; doctor page; owner bite case page with check-ins; clinic dashboar
 check-ins, one missed day, an urgent "unusual behaviour" case on another pet), tests listed in §21.1, docs
 (THREAT_MODEL/OPERATIONS/CONTENT_REGISTER/DEMO_GUIDE sections), full test re-run, commit Part 2, final report.
 
+### 21.6a Part 2 BUILT (7 Oct 2026, reduced scope)
+* **Migration 0021** (`0021_bite_check.py`): `organisations.contact_phone`; `observation_periods` (one per pet + bite
+  date; 10 days; policy note "pending clinical review"; status active/completed/completed_with_gaps/change_reported),
+  `bite_reports` (reference `BR-XXXX-XXXX`, date, optional time, person/animal, coarse area, note, reporter email sealed
+  with the master key only with consent, consent flags, status incl. disputed, duplicate_of, client hash),
+  `observation_checkins` (day, state normal/not_eating/unusual_behaviour/missing/died/other, note, source owner/vet),
+  `share_links` (reporter/doctor, SHA-256 token hash, expiry, revoked) + `share_link_access` (view log); delivery kinds
+  `bite_alert` / `bite_closed` with `observation_period_id`; security-definer functions `public_bite_pet`,
+  `public_create_bite_report` (limits 3/client/hour, 5/pet/day, date within 30 days, duplicates join the period, owner
+  alert queued once), `share_view` (logs access), `share_create_doctor_link` (30 days, max 5), `share_revoke_doctor_links`,
+  `bite_update_contacts`, `close_due_observations`, `queue_bite_notice`; claim function returns bite date/pet sex.
+* **API** (`domain/bites.py`, `routers/bites.py`, `bite_contracts.py`): `GET /public/cards/{token}/bite`,
+  `POST /public/cards/{token}/bites`, `GET /public/bites/{token}`, `POST /public/bites/{token}/doctor-links`,
+  `POST /public/bites/{token}/doctor-links/revoke`, `GET /my/bites`, `GET /my/bites/{id}`, `POST /my/bites/{id}/checkins`,
+  `POST /my/bites/{id}/dispute`, `GET /clinic/bites`, `POST /clinic/bites/{id}/exams`. Day counting with the clinic's local
+  date (Asia/Kolkata) + demo clock; "No update" for missed days; urgent on any non-normal; reporter emails (tracking link
+  once, urgent change, closing) via BackgroundTasks / dispatcher; gateway forwards `x-pawguard-client-ip`.
+* **Dispatcher**: every 10 minutes `close_bite_observations()` ends periods and sends closing notices.
+* **Web**: `/[locale]/card/[token]/bite` (bite mode: minimal shell with language switch, first aid first, record +
+  in-browser signature check, report form), `/[locale]/bite/[token]` (reporter: first aid, urgent banner, record,
+  timeline, contact through the clinic, doctor links; doctor: read-only + clinical note), `/[locale]/app/bites` (owner:
+  contact vet / "Contact your vet now", one-tap daily update, timeline, reports, dispute), card page red button, My pets
+  banner, clinic dashboard "Bite reports" (urgent/missed/disputed/duplicate flags, vet examination form). en + ta/hi
+  (draft) strings in `bite.*`.
+* **Demo data** (`seed/bites.py`, part of seed and demo reset): Bruno day 4 with updates on days 1 and 3, day 2 missed;
+  Misty urgent "unusual behaviour" on day 2; fixed demo reporter links `pawguard-demo-reporter-link-bruno-0001` /
+  `-misty-0002`; Lotus contact email `clinic.lotus@example.org`.
+* **Tests**: `test_bites.py` 9/9 (day counting across midnight IST, month/leap/year boundaries; "No update"; privacy;
+  urgent fan-out; share links expire/revoke + access log; rate limits/dates/duplicates; dispute + closing; forbidden
+  wording incl. en.json `bite.*`); Playwright `bite.spec.ts` 3 tests × mobile + desktop (first aid first in en/ta/hi at
+  390 px; report → private link → doctor link → revoke; owner update → urgent banners → clinic view; forbidden wording).
+* **Not built (agreed reduced scope)**: staff moderation queue (disputes flagged on the dashboard instead), area-level
+  bite surveillance map, photos in daily check-ins, the separate afternoon reminder (case page and My pets banner show
+  "Today's update is needed"), reporter contact by phone (email only), in-app relay messaging (pages say "Contact through
+  the clinic").
+
 ### 21.7 How to resume
 ```bash
 git checkout signed-certs-bite-check          # uncommitted work is in the working tree

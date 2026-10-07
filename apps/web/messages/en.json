@@ -1592,7 +1592,8 @@
     "disclaimerTitle": "Please note",
     "verifiedOnly": "Only vaccinations verified by the clinic's vet are listed. Ask the clinic if you need confirmation.",
     "notFoundTitle": "This card is not available",
-    "notFoundBody": "The QR code may have been replaced or turned off by the pet's owner."
+    "notFoundBody": "The QR code may have been replaced or turned off by the pet's owner.",
+    "biteButton": "Did this pet bite someone? Get help now"
   },
   "clinic": {
     "title": "Clinic dashboard",
@@ -2100,6 +2101,158 @@
         "title": "Cancelled",
         "body": "An earlier certificate that the clinic replaced."
       }
+    }
+  },
+  "bite": {
+    "button": "Did this pet bite someone? Get help now",
+    "title": "Bitten by {pet}?",
+    "draftTranslation": "",
+    "firstAid": {
+      "title": "First aid — do this now",
+      "wash": "Wash the wound with soap and running water for 15 minutes.",
+      "doctor": "See a doctor today, whatever this pet's vaccination status.",
+      "noRemedies": "Don't apply turmeric, chilli or other home remedies.",
+      "findCare": "Find a hospital or health centre",
+      "call": "Call 112 (emergency)",
+      "source": "Based on guidance from the World Health Organization and India's National Rabies Control Programme. Pending clinical review."
+    },
+    "status": {
+      "title": "This pet's vaccination record",
+      "none": "No verified rabies vaccination record.",
+      "given": "{vaccine}, given {date}.",
+      "nextDue": "Next dose due {date}.",
+      "checking": "Checking the signed certificate…",
+      "genuine": "Signed certificate checked: issued by {clinic} and not changed.",
+      "notConfirmed": "The signed certificate could not be confirmed. Treat the record as unconfirmed.",
+      "noLists": "The signed certificate can't be checked on this device yet (needs a connection once).",
+      "noCertificate": "There is no signed certificate to check for this record.",
+      "showDoctor": "Show this screen to your doctor. Your doctor decides your treatment.",
+      "notAGuarantee": "A vaccination record does not replace medical care."
+    },
+    "report": {
+      "title": "Report this bite (optional)",
+      "intro": "It helps the pet's clinic follow up. You don't need an account, and the owner is not shown your details.",
+      "when": "Date of the bite",
+      "time": "Approximate time (optional)",
+      "who": "Who was bitten?",
+      "person": "A person",
+      "animal": "Another animal",
+      "area": "Area (optional, for example the neighbourhood)",
+      "note": "Anything else (optional)",
+      "email": "Email for updates (optional)",
+      "consent": "Send me updates about this pet's observation",
+      "share": "Let the owner see my email so they can contact me",
+      "submit": "Send report",
+      "sending": "Sending…",
+      "doctorLater": "After you send it, you get a private page where you can also make a link for your doctor.",
+      "failed": "The report could not be sent. Please try again — and get medical care first."
+    },
+    "created": {
+      "title": "Report sent ({reference})",
+      "save": "Save this link to see updates.",
+      "duplicate": "Someone already reported a bite by this pet on that day; you'll both see the same updates.",
+      "emailed": "We also emailed you the link.",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "open": "Open your private page"
+    },
+    "share": {
+      "reporterTitle": "Your bite report {reference}",
+      "doctorTitle": "Bite report {reference} — for the doctor",
+      "urgent": "The owner reported a change. Tell your doctor right away.",
+      "doctorNote": "Information provided to support your clinical decision. Owner reports are not vet-verified unless marked.",
+      "biteOn": "Bite on {date}",
+      "biteAt": "around {time}",
+      "bittenPerson": "A person was bitten.",
+      "bittenAnimal": "Another animal was bitten.",
+      "observationTitle": "{pet}'s observation",
+      "policy": "Observation period: {days} days after the bite (WHO guidance) — pending clinical review.",
+      "notStarted": "Day 1 of the observation starts tomorrow.",
+      "day": "Day {day}",
+      "dayStatus": {
+        "normal": "Normal",
+        "change": "Change reported",
+        "no_update": "No update",
+        "awaiting": "Waiting for today's update"
+      },
+      "state": {
+        "normal": "Normal",
+        "not_eating": "Not eating",
+        "unusual_behaviour": "Unusual behaviour",
+        "missing": "Pet missing",
+        "died": "Pet died",
+        "other": "Other change"
+      },
+      "ownerReported": "Owner-reported",
+      "vetRecorded": "Vet-recorded",
+      "ended": {
+        "completed": "Observation period completed — the owner reported no changes.",
+        "completed_with_gaps": "The observation period ended with days without an update. The clinic has been asked to follow up.",
+        "change_reported": "A change was reported during the observation period. The clinic has been asked to follow up."
+      },
+      "endedNote": "This does not change anything your doctor advised.",
+      "contactTitle": "Questions about the pet?",
+      "contactClinic": "Contact through the clinic: {clinic}",
+      "keepPrivate": "Keep this link private. Anyone with it can see this page.",
+      "expires": "This link works until {date}.",
+      "notFoundTitle": "This link doesn't work",
+      "notFoundBody": "It has expired or was turned off.",
+      "demo": "Demo data — fictional pet, clinic and report."
+    },
+    "doctorLinks": {
+      "title": "Link for your doctor",
+      "intro": "Make a read-only link to show your doctor. It expires after 30 days, and you can turn it off at any time.",
+      "make": "Make a doctor link",
+      "made": "Doctor link — copy it now, it is shown only once:",
+      "active": "{count, plural, =0 {No doctor links are active.} one {# doctor link is active.} other {# doctor links are active.}}",
+      "views": "{count, plural, one {opened # time} other {opened # times}}",
+      "until": "until {date}",
+      "revoke": "Turn off all doctor links",
+      "revoked": "Doctor links turned off.",
+      "failed": "That didn't work. Please try again."
+    },
+    "owner": {
+      "listTitle": "Bite reports",
+      "listIntro": "Reports that one of your pets bit someone. The person who reported it is not shown to you unless they chose to share their contact.",
+      "none": "There are no bite reports about your pets.",
+      "banner": "{pet} was reported in a bite. Please record today's update.",
+      "open": "Open bite reports",
+      "caseTitle": "{pet}: bite on {date}",
+      "intro": "Please keep {pet} under observation for {days} days and contact your vet today.",
+      "contactVet": "Contact your vet",
+      "contactVetNow": "Contact your vet now — you reported a change.",
+      "email": "Email {email}",
+      "call": "Call {phone}",
+      "todayTitle": "Today's update (day {day} of {days})",
+      "todayDone": "Today's update is saved. You can change it today.",
+      "todayNeeded": "Today's update is needed.",
+      "notePlaceholder": "Optional note",
+      "save": "Save today's update",
+      "saving": "Saving…",
+      "disputeTitle": "I dispute this report",
+      "disputeHint": "Tell the clinic why. Please keep recording daily updates — the observation continues.",
+      "disputeReason": "Reason",
+      "disputeSend": "Send to the clinic",
+      "disputed": "You disputed this report. The clinic can see your reason.",
+      "reportsTitle": "Reports",
+      "report": "{reference}: {who}",
+      "sharedContact": "The reporter shared their contact: {contact}",
+      "possibleDuplicate": "Possibly the same bite reported again",
+      "failed": "That didn't work. Please try again."
+    },
+    "clinic": {
+      "title": "Bite reports",
+      "intro": "Pets of this clinic reported in a bite, with their daily observation updates. Reporters' contact details are never shown.",
+      "none": "No bite reports.",
+      "urgent": "Change reported",
+      "missed": "{count, plural, one {# day without an update} other {# days without an update}}",
+      "disputed": "Disputed by the owner",
+      "duplicate": "Possible duplicate report",
+      "dayOf": "Day {day} of {days}",
+      "examTitle": "Record an examination",
+      "examSave": "Save examination",
+      "saved": "Examination saved.",
+      "failed": "That didn't work."
     }
   }
 }

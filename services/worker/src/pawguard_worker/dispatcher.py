@@ -82,6 +82,9 @@ class NotificationTicker:
                 queued = notify.queue_due()
                 if queued:
                     log.info("notifications_queued", count=queued)
+                closed = notify.close_bite_observations()  # ended observation periods: notices to owner/reporters
+                if closed:
+                    log.info("bite_observations_closed", count=closed)
             if now >= self.next_status:  # Twilio delivery status fallback (callbacks are the main path)
                 self.next_status = now + 60
                 notify.poll_twilio_status()

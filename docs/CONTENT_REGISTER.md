@@ -22,5 +22,17 @@ machine translation or an AI system.
 | C-PET-04 | Reminders and notification preview | "Reminders are shown in the app only…", "Preview only — no message is actually sent.", "PawGuard only reminds you. Your vet decides what your pet needs." | Product invariants | en; ta draft for the preview note | Product statement | — | — |
 | C-UI-TA-PETS | Tamil labels for the pet screens (`ta.json`: nav, pets, reminders, clinic, publicCard) | Interface labels only | — | ta | **Draft translation — pending native-speaker review** | — | Before ta release |
 
+| C-BITE-01 | Bite mode, reporter and owner pages — first aid 1 | "Wash the wound with soap and running water for 15 minutes." | S01, S30, S31 | en; ta/hi **draft translations shown with a "draft translation" note** | **Pending clinical review** | — | Before any real use |
+| C-BITE-02 | Bite mode — first aid 2 | "See a doctor today, whatever this pet's vaccination status." | S01, S30 ("as soon as possible"), S31 ("consult your doctor immediately") | en; ta/hi draft | **Pending clinical review** | — | Before any real use |
+| C-BITE-03 | Bite mode — first aid 3 | "Don't apply turmeric, chilli or other home remedies." The sources name chili powder / chillies, mustard oil, plant juices and irritants; **turmeric is not named in them** (added at the product owner's request as a common local remedy) | S30, S31 | en; ta/hi draft | **Pending clinical review** | — | Before any real use |
+| C-BITE-04 | Bite mode / private pages | "Show this screen to your doctor. Your doctor decides your treatment." · "A vaccination record does not replace medical care." · Doctor page: "Information provided to support your clinical decision. Owner reports are not vet-verified unless marked." | Product invariants | en; ta/hi draft (first two) | Product statement | — | — |
+| C-BITE-05 | Observation policy | "Observation period: 10 days after the bite (WHO guidance) — pending clinical review." Owner alert: "… keep him/her under observation for 10 days and contact your vet today." | S30 ("Keep the biting animal confined and under observation for 10 days"), S31 p. 90 | en | **Pending clinical review** | — | Before any real use |
+| C-BITE-06 | Closing statements | "Observation period completed — the owner reported no changes." / "…ended with days without an update…" / "A change was reported…" plus "This does not change anything your doctor advised." Never "safe", "rabies-free" or "no treatment needed" (automated checks in `test_bites.py` and `bite.spec.ts`) | Product invariants | en | Product statement | — | — |
+| C-UI-TA-BITE / C-UI-HI-BITE | Tamil and Hindi bite-mode strings (`bite.*` in ta.json / hi.json) | First aid, record, report form, urgent banner, day statuses | — | ta, hi | **Draft translation — pending clinical and native-speaker review** (written by software, not by a qualified translator) | — | Before ta/hi release |
+
 Health wording is deliberately **not** translated until a qualified reviewer approves both the English text and
 its translation; Tamil/Hindi readers see the English text with a notice in their language.
+
+**Exception (7 Oct 2026, product owner's request):** bite mode must be usable in Tamil and Hindi, so its first-aid
+lines are shown in draft Tamil/Hindi with a visible "draft translation — pending clinical and language review" note.
+This exception is limited to the C-BITE rows above and must be reviewed before any real use.

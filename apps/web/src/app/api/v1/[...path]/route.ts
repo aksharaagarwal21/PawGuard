@@ -56,6 +56,10 @@ async function handle(request: NextRequest, ctx: { params: Promise<{ path: strin
     if (v) headers.set(name, v);
   }
   if (token) headers.set("authorization", `Bearer ${token}`);
+  // Client address for public rate limits (e.g. bite reports), set here — never taken from the browser as is:
+  // the tunnel/proxy header first, then the first forwarded address. The API only stores a hash of it.
+  const clientIp = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  if (clientIp && !webhook) headers.set("x-pawguard-client-ip", clientIp.slice(0, 64));
   // A page may name the organisation explicitly (e.g. an owner uploading for a pet at another clinic). It is only
   // a selection: FastAPI checks the caller's membership in it on every request.
   const explicit = request.headers.get("x-pawguard-org");

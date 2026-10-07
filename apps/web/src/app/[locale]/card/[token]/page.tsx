@@ -58,6 +58,13 @@ export default async function PublicCardPage({ params }: { params: Promise<{ loc
         ) : (
           <>
             <h1 className="sr-only">{t("title", { name: card.pet_name })}</h1>
+            <a
+              href={`/${locale}/card/${token}/bite`}
+              className="flex min-h-14 items-center justify-center gap-2 rounded-card bg-urgent px-4 py-3 text-center font-display text-lg font-semibold text-white no-underline"
+              data-testid="bite-button"
+            >
+              {t("biteButton")}
+            </a>
             {lost?.lost ? (
               <section aria-labelledby="lost-h" className="space-y-3 rounded-card border-2 border-urgent bg-urgent-soft p-5">
                 <h2 id="lost-h" className="text-xl text-urgent">{tl("bannerTitle", { name: card.pet_name })}</h2>
