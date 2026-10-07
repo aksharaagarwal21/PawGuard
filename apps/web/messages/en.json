@@ -2300,5 +2300,81 @@
     },
     "signedDetail": "On the signed certificate: {pet} · {vaccine} · given {given} · {vet}",
     "disclaimer": "Automatic checks assist you and can be wrong. You decide: compare the certificate with the record yourself."
+  },
+  "story": {
+    "eyebrow": "Rabies awareness · a 25-second story",
+    "title": "One second with a sleeping dog. Know what to do next.",
+    "intro": "Watch what can happen on any street — and how acting the same day prevents rabies.",
+    "sceneOf": "Scene {n} of {total}",
+    "scenes": {
+      "0": "A quiet afternoon. A street dog is fast asleep in the shade.",
+      "1": "Aarav, 8, sees the dog on his way home and walks over to say hello.",
+      "2": "He reaches out to pat the sleeping dog.",
+      "3": "Startled awake, the dog bites his hand. It happens in a second.",
+      "4": "A bite can pass on rabies. The virus travels along the nerves to the brain — quietly, for weeks or months.",
+      "5": "Rabies can be prevented if you act today."
+    },
+    "alt": {
+      "0": "Illustration: a brown street dog sleeping under a tree.",
+      "1": "Illustration: a boy with a school bag walks towards the sleeping dog.",
+      "2": "Illustration: the boy leans over and pats the dog's head.",
+      "3": "Illustration: the dog wakes and bites the boy's hand; the boy pulls back, hurt.",
+      "4": "Illustration: red dots travel from the bite on the boy's hand up his arm to his head.",
+      "5": "Illustration: the boy washes his hand under a tap for 15 minutes while the dog is watched for 10 days."
+    },
+    "art": {
+      "fifteen": "15 min",
+      "watch": "10-day watch"
+    },
+    "symptoms": {
+      "title": "Signs of rabies, if it develops",
+      "when": "They usually start 2–3 months after the bite, but can appear after 1 week or as late as 1 year.",
+      "fever": "Fever and pain",
+      "tingling": "Tingling, pricking or burning at the bite",
+      "fear": "Fear of water and of fresh air",
+      "agitation": "Agitation, confusion, hallucinations",
+      "paralysis": "Weakness that spreads into paralysis",
+      "fatal": "Once these signs appear, rabies is almost always fatal. Don't wait for them — act on the day of the bite.",
+      "source": "Source: World Health Organization, rabies fact sheet. Pending clinical review."
+    },
+    "watch": "Keep the dog watched for 10 days. PawGuard tracks it with the owner.",
+    "whatToDo": "What to do now",
+    "signIn": "Sign in to PawGuard",
+    "pause": "Pause",
+    "play": "Play",
+    "replay": "Watch again",
+    "back": "Previous scene",
+    "next": "Next scene",
+    "scenesLabel": "Scenes",
+    "goTo": "Go to scene {n}",
+    "skip": "Skip to what to do",
+    "after": {
+      "title": "If a dog bites — what to do next",
+      "intro": "First aid comes first. Then PawGuard helps everyone involved follow up.",
+      "helpsTitle": "How PawGuard helps after a bite",
+      "helps": {
+        "scan": {
+          "title": "Scan the dog's PawGuard tag",
+          "body": "See whether a vet verified its rabies vaccination, and report the bite. Your contact details are not shown to the owner."
+        },
+        "watch": {
+          "title": "The dog is watched for 10 days",
+          "body": "The owner sends a daily update with the clinic. If you ask for updates, you're told at once if anything changes, and you can give your doctor a read-only link."
+        },
+        "verify": {
+          "title": "Check that a certificate is genuine",
+          "body": "Scan the signed QR code on a PawGuard certificate. Altered or cancelled certificates are caught, even offline.",
+          "link": "Open the verifier"
+        },
+        "protect": {
+          "title": "Keep your own pets protected",
+          "body": "Store vaccine records, get reminders before a dose is due, and carry a card your vet has verified.",
+          "link": "Sign in"
+        }
+      },
+      "preventTitle": "Prevent the next bite",
+      "preventBody": "Teach children to let sleeping dogs sleep, and never to touch a dog they don't know, a dog that is eating, or a mother with puppies."
+    },
+    "doctor": "See a doctor today, whatever the dog's vaccination status. The doctor decides on treatment."
   }
 }

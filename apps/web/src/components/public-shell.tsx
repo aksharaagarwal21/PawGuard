@@ -10,7 +10,7 @@ import { Wordmark } from "./wordmark";
 export async function PublicHeader() {
   const t = await getTranslations("nav");
   const tm = await getTranslations("meta");
-  const getStarted = serverEnv().demoMode ? "/welcome" : "/sign-in";
+  const getStarted = "/sign-in";
   const navLink =
     "inline-flex min-h-11 items-center rounded-control px-3 font-display font-semibold text-ink no-underline hover:bg-sage motion-safe:transition-colors motion-safe:duration-150";
   return (

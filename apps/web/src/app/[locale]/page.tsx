@@ -15,12 +15,13 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Button, StatusChip } from "@pawguard/ui";
 
+import { AfterBite } from "@/components/landing/after-bite";
+import { BiteStory } from "@/components/landing/bite-story";
 import { Faq } from "@/components/landing/faq";
 import { StatusGuide } from "@/components/landing/status-guide";
 import { PetStatusChip } from "@/components/pets/status";
 import { PublicPage } from "@/components/public-shell";
 import { Link } from "@/i18n/navigation";
-import { serverEnv } from "@/lib/server-env";
 
 const STEPS = [
   { key: "add", Icon: Camera },
@@ -44,18 +45,37 @@ const TRUST = [
 
 const WHO_URL = "https://www.who.int/news-room/fact-sheets/detail/rabies";
 
-/** Public landing page, told as a short story: what it is, how it works, what the colours mean, who it's for. */
+/** Public landing page: the bite story and what to do next, then what PawGuard is, how it works and who it's for. */
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("landing");
-  const getStarted = serverEnv().demoMode ? "/welcome" : "/sign-in";
+  const ts = await getTranslations("story");
+  const getStarted = "/sign-in";
   return (
     <PublicPage locale={locale}>
-      {/* Hero */}
-      <section className="container-pg grid items-center gap-10 py-12 md:py-16 lg:grid-cols-[1.1fr_0.9fr]">
+      {/* Story: a bite in a second, what rabies can do, what to do today */}
+      <section aria-labelledby="story-h" className="bg-sage/60 py-10 md:py-14">
+        <div className="container-pg">
+          <p className="text-sm font-semibold tracking-wide text-primary uppercase">{ts("eyebrow")}</p>
+          <h1 id="story-h" className="mt-2 max-w-3xl text-3xl md:text-[2.75rem] md:leading-[1.12]">
+            {ts("title")}
+          </h1>
+          <p className="mt-3 max-w-prose text-lg text-ink-2">{ts("intro")}</p>
+          <div className="mt-7 max-w-5xl">
+            <BiteStory />
+          </div>
+        </div>
+      </section>
+
+      <AfterBite />
+
+      {/* PawGuard and sign-in */}
+      <section aria-labelledby="pitch-h" className="container-pg grid items-center gap-10 py-12 md:py-16 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <h1 className="text-3xl md:text-[2.875rem] md:leading-[1.12]">{t("headline")}</h1>
+          <h2 id="pitch-h" className="text-3xl md:text-[2.5rem] md:leading-[1.15]">
+            {t("headline")}
+          </h2>
           <p className="prose-pg mt-5 text-lg text-ink-2">{t("subheading")}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg">

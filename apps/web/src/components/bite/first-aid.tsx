@@ -3,11 +3,11 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 /** First aid, always the first thing on every bite page. Wording: WHO + India's NRCP (CONTENT_REGISTER C-BITE-01..03),
  *  pending clinical review. Tamil/Hindi are draft translations and say so. */
-export async function FirstAid({ headingLevel = 2 }: { headingLevel?: 1 | 2 }) {
+export async function FirstAid({ headingLevel = 2 }: { headingLevel?: 1 | 2 | 3 }) {
   const t = await getTranslations("bite.firstAid");
   const tb = await getTranslations("bite");
   const locale = await getLocale();
-  const H = headingLevel === 1 ? "h1" : "h2";
+  const H = headingLevel === 1 ? "h1" : headingLevel === 3 ? "h3" : "h2";
   return (
     <section aria-labelledby="first-aid-h" className="space-y-4 rounded-card border-l-8 border-urgent bg-urgent-soft p-5" data-testid="first-aid">
       <H id="first-aid-h" className="text-2xl text-urgent">

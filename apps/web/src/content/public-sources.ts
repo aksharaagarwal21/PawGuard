@@ -19,7 +19,7 @@ export const PUBLIC_SOURCES: PublicSource[] = [
     title: "Rabies — fact sheet (updated 17 September 2026)",
     publisher: "World Health Organization",
     url: "https://www.who.int/news-room/fact-sheets/detail/rabies",
-    usedFor: "Wound washing for at least 15 minutes; seeking medical attention; fatality once symptoms appear.",
+    usedFor: "Wound washing for at least 15 minutes; seeking medical attention; fatality once symptoms appear; landing story: incubation (typically 2–3 months, 1 week to 1 year), first signs (fever, pain, tingling or burning at the wound), later signs (fear of water and of drafts, agitation, hallucinations, paralysis), virus moving to the central nervous system.",
     checked: "2026-10-05",
     reviewStatus: "unreviewed",
   },

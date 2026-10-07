@@ -19,7 +19,8 @@ for (const [label, viewport] of WIDTHS) {
     test.setTimeout(60_000);
     await page.setViewportSize(viewport);
     await page.goto("/en");
-    await expect(page.getByRole("heading", { level: 1, name: "Never miss your pet's vaccination again." })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name: "One second with a sleeping dog. Know what to do next." })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Never miss your pet's vaccination again." })).toBeVisible();
     await expect(page.getByRole("heading", { name: "What the colours mean" })).toBeVisible();
     await expect(page.getByText("This doesn't mean your pet is unvaccinated.", { exact: false })).toBeVisible();
     await page.getByText("Do reminders send SMS?").click();

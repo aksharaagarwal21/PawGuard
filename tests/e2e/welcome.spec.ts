@@ -2,10 +2,9 @@ import { expect, test } from "@playwright/test";
 
 import { expectNoAxeViolations } from "./helpers";
 
-/** Demo entry: opening the address shows the instructions; "Let's start" leads to the sign-in page. */
-test("opening the demo shows instructions, then Let's start opens sign-in", async ({ page }) => {
-  await page.goto("/");
-  await page.waitForURL(/\/en\/welcome$/);
+/** The instructions page (linked from sign-in): "Let's start" leads to the sign-in page. */
+test("the instructions page leads to sign-in", async ({ page }) => {
+  await page.goto("/en/welcome");
   await expect(page.getByRole("heading", { level: 1, name: "Welcome to PawGuard 360" })).toBeVisible();
   await expect(page.getByText("Sample accounts, pets and clinics", { exact: true })).toBeVisible();
   await expect(page.getByText("Photo matching is a research preview", { exact: false })).toBeVisible();
