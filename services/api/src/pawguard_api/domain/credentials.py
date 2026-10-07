@@ -248,7 +248,8 @@ def credential_photo(credential_id: UUID) -> str | None:
 
 def qr_svg(qr_text: str) -> str:
     buf = io.BytesIO()
-    segno.make(qr_text, error="m").save(buf, kind="svg", scale=4, border=2, xmldecl=False, svgns=True)
+    # viewBox, no fixed size: the page scales it (a fixed 276 px SVG in a smaller box was cropped, unscannable).
+    segno.make(qr_text, error="m").save(buf, kind="svg", scale=4, border=4, xmldecl=False, svgns=True, omitsize=True)
     return buf.getvalue().decode("utf-8")
 
 

@@ -65,12 +65,21 @@ def find_qr(image: bytes) -> str | None:
     (the PawGuard PDF card has a link QR and a certificate QR). Several passes: as is, grey, enlarged."""
     import cv2
     import numpy as np
+    from PIL import Image, UnidentifiedImageError
 
-    img = cv2.imdecode(np.frombuffer(image, np.uint8), cv2.IMREAD_COLOR)
-    if img is None:
+    # Decoding and resizing with Pillow; OpenCV only looks for QR codes. Inside the API process OpenCV's own image
+    # functions and thread pool failed with "Unknown C++ exception" (other native libraries share the process), so
+    # its threading is off and any OpenCV failure only skips that pass.
+    cv2.setNumThreads(0)
+    try:
+        with Image.open(io.BytesIO(image)) as pil:
+            pil.load()
+            grey_pil = pil.convert("L")
+    except (UnidentifiedImageError, OSError):
         return None
-    grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    candidates = [img, grey, cv2.resize(grey, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)]
+    grey = np.asarray(grey_pil)
+    big = np.asarray(grey_pil.resize((grey_pil.width * 2, grey_pil.height * 2), Image.Resampling.BICUBIC))
+    candidates = [grey, big]
     detectors = [cv2.QRCodeDetector()]
     if hasattr(cv2, "QRCodeDetectorAruco"):
         detectors.append(cv2.QRCodeDetectorAruco())
@@ -79,7 +88,8 @@ def find_qr(image: bytes) -> str | None:
         for candidate in candidates:
             try:
                 ok, texts, _pts, _ = det.detectAndDecodeMulti(candidate)
-            except cv2.error:
+            except Exception as exc:  # cv2.error or a native failure: try the next pass
+                log.info("evidence_qr_pass_failed", error=type(exc).__name__)
                 continue
             found.extend(str(t) for t in (texts if ok else []) if t)
             signed = next((t for t in found if t.strip().startswith(cose.PREFIX)), None)
@@ -218,7 +228,11 @@ def check_event(db: Any, ctx: OrgContext, event_id: UUID) -> dict[str, Any]:
             log.warning("evidence_image_failed", error=type(exc).__name__)
             image = None
         # 1. Signed PawGuard certificate
-        qr = find_qr(image) if image else None
+        try:
+            qr = find_qr(image) if image else None
+        except Exception as exc:  # QR reading is one pass of several; the others still run
+            log.warning("evidence_qr_failed", error=type(exc).__name__)
+            qr = None
         if qr and qr.strip().startswith(cose.PREFIX):
             result = verify_signed(db, qr)
             status, template = SIGNED_TEXT[result["status"]]

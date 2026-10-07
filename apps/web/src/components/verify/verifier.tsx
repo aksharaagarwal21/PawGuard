@@ -91,6 +91,30 @@ export function Verifier({ demoSamples }: { demoSamples: boolean }) {
     [lists],
   );
 
+  // A code handed over in the URL fragment (sample page "Check it in the verifier"); the fragment never reaches the
+  // server. It is checked once the lists have finished loading, then removed from the address bar.
+  const linked = useRef<string | null>(null);
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash.startsWith("#qr=")) return;
+    try {
+      linked.current = decodeURIComponent(hash.slice(4));
+    } catch {
+      linked.current = null;
+    }
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }, []);
+  useEffect(() => {
+    if (!linked.current || now === 0 || updating) return;
+    const qr = linked.current;
+    linked.current = null;
+    const id = window.setTimeout(() => {
+      setText(qr);
+      void check(qr);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [now, updating, check]);
+
   const stopCamera = useCallback(() => {
     stream.current?.getTracks().forEach((tr) => tr.stop());
     stream.current = null;

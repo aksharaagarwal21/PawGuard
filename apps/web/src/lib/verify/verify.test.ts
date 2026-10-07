@@ -54,6 +54,15 @@ describe("certificates", () => {
       expect(r.overdue).toBe(false);
     }
   });
+  it("survives copy and paste: line breaks, look-alike spaces and collapsed double spaces", async () => {
+    const g = vectors.certs.genuine;
+    const wrapped = g.replace(/(.{40})/g, "$1\r\n").replaceAll(" ", " ");
+    expect((await check(`  ${wrapped}\n`)).status).toBe("genuine");
+    const k = vectors.certs.revoked_key;
+    expect(k).toContain("  ");
+    expect((await check(k.replace(/ {2,}/g, " "))).status).toBe("untrusted");
+    expect((await check(vectors.certs.altered.replace(/ {2,}/g, " "))).status).toBe("altered");
+  });
   it("a changed date is detected as altered", async () => {
     expect((await check(vectors.certs.altered)).status).toBe("altered");
   });

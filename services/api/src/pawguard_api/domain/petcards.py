@@ -43,7 +43,7 @@ def _base(base_url: str | None) -> str:
 def _qr_svg(url: str) -> str:
     buf = io.BytesIO()
     # No <title>: the page wraps the SVG in one labelled image for screen readers.
-    segno.make(url, error="m").save(buf, kind="svg", scale=6, border=2, xmldecl=False, svgns=True)
+    segno.make(url, error="m").save(buf, kind="svg", scale=6, border=2, xmldecl=False, svgns=True, omitsize=True)
     return buf.getvalue().decode("utf-8")
 
 

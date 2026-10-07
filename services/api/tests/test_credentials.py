@@ -88,7 +88,12 @@ def test_verification_issues_a_minimal_signed_certificate(client, clinic, owner_
     p = msg.payload
     assert set(p) == {1, 2, 3, 4, 5, 6, 7}
     assert p[3][2] == "Coco" and p[4][1] == "Rabies (test)" and p[4][5] == "vet" and len(p[4][3]) == 10
-    flat = repr(p).lower()
+    def texts(v):  # only the text values: random id bytes can print as "@" and made this test flaky
+        if isinstance(v, dict):
+            return [t for k, x in v.items() for t in [str(k), *texts(x)]]
+        return [v] if isinstance(v, str) else []
+
+    flat = " ".join(texts(p)).lower()
     for forbidden in ("@", "owner", "phone", "address", "lat", "lon"):
         assert forbidden not in flat, forbidden
     # The owner's view lists it with a QR; no certificate for unverified records.

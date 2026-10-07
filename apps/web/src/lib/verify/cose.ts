@@ -96,9 +96,57 @@ export function verifySign1(msg: Sign1, publicKey: Uint8Array): boolean {
   }
 }
 
+/** Copying a code out of a page, PDF or chat adds line breaks and turns spaces into look-alikes. Remove what can never
+ *  be part of the code (Base45 has no line breaks, tabs or zero-width characters) and map look-alike spaces back. */
+export function normaliseQrText(text: string): string {
+  return text
+    .replace(/[   ]/g, " ")
+    .replace(/[\r\n\t​-‍﻿]/g, "")
+    .trim();
+}
+
 /** QR text → COSE_Sign1 (throws Unreadable for anything that is not a well-formed PawGuard certificate). */
 export async function decodeQr(text: string): Promise<Sign1> {
-  const t = text.trim();
+  const t = normaliseQrText(text);
+  try {
+    return await decodeExact(t);
+  } catch (e) {
+    if (!(e instanceof Unreadable) || !t.startsWith(PREFIX) || t.length >= MAX_QR_TEXT) throw e;
+    const repaired = await restoreSpaces(t);
+    if (repaired) return repaired;
+    throw e;
+  }
+}
+
+/** Base45 uses the space character, and copy and paste often turns a double space into one (or drops a trailing
+ *  one). Put back up to three spaces at existing spaces or at the end. Only a text that decodes completely — Base45,
+ *  the zlib checksum and the COSE structure — is accepted, and the signature is still checked afterwards, so a wrong
+ *  guess can never pass as genuine. */
+async function restoreSpaces(t: string): Promise<Sign1 | null> {
+  const spots: number[] = [];
+  for (let i = PREFIX.length; i <= t.length; i++) if (i === t.length || t[i] === " ") spots.push(i);
+  if (spots.length > 40) return null;
+  const withSpaces = (at: number[]) => at.reduceRight((s, i) => s.slice(0, i) + " " + s.slice(i), t);
+  const tries: number[][] = [];
+  spots.forEach((a, i) => {
+    tries.push([a]);
+    spots.slice(i).forEach((b, j) => {
+      tries.push([a, b]);
+      spots.slice(i + j).forEach((c) => tries.push([a, b, c]));
+    });
+  });
+  tries.sort((x, y) => x.length - y.length);
+  for (const at of tries) {
+    try {
+      return await decodeExact(withSpaces(at));
+    } catch {
+      /* not this one */
+    }
+  }
+  return null;
+}
+
+async function decodeExact(t: string): Promise<Sign1> {
   if (t.length > MAX_QR_TEXT || !t.startsWith(PREFIX)) throw new Unreadable("not a PawGuard certificate");
   let compressed: Uint8Array;
   try {

@@ -6,6 +6,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Notice } from "@pawguard/ui";
 
 import { PublicPage } from "@/components/public-shell";
+import { SampleActions } from "@/components/verify/sample-actions";
 import { Link } from "@/i18n/navigation";
 import { serverEnv } from "@/lib/server-env";
 
@@ -46,12 +47,15 @@ export default async function SamplesPage({ params }: { params: Promise<{ locale
                 <p className="text-sm">{t("missing")}</p>
               )}
               {sample?.qr_text ? (
-                <details>
-                  <summary className="cursor-pointer text-sm">{t("showText")}</summary>
-                  <p className="mt-1 font-mono text-xs break-all" data-qr-text>
-                    {sample.qr_text}
-                  </p>
-                </details>
+                <>
+                  <SampleActions qr={sample.qr_text} />
+                  <details>
+                    <summary className="cursor-pointer text-sm">{t("showText")}</summary>
+                    <p className="mt-1 font-mono text-xs break-all whitespace-pre-wrap" data-qr-text>
+                      {sample.qr_text}
+                    </p>
+                  </details>
+                </>
               ) : null}
             </li>
           ))}

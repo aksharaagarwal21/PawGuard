@@ -80,7 +80,7 @@ test("a photo of the QR code is read in the browser (WebAssembly fallback reader
   test.setTimeout(90_000);
   await page.goto("/en/verify/samples");
   // Turn the genuine sample's QR (SVG) into a PNG "photo" with a white margin.
-  const png = await page.getByTestId("sample-genuine").locator("svg").evaluate(async (svg) => {
+  const png = await page.getByTestId("sample-genuine").locator("svg.segno").evaluate(async (svg) => {
     const xml = new XMLSerializer().serializeToString(svg);
     const img = new Image();
     img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
