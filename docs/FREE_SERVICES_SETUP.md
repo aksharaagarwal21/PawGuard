@@ -88,6 +88,8 @@ allowed only inside the 24-hour window that starts when the recipient messages y
    PAWGUARD_GEMINI_API_KEY=the key
    PAWGUARD_GEMINI_MODEL=the model code from step 2
    ```
+   Tested October 2026: `gemini-2.5-flash` is closed to new API keys; `gemini-flash-lite-latest` answers in about
+   2 seconds and has the largest free quota. Larger "thinking" Flash models took 8–10 seconds.
 **Important (Gemini terms, free tier):** Google may use free-tier prompts and responses to improve its products and
 "human reviewers may read, annotate, and process your API input and output". The terms say: "Do not submit
 sensitive, confidential, or personal information to the Unpaid Services." PawGuard therefore sends no owner names,

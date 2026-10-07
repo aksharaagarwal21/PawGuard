@@ -26,6 +26,20 @@ from pawguard_api.settings import get_settings
 ACTIONS = ("open_reminders", "mark_done", "add_calendar", "open_pets", "open_card", "notifications", "how_to",
            "bite_help")
 LANGUAGES = {"en": "English", "hi": "Hindi", "ta": "Tamil"}
+# Fixed help text about the app itself (no personal data), so usage questions get a real answer.
+APP_GUIDE = (
+    "- Reminders: what is due or overdue. Reminders come 14 days, 7 days and 1 day before the due date, and if "
+    "overdue. After a visit, press 'Mark as done'; the clinic's vet then checks it. Reminders can be added to the "
+    "phone's calendar.\n"
+    "- Notifications: every channel is off until you turn it on. Email: switch it on, enter your address and open "
+    "the confirmation link we email you. Browser notifications: switch on and allow them in the browser. WhatsApp: "
+    "switch on and enter the number with country code.\n"
+    "- My pets: each pet's vaccination status, records and pet card with a QR tag for the collar.\n"
+    "- Lost & found: report a lost pet; someone who scans its QR tag can message you without seeing your phone "
+    "number or address.\n"
+    "- Help (bite help): what to do straight away after an animal bite or scratch.\n"
+    "- 'How to use PawGuard' in the menu is the full guide."
+)
 PER_HOUR = 20
 _recent: dict[str, deque[float]] = defaultdict(deque)
 
@@ -86,11 +100,13 @@ def _system(facts: str, today: str, language: str) -> str:
     return (
         "You are PawGuard's helper for pet owners in India. You help people use the PawGuard app and understand "
         "their pets' vaccination reminders.\n"
-        f"Today is {today}. Facts from the owner's clinic records (the only facts you may use):\n{facts}\n\n"
+        f"Today is {today}. Facts from the owner's clinic records (the only facts you may use about pets):\n{facts}\n\n"
+        f"How the PawGuard app works (menu names as shown):\n{APP_GUIDE}\n\n"
         "Rules:\n"
         "1. Never diagnose. Never recommend, change, skip, delay or schedule any vaccine or treatment, and never give "
         "doses. Say that their vet decides.\n"
-        "2. Use only the facts above. If something isn't there, say you don't know and suggest asking the clinic.\n"
+        "2. Use only the facts and the app guide above. If something isn't there, say you don't know and suggest "
+        "asking the clinic.\n"
         "3. If anyone was bitten or scratched by an animal, tell them to open bite help in the app and get medical "
         "care straight away.\n"
         "4. Statuses: up_to_date = verified and next dose more than 2 weeks away; due_soon = within 14 days; "
