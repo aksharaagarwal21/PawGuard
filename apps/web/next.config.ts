@@ -66,6 +66,11 @@ const nextConfig: NextConfig = {
         ],
       },
       { source: "/:locale(en|ta|hi)/verify", headers: [{ key: "Content-Security-Policy", value: verifyCsp }] },
+      // Voice questions on the assistant page need the microphone; every other page keeps it switched off.
+      {
+        source: "/:locale(en|ta|hi)/app/assistant",
+        headers: [{ key: "Permissions-Policy", value: "camera=(self), geolocation=(self), microphone=(self)" }],
+      },
     ];
   },
 };

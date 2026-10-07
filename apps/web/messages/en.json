@@ -1964,7 +1964,7 @@
       "heard": "Heard: “{text}”",
       "noRecognition": "Voice input isn't available in this browser. On Android use Chrome; on iPhone use Safari. You can type instead.",
       "noVoice": "This device has no {language} voice, so answers will be shown as text only.",
-      "denied": "Microphone permission was denied. Allow the microphone for this site, or type instead.",
+      "denied": "Microphone permission was denied. Allow the microphone for this site (the icon in the address bar), then try again — or type instead.",
       "noSpeech": "I didn't catch that — tap Talk and try again.",
       "error": "Voice input stopped. Try again or type instead.",
       "privacy": "In Chrome and Safari, speech recognition is done by the browser maker's online service (your recording is sent to it). Answers are read aloud by your device. Don't say personal details.",
@@ -1972,7 +1972,9 @@
         "en": "English",
         "hi": "Hindi",
         "ta": "Tamil"
-      }
+      },
+      "brave": "Brave switches off voice input. To talk to the assistant, open this page in Chrome or Edge — or type your question below.",
+      "network": "Voice input needs the browser's online speech service, which couldn't be reached. Check the connection, use Chrome or Edge, or type instead."
     }
   },
   "lost": {

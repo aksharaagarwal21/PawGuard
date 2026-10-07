@@ -68,6 +68,8 @@ export function AssistantChat({ status }: { status: Schemas["AssistantStatusOut"
     }
     stopSpeaking();
     setSpeaking(false);
+    // Brave ships the speech API but switches off the online recognition service behind it.
+    if ((navigator as Navigator & { brave?: unknown }).brave) return setVoiceNote(t("voice.brave"));
     const rec = createRecognition(lang);
     if (!rec) return setVoiceNote(t("voice.noRecognition"));
     recRef.current = rec;
@@ -82,7 +84,15 @@ export function AssistantChat({ status }: { status: Schemas["AssistantStatusOut"
       setHeard(finalText || interim);
     };
     rec.onerror = (e) => {
-      setVoiceNote(e.error === "not-allowed" || e.error === "service-not-allowed" ? t("voice.denied") : e.error === "no-speech" ? t("voice.noSpeech") : t("voice.error"));
+      setVoiceNote(
+        e.error === "not-allowed" || e.error === "service-not-allowed"
+          ? t("voice.denied")
+          : e.error === "no-speech"
+            ? t("voice.noSpeech")
+            : e.error === "network"
+              ? t("voice.network")
+              : t("voice.error"),
+      );
     };
     rec.onend = () => {
       setListening(false);
