@@ -94,9 +94,9 @@ def prepare_pets(s) -> None:
         return
     cert = upload(api, s, ROOT / "tests/fixtures/synthetic-certificate.jpg", "vaccination_evidence", "image/jpeg")
     r = api.post(f"/api/v1/my/pets/{bruno['id']}/vaccinations", json={
-        "product_text": "Leptospirosis vaccine (from a previous clinic, demo)",
+        "product_text": "Leptospirosis vaccine (from a previous clinic)",
         "administered_on": time.strftime("%Y-%m-%d", time.localtime(time.time() - 20 * 86400)),
-        "given_by": "Previous clinic (demo)", "certificate_media_ids": [cert]})
+        "given_by": "Previous clinic", "certificate_media_ids": [cert]})
     r.raise_for_status()
     print("Pets: owner upload for Bruno submitted; it is awaiting the clinic vet's verification.")
 
@@ -134,12 +134,12 @@ def main() -> None:
     if not analysis["dogs"]:
         sys.exit(f"No dog detected ({analysis['state']}); cannot choose a subject.")
     d = analysis["dogs"][0]
-    reason = "Demo preparation photo" if any(q["warnings"] for q in analysis.get("quality", [])) else None
+    reason = "Preparation photo" if any(q["warnings"] for q in analysis.get("quality", [])) else None
     r = api.post("/api/v1/observations", json={
         "animal_id": animal["id"], "observed_on": time.strftime("%Y-%m-%d"), "time_precision": "day",
         "media_ids": [mid], "subjects": [{"media_id": mid, "source": "detector",
                                           "box": {k: d[k] for k in ("x", "y", "w", "h")}, "dog_count": 1}],
-        "quality_override_reason": reason, "notes": "Demo preparation sighting (licence-filtered COCO photo)."})
+        "quality_override_reason": reason, "notes": "Sighting from the sample photo set (licence-filtered COCO photo)."})
     r.raise_for_status()
     wait(lambda: api.get("/api/v1/identity/status").json().get("index_coverage") == 1, "gallery indexing")
     print(f"Ready. Enrolled a photo for {animal['reference_code']}. On the capture page, upload:\n  {photo}")

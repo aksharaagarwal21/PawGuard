@@ -77,24 +77,24 @@ def seed_org(c: Connection, org: str, users: dict[str, UUID], n_animals: int, vo
                                    ("C", "South", -0.012, 0.004)]:
         aid = demo_id("area", f"{org}:{code}")
         alat, alon = lat0 + dlat, lon0 + dlon
-        _ins(c, "areas", {"id": aid, "org_id": org_id, "code": f"DEMO-{code}", "name": f"Demo Ward {code} — {name}",
-                          "kind": "ward", "boundary_source": "Synthetic demo geometry (not a real boundary)",
-                          "boundary_version": "demo-1", "is_demo": True, "effective_from": date(2026, 1, 1)},
+        _ins(c, "areas", {"id": aid, "org_id": org_id, "code": f"W-{code}", "name": f"Ward {code} — {name}",
+                          "kind": "ward", "boundary_source": "Approximate ward outline (sample data)",
+                          "boundary_version": "v1", "is_demo": True, "effective_from": date(2026, 1, 1)},
              {"boundary": f"extensions.st_geomfromtext('{_square(alat, alon, 0.005)}', 4326)"})
         areas.append((aid, alat, alon))
         counts["areas"] += 1
 
     products = []
-    for key, name in (("A", "DEMO Rabies Vaccine A (fictional)"), ("B", "DEMO Rabies Vaccine B (fictional)")):
+    for key, name in (("A", "Anti-rabies vaccine A"), ("B", "Anti-rabies vaccine B")):
         pid = demo_id("product", f"{org}:{key}")
-        _ins(c, "vaccine_products", {"id": pid, "org_id": org_id, "name": name, "manufacturer": "Fictional Biologicals",
+        _ins(c, "vaccine_products", {"id": pid, "org_id": org_id, "name": name, "manufacturer": None,
                                      "species": ["dog", "cat"], "unit": "dose", "review_state": "unreviewed",
                                      "is_demo": True})
         lots = []
         for j, exp in enumerate((today + timedelta(days=200), today - timedelta(days=30))):
             lid = demo_id("lot", f"{org}:{key}:{j}")
-            _ins(c, "vaccine_lots", {"id": lid, "org_id": org_id, "product_id": pid, "lot_number": f"DEMO-{key}-{j + 1:03d}",
-                                     "expiry_date": exp, "supplier": "Fictional supplier", "is_demo": True})
+            _ins(c, "vaccine_lots", {"id": lid, "org_id": org_id, "product_id": pid, "lot_number": f"ARV-{key}-{j + 1:03d}",
+                                     "expiry_date": exp, "supplier": None, "is_demo": True})
             lots.append((lid, exp))
         products.append((pid, lots))
 
@@ -150,7 +150,7 @@ def seed_org(c: Connection, org: str, users: dict[str, UUID], n_animals: int, vo
         row = {"id": eid, "org_id": org_id, "animal_id": aid, "original_animal_id": aid, "administered_on": administered,
                "date_precision": precision, "product_id": pid, "lot_id": lid, "lot_text": lot_text,
                "product_text": None if pid else "Rabies vaccine (product name not recorded)",
-               "administered_by_name": "Dr Fictional Vet (demo)", "source_type": "field_entry",
+               "administered_by_name": "Dr Meera Rao", "source_type": "field_entry",
                "submitter_note": note, "state": "submitted" if state != "draft" else "draft",
                "submitted_by": users[submitter], "submitted_at": datetime.now(UTC) - timedelta(days=(days_ago or 3)),
                "is_demo": True, "created_by": users[submitter]}
@@ -203,15 +203,15 @@ def seed_org(c: Connection, org: str, users: dict[str, UUID], n_animals: int, vo
         counts["tasks"] += 1
 
     # Field tasks for the volunteer and an unassigned pool for the coordinator
-    plan = [("round-a", "vaccination_round", "Vaccination round — Demo Ward A", 0, None, "assigned", 0),
-            ("round-b", "vaccination_round", "Vaccination round — Demo Ward B", 1, None, "in_progress", 1),
+    plan = [("round-a", "vaccination_round", "Vaccination round — Ward A", 0, None, "assigned", 0),
+            ("round-b", "vaccination_round", "Vaccination round — Ward B", 1, None, "in_progress", 1),
             ("follow-2", "animal_followup", "Check on limping dog", 2, 6, "assigned", 2),
-            ("survey-c", "survey", "Street survey — Demo Ward C", 2, None, "unassigned", 4),
+            ("survey-c", "survey", "Street survey — Ward C", 2, None, "unassigned", 4),
             ("follow-blocked", "animal_followup", "Re-sight dog last seen near the market", 0, 5, "blocked", -1)]
     for key, ttype, title, area_i, animal_i, state, due in plan:
         _ins(c, "field_tasks", {
             "id": demo_id("task", f"{org}:{key}"), "org_id": org_id, "task_type": ttype, "title": title,
-            "instructions": "Demo task. Follow your programme's field protocol.", "area_id": areas[area_i][0],
+            "instructions": "Follow your programme's field protocol.", "area_id": areas[area_i][0],
             "animal_id": animals[animal_i][0] if animal_i is not None else None,
             "assignee_membership_id": None if state == "unassigned" else vol_mid, "state": state,
             "due_on": today + timedelta(days=due), "priority": "high" if key == "follow-2" else "normal",
@@ -258,14 +258,14 @@ def _seed_planning(c: Connection, org: str, org_id: str, areas: list, lat0: floa
     for code, name, dlat, dlon in extra:
         aid = demo_id("area", f"{org}:{code}")
         alat, alon = lat0 + dlat, lon0 + dlon
-        _ins(c, "areas", {"id": aid, "org_id": org_id, "code": f"DEMO-{code}", "name": f"Demo Ward {code} — {name}",
-                          "kind": "ward", "boundary_source": "Synthetic demo geometry (not a real boundary)",
-                          "boundary_version": "demo-1", "is_demo": True, "effective_from": date(2026, 1, 1)},
+        _ins(c, "areas", {"id": aid, "org_id": org_id, "code": f"W-{code}", "name": f"Ward {code} — {name}",
+                          "kind": "ward", "boundary_source": "Approximate ward outline (sample data)",
+                          "boundary_version": "v1", "is_demo": True, "effective_from": date(2026, 1, 1)},
              {"boundary": f"extensions.st_geomfromtext('{_square(alat, alon, 0.004)}', 4326)"})
         all_areas.append((aid, alat, alon))
     coord_mid = demo_id("membership", f"{coordinator}:{org}")
-    for key, name, start_i, start, end, doses in (("1", "Demo team 1", 0, "08:00", "12:30", 60),
-                                                  ("2", "Demo team 2", 1, "09:00", "13:00", 45)):
+    for key, name, start_i, start, end, doses in (("1", "Team 1", 0, "08:00", "12:30", 60),
+                                                  ("2", "Team 2", 1, "09:00", "13:00", 45)):
         _ins(c, "teams", {"id": demo_id("team", f"{org}:{key}"), "org_id": org_id, "name": name,
                           "shift_start": start, "shift_end": end, "doses_per_day": doses,
                           "start_area_id": all_areas[start_i][0], "is_demo": True, "created_by": users[coordinator]})
@@ -275,11 +275,11 @@ def _seed_planning(c: Connection, org: str, org_id: str, areas: list, lat0: floa
         _ins(c, "survey_counts", {"id": demo_id("survey", f"{org}:{i}"), "org_id": org_id,
                                   "area_id": all_areas[i][0], "observed_on": today - timedelta(days=days),
                                   "dogs_counted": n, "marked_count": n // 3, "puppies_count": 2,
-                                  "method": "street_count", "notes": "Demo count (fictional).",
+                                  "method": "street_count", "notes": "Sample count.",
                                   "observer_user_id": users[coordinator], "is_demo": True})
     camp = demo_id("campaign", f"{org}:october")
-    _ins(c, "campaigns", {"id": camp, "org_id": org_id, "name": "Demo October vaccination round",
-                          "purpose": "Fictional campaign for trying the day planner.", "activity": "vaccination",
+    _ins(c, "campaigns", {"id": camp, "org_id": org_id, "name": "October vaccination round",
+                          "purpose": "Sample campaign for trying the day planner.", "activity": "vaccination",
                           "starts_on": today + timedelta(days=2), "ends_on": today + timedelta(days=9),
                           "coordinator_membership_id": coord_mid, "state": "draft", "is_demo": True,
                           "created_by": users[coordinator]})
@@ -304,4 +304,7 @@ def seed_domain(c: Connection, users: dict[str, UUID]) -> dict[str, object]:
     from pawguard_api.seed.bites import seed_bites
 
     out["bite_cases"] = seed_bites(c, users)
+    from pawguard_api.seed.clinic_map import seed_clinic_map
+
+    out["clinic_map"] = seed_clinic_map(c, users)
     return out

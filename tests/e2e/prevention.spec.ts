@@ -47,7 +47,7 @@ test("volunteer registers a provisional animal with a photo", async ({ browser }
   await page.getByLabel("Identifying marks").fill("Left ear notched; white tip on tail");
   await page.getByText("Female", { exact: true }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByLabel("Area").selectOption({ label: "Demo Ward A — North" });
+  await page.getByLabel("Area").selectOption({ label: "Ward A — North" });
   await page.getByTestId("new-animal-photo-file-input").setInputFiles(path.join(FIXTURES, "synthetic-animal.jpg"));
   await expect(page.getByText(/^(Ready|Checking the file…|Saved\. It will be checked shortly)/)).toBeVisible({ timeout: 30_000 });
   await page.getByRole("button", { name: "Continue" }).click();
@@ -71,9 +71,9 @@ test("volunteer submits vaccination evidence — shown as submitted, not verifie
   await expectNoAxeViolations(page);
   const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
   await page.getByLabel("Date", { exact: true }).fill(yesterday);
-  await page.getByLabel("Vaccine product").selectOption({ label: "DEMO Rabies Vaccine A (fictional)" });
-  await page.getByLabel("Lot / batch number").selectOption({ label: "DEMO-A-001" });
-  await page.getByLabel("Given by (name)").fill("Dr Fictional (demo)");
+  await page.getByLabel("Vaccine product").selectOption({ label: "Anti-rabies vaccine A" });
+  await page.getByLabel("Lot / batch number").selectOption({ label: "ARV-A-001" });
+  await page.getByLabel("Given by (name)").fill("Dr Meera Rao");
   await page.getByTestId("vacc-evidence-file-input").setInputFiles(path.join(FIXTURES, "synthetic-certificate.jpg"));
   await expect(page.getByText(/^(Ready|Checking the file…|Saved\. It will be checked shortly)/)).toBeVisible({ timeout: 30_000 });
   await page.getByRole("button", { name: "Submit for review" }).click();
@@ -107,7 +107,7 @@ test("volunteer sees the correction on Today and amends the record", async ({ br
   await expect(page.getByText("Please confirm the lot number against the vial label.").first()).toBeVisible();
   await page.getByRole("link", { name: "Correct this record" }).click();
   await page.getByLabel("Lot / batch number").selectOption({ label: "Type the lot number as written" });
-  await page.getByLabel("Lot number", { exact: true }).fill("DEMO-A-001/B");
+  await page.getByLabel("Lot number", { exact: true }).fill("ARV-A-001/B");
   await page.getByRole("button", { name: "Submit for review" }).click();
   await page.waitForURL(/\/app\/vaccinations\/[0-9a-f-]+\?submitted=1/);
   amendedEventUrl = page.url().split("?")[0]!;

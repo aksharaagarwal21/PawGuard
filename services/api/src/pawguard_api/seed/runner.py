@@ -49,8 +49,8 @@ def seed_accounts(c: Connection, auth: SupabaseAuthAdmin) -> dict[str, UUID]:
                     insert into app.professional_approvals (id, org_id, membership_id, user_id, scope,
                       evidence_reference, reviewer_user_id, review_state, decided_at, decision_reason, is_demo)
                     values (:id, :o, :m, :u, 'veterinary_review',
-                      'DEMO: fictional registration reference — not a real professional record',
-                      :rv, 'approved', now(), 'Demo fixture', true)
+                      'Sample registration reference (sample data, not a professional record)',
+                      :rv, 'approved', now(), 'Sample data', true)
                     on conflict (id) do update set review_state = 'approved', valid_until = null
                 """), {"id": demo_id("approval", f"{acc.key}:{org_key}"), "o": org_id, "m": mid,
                        "u": user_ids[acc.key], "rv": user_ids[admin_of[org_key].key]})

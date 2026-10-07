@@ -109,7 +109,7 @@ for (const [label, viewport] of WIDTHS) {
     await signIn(page, DEMO.clinicVet.email);
     await page.goto("/en/app/clinic");
     await expect(page.getByRole("heading", { level: 1, name: /Today at Lotus Pet Clinic/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Demo tools" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Presenter tools" })).toBeVisible();
     await check(page, `clinic-${label}`);
     await page.getByRole("button", { name: /Overdue/ }).click();
     await expect(page.getByText("Showing only: Overdue.")).toBeVisible();

@@ -11,7 +11,7 @@ test("WhatsApp demo panel shows setup state and the masked recipient, never cred
   await page.setViewportSize({ width: 1440, height: 900 });
   await signIn(page, DEMO.clinicVet.email);
   await page.goto("/en/app/clinic");
-  await expect(panel(page).getByRole("heading", { name: "WhatsApp demo (Twilio trial)" })).toBeVisible();
+  await expect(panel(page).getByRole("heading", { name: "WhatsApp (Twilio trial)" })).toBeVisible();
   await expect(panel(page)).toContainText("••••1527");
   await expect(panel(page)).toContainText("generic Twilio trial template");
   const html = await page.content();
@@ -79,7 +79,7 @@ test("WhatsApp demo history, failure explanations, IST times and double-click pr
   await signIn(page, DEMO.clinicVet.email);
   await page.goto("/en/app/clinic");
   const p = panel(page);
-  await expect(p.getByRole("heading", { name: "WhatsApp demo (Twilio trial)" })).toBeVisible();
+  await expect(p.getByRole("heading", { name: "WhatsApp (Twilio trial)" })).toBeVisible();
   await expect(p.getByTestId("wa-template-preview")).toContainText("Test message from Twilio.");
   await expect(p).toContainText("exact text Twilio reported");
   const history = p.getByTestId("wa-history");
@@ -105,7 +105,7 @@ test("WhatsApp demo history, failure explanations, IST times and double-click pr
   await expect(p.getByRole("status")).toContainText("Queued");
   expect(posts).toBe(1);
 
-  await p.getByRole("button", { name: "Schedule demo reminder in 2 minutes" }).click();
+  await p.getByRole("button", { name: "Schedule a practice reminder in 2 minutes" }).click();
   await expect(p.getByRole("status")).toContainText("already waiting");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await expectNoAxeViolations(page);

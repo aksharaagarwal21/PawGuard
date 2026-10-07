@@ -30,7 +30,7 @@ test("genuine, altered and cancelled certificates, verified in the browser", asy
 
   const genuine = await check(page, samples.genuine);
   await expect(genuine.locator("[data-result=genuine]")).toBeVisible();
-  await expect(genuine).toContainText("Issued by Demo — Lotus Pet Clinic");
+  await expect(genuine).toContainText("Issued by Lotus Pet Clinic");
   await expect(genuine).toContainText("Bruno");
   await expect(genuine).toContainText("Check that this matches the animal in front of you.");
 

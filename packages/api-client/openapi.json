@@ -2831,6 +2831,114 @@
         "title": "ErrorResponse",
         "type": "object"
       },
+      "EvidenceCheckItemOut": {
+        "properties": {
+          "certificate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SignedSummaryOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "enum": [
+              "file",
+              "signature",
+              "reading",
+              "date",
+              "vaccine",
+              "batch",
+              "reuse"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "warn",
+              "bad",
+              "info",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "status",
+          "message",
+          "certificate"
+        ],
+        "title": "EvidenceCheckItemOut",
+        "type": "object"
+      },
+      "EvidenceCheckOut": {
+        "properties": {
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceFileOut"
+            },
+            "title": "Files",
+            "type": "array"
+          },
+          "summary": {
+            "enum": [
+              "problems",
+              "check",
+              "partial",
+              "consistent"
+            ],
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary",
+          "files"
+        ],
+        "title": "EvidenceCheckOut",
+        "type": "object"
+      },
+      "EvidenceFileOut": {
+        "properties": {
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/EvidenceCheckItemOut"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "photo",
+              "pdf"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "media_id": {
+            "format": "uuid",
+            "title": "Media Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "media_id",
+          "kind",
+          "checks"
+        ],
+        "title": "EvidenceFileOut",
+        "type": "object"
+      },
       "EvidenceOut": {
         "properties": {
           "detected_mime": {
@@ -7415,6 +7523,98 @@
           "cose"
         ],
         "title": "SignedListOut",
+        "type": "object"
+      },
+      "SignedSummaryOut": {
+        "properties": {
+          "clinic": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clinic"
+          },
+          "given_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Given On"
+          },
+          "next_due_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Due On"
+          },
+          "pet_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pet Name"
+          },
+          "pet_reference": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pet Reference"
+          },
+          "vaccine": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vaccine"
+          },
+          "vet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vet"
+          }
+        },
+        "required": [
+          "pet_reference",
+          "pet_name",
+          "vaccine",
+          "given_on",
+          "next_due_on",
+          "clinic",
+          "vet"
+        ],
+        "title": "SignedSummaryOut",
         "type": "object"
       },
       "SignedUrlOut": {
@@ -22052,6 +22252,103 @@
           }
         },
         "summary": "Correct a verified record (vet); replaces its signed certificate",
+        "tags": [
+          "certificates (signed)"
+        ]
+      }
+    },
+    "/api/v1/vaccination-events/{event_id}/evidence-check": {
+      "get": {
+        "description": "Permission: clinic staff. For each attached certificate: verifies a signed PawGuard QR if present, reads the\ncertificate (OCR / Gemini vision for sample clinics) and compares date, vaccine and batch with the record, and flags\na file already used for another record. Assists the vet — never verifies or rejects on its own.",
+        "operationId": "certificates (signed)_check_evidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "event_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Event Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-pawguard-org",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Pawguard-Org"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvidenceCheckOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "AI-assisted check of a record's certificates",
         "tags": [
           "certificates (signed)"
         ]

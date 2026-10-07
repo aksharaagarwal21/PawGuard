@@ -41,7 +41,7 @@ def _when(d: date) -> str:
 def compose(info: dict[str, Any], s: Settings) -> Message:
     """Build the message from facts only (no free text from users)."""
     link = f"{s.public_app_url}/en/app/reminders"
-    demo = "\n\n(Demo — fictional pets and clinics. Not for real medical use.)" if info.get("is_demo") else ""
+    demo = "\n\n(Sample data — not for real medical use.)" if info.get("is_demo") else ""
     footer = ("\n\nPawGuard only reminds you; your vet decides what your pet needs."
               "\nTo stop these messages, open PawGuard → Notifications.")
     if info["kind"] == "verify_email":
@@ -74,8 +74,8 @@ def compose(info: dict[str, Any], s: Settings) -> Message:
         return Message(f"Observation ended for {pet}", f"Hello,\n\n{short} Your clinic can see it in PawGuard.\n\n"
                        f"{bites_link}{demo}", short, bites_link)
     if info["kind"] == "demo_reminder":
-        short = f"PawGuard demo: {info.get('pet') or 'Biscuit'} (fictional pet) has a vaccination reminder."
-        return Message("PawGuard demo reminder", f"Hello,\n\n{short}\n\n{link}{demo}", short, link)
+        short = f"PawGuard practice reminder for {info.get('pet') or 'Biscuit'} (sample pet)."
+        return Message("PawGuard practice reminder", f"Hello,\n\n{short}\n\n{link}{demo}", short, link)
     if info["kind"] == "test":
         subject = "PawGuard test message"
         short = "PawGuard: this is a test message. Your notifications are working."
@@ -98,7 +98,7 @@ def compose_verification(token: str, s: Settings) -> Message:
     short = "Please confirm your email address for PawGuard reminders."
     text = ("Hello,\n\nSomeone (hopefully you) asked PawGuard 360 to send vaccination reminders to this address.\n"
             f"To confirm, open this link within 48 hours:\n{link}\n\n"
-            "If this wasn't you, ignore this email — nothing will be sent to you.\n\n— PawGuard 360 (demo)")
+            "If this wasn't you, ignore this email — nothing will be sent to you.\n\n— PawGuard 360")
     return Message("Confirm your email for PawGuard reminders", text, short, link)
 
 

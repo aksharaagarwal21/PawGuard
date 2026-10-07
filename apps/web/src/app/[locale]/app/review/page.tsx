@@ -5,6 +5,7 @@ import { Card, EmptyState, Notice, StatusChip } from "@pawguard/ui";
 
 import { PageBody, PageHeader } from "@/components/page-header";
 import { VaccinationStateChip } from "@/components/prevention/evidence";
+import { EvidenceCheck } from "@/components/vaccinations/evidence-check";
 import { Link } from "@/i18n/navigation";
 import { formatDateTime, formatPartialDate } from "@/lib/format";
 import { pageContext } from "@/lib/page-context";
@@ -138,6 +139,11 @@ export default async function ReviewPage({
                       ))}
                     </ul>
                   )}
+                  {e.evidence.length ? (
+                    <div className="mt-3">
+                      <EvidenceCheck eventId={e.id} />
+                    </div>
+                  ) : null}
                   {draft ? (
                     <div className="mt-3 rounded-control border border-dashed border-control p-3 text-sm">
                       <p className="font-semibold">{tv("ocr.title")}</p>

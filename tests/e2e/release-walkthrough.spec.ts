@@ -82,7 +82,7 @@ test("Prevention walkthrough: register → sighting → evidence → task → ve
   await vol.getByLabel("Identifying marks").fill("Notched left ear");
   await vol.getByText("Female", { exact: true }).click();
   await vol.getByRole("button", { name: "Continue" }).click();
-  await vol.getByLabel("Area").selectOption({ label: "Demo Ward A — North" });
+  await vol.getByLabel("Area").selectOption({ label: "Ward A — North" });
   await vol.getByTestId("new-animal-photo-file-input").setInputFiles(path.join(FIXTURES, "synthetic-animal.jpg"));
   await expect(vol.getByText(/^(Ready|Checking the file…|Saved\. It will be checked shortly)/)).toBeVisible({ timeout: 30_000 });
   await vol.getByRole("button", { name: "Continue" }).click();
@@ -109,9 +109,9 @@ test("Prevention walkthrough: register → sighting → evidence → task → ve
   await vol.getByRole("link", { name: "Record vaccination evidence" }).click();
   const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
   await vol.getByLabel("Date", { exact: true }).fill(yesterday);
-  await vol.getByLabel("Vaccine product").selectOption({ label: "DEMO Rabies Vaccine A (fictional)" });
-  await vol.getByLabel("Lot / batch number").selectOption({ label: "DEMO-A-001" });
-  await vol.getByLabel("Given by (name)").fill("Dr Fictional (demo)");
+  await vol.getByLabel("Vaccine product").selectOption({ label: "Anti-rabies vaccine A" });
+  await vol.getByLabel("Lot / batch number").selectOption({ label: "ARV-A-001" });
+  await vol.getByLabel("Given by (name)").fill("Dr Meera Rao");
   await vol.getByTestId("vacc-evidence-file-input").setInputFiles(path.join(FIXTURES, "synthetic-certificate.jpg"));
   await expect(vol.getByText(/^(Ready|Checking the file…|Saved\. It will be checked shortly)/)).toBeVisible({ timeout: 30_000 });
   await expectNoAxeViolations(vol);

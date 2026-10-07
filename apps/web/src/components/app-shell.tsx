@@ -34,7 +34,6 @@ import { serverApi, type Me, type MembershipInfo } from "@/lib/session";
 import { ConnectionStatus } from "./connection-status";
 import { LanguageSwitcher } from "./language-switcher";
 import { NavLink } from "./nav-link";
-import { DemoBanner } from "./public-shell";
 import { Wordmark } from "./wordmark";
 
 const ICONS: Record<NavItem["icon"], React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
@@ -187,7 +186,6 @@ export async function AppShell({
       </aside>
 
       <div className="flex min-h-dvh flex-col pb-20 md:pb-0">
-        <DemoBanner />
         <TranslationNotice locale={locale} />
         <header className="flex items-center gap-3 border-b border-divider bg-surface px-4 py-2 md:hidden">
           <Link href="/app" className="no-underline">

@@ -149,12 +149,11 @@ def owner_card_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
     pdf.set_auto_page_break(auto=True, margin=12)
     pdf.add_page()
     pdf.set_title(_latin(f"Vaccination card - {data.pet_name}"))
-    if data.is_demo:
-        pdf.set_font("Noto", "B", 9)
-        pdf.set_fill_color(230, 225, 245)
-        pdf.cell(0, 7, "DEMO DATA — fictional pet and clinic, not a real record", new_x="LMARGIN", new_y="NEXT",
-                 fill=True, align="C")
-        pdf.ln(2)
+    if data.is_demo:  # one quiet line, not a banner
+        pdf.set_font("Noto", "", 7)
+        pdf.set_text_color(110, 110, 110)
+        pdf.cell(0, 4, "Sample data", new_x="LMARGIN", new_y="NEXT", align="R")
+        pdf.set_text_color(0, 0, 0)
     pdf.set_font("Noto", "B", 18)
     pdf.cell(0, 10, _latin(data.pet_name), new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Noto", "", 10)
@@ -236,7 +235,7 @@ def owner_tags_pdf(p: Principal, animal_id: UUID, base_url: str | None, request_
     pdf.multi_cell(0, 4, "Print at 100% scale, cut along the dashed lines and laminate. The QR code shows only the "
                          "pet's name, photo, clinic and vaccinations verified by a vet - never your contact details. "
                          "Making a new QR code in the app makes these tags stop working."
-                   + ("  DEMO DATA - fictional pet." if data.is_demo else ""), new_x="LMARGIN", new_y="NEXT")
+                   + ("  Sample data." if data.is_demo else ""), new_x="LMARGIN", new_y="NEXT")
     top, left, w, h, cols, rows = 30.0, 12.5, 45.0, 62.0, 4, 4
     pdf.set_draw_color(150, 150, 150)
     pdf.set_dash_pattern(dash=1.5, gap=1.5)

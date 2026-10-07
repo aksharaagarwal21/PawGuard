@@ -69,13 +69,13 @@ password is documented in `README.md` for development use only.
 
 | Role in the demo | Button | Organisation |
 |---|---|---|
-| Volunteer | **Sign in as Priya** | Demo — Riverside Animal Welfare Trust |
+| Volunteer | **Sign in as Priya** | Riverside Animal Welfare Trust |
 | Veterinary reviewer | **Sign in as Dr Arun** | Riverside (approved reviewer) |
 | Coordinator | **Sign in as Meena** | Riverside coordinator (also a volunteer at Hillview — choose Riverside under **More → Switch organisation** if needed) |
-| Pet owner | **Sign in as Neha** | Demo — Lotus Pet Clinic (fictional): Bruno (up to date), Misty (due soon), Coco (overdue) |
+| Pet owner | **Sign in as Neha** | Lotus Pet Clinic: Bruno (up to date), Misty (due soon), Coco (overdue) |
 | Clinic vet | **Sign in as Dr Kiran** | Lotus (approved veterinary reviewer) |
 | Clinic manager | **Sign in as Asha** | Lotus (dashboard and counts; cannot verify) |
-| Another clinic | **Sign in as Vikram** | Demo — Banyan Veterinary Centre (fictional): sees none of Lotus's pets |
+| Another clinic | **Sign in as Vikram** | Banyan Veterinary Centre: sees none of Lotus's pets |
 
 Tip: open Priya in a normal window and Dr Arun in a private window so you don't have to sign out between steps.
 
@@ -130,7 +130,7 @@ record's origin, not the pet's health or identity; offline verifiers only know c
 | 3 | **Choose photo** → select `000000392818.jpg` | Status **Checking the file…** → **Ready**, then the photo with a numbered box and **Which dog do you want to look up?** | "The photo is checked and stripped of location metadata; the detector only marks where a dog may be." |
 | 4 | Click **Dog 1**. If **Why use this photo anyway?** appears, type `Clearest photo taken today`. Click **Look for possible matches** | "Looking through this organisation's photos…", then **Possible matches** → **Possible match 1 · PG-MGZ2-GBBN** with **Your photo** beside **On record** photos, no percentages | "These are suggestions, not identifications. There's no confidence percentage on purpose — the person compares the photos." |
 | 5 | On the card: **This is the same animal** → dialog **Record this photo as a sighting of PG-MGZ2-GBBN?** → **Yes, same animal** | The animal's profile, *Sightings* tab, with today's sighting | "Nothing is linked until a person confirms." |
-| 6 | Click **Record vaccination evidence**. **Date**: yesterday · **Vaccine product**: *DEMO Rabies Vaccine A (fictional)* · **Lot / batch number**: *DEMO-A-001* · **Given by (name)**: `Dr Fictional (demo)` · evidence **Choose file** → `synthetic-certificate.jpg` (wait for **Ready**) → **Submit for review** | Record page **Submitted for review** | "Volunteers submit evidence; they can't verify it — the server refuses even a hand-made request." |
+| 6 | Click **Record vaccination evidence**. **Date**: yesterday · **Vaccine product**: *Anti-rabies vaccine A* · **Lot / batch number**: *ARV-A-001* · **Given by (name)**: `Dr Meera Rao` · evidence **Choose file** → `synthetic-certificate.jpg` (wait for **Ready**) → **Submit for review** | Record page **Submitted for review** | "Volunteers submit evidence; they can't verify it — the server refuses even a hand-made request." |
 | 7 | Switch to Dr Arun's window (or **Sign out** → **Sign in as Dr Arun**) → menu **Review** → click **PG-MGZ2-GBBN** in *Waiting for review* | **Verification workbench** with the record and the certificate | "Only an approved veterinary reviewer, who didn't submit it, can verify." |
 | 8 | **Verify** → read the dialog → **Verify** | Dialog text: verifying "does not certify that the animal cannot carry or transmit disease"; then **Record verified.** | "We are careful about what a record means." |
 | 9 | Priya's window → open PG-MGZ2-GBBN (Animals → search `PG-MGZ2-GBBN`) → press **F5** | **Last verified vaccination record: <date>** and "It does not mean the animal cannot carry or transmit disease." — still there after refresh | "It's stored server-side with a full audit trail, and another organisation can't see any of it." |
@@ -145,7 +145,7 @@ continue from step 6. To restore the prepared match: `.venv\Scripts\python.exe s
   street dogs), both charts, and why the threshold is not yet reliable.
 - *Offline:* as Priya open **Offline field kit** → **Use this device for field work** (once) → browser DevTools →
   Network → **Offline** → reload → **Start** a task → "Not sent yet" → set back to **No throttling** → "Sent: 1 applied…".
-- *Planning:* as Meena → **Campaign planning** → **Demo October vaccination round** → **Make plan** → point at
+- *Planning:* as Meena → **Campaign planning** → **October vaccination round** → **Make plan** → point at
   "Travel times are straight-line distance × 1.3 at 15 km/h — an estimate" and **Not planned, and why**.
 
 ## 4. Recovery during the demo
@@ -201,7 +201,7 @@ Not available offline (by design): photos, vaccination evidence, registering ani
 - Health and first-aid wording has **not** been reviewed by clinicians.
 - **Pet reminders are in-app only.** Email/SMS texts are previews; nothing is sent. The `.ics` file is real.
   Seeded pets, clinics, products and due dates are fictional; product schedule templates are demo data labelled
-  "Demo template — confirm with your vet" — the app only reminds and never decides treatment.
+  "Standard schedule — confirm with your vet" — the app only reminds and never decides treatment.
 - The clinic count describes **pets registered in this app**, not population coverage.
 - The PDF card uses a built-in Latin font: names in Tamil script print as "?" in the PDF (the web card is fine).
 

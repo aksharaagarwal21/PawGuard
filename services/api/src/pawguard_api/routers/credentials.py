@@ -7,13 +7,14 @@ from fastapi import APIRouter, Request, Response
 from pawguard_api.credential_contracts import (
     CredentialPhotoOut,
     DemoSamplesOut,
+    EvidenceCheckOut,
     IssuedOut,
     PetCertificatesOut,
     SignedListOut,
     VaccinationCorrect,
 )
 from pawguard_api.deps import CurrentOrg, CurrentPrincipal
-from pawguard_api.domain import credentials, petcare, vaccinations
+from pawguard_api.domain import credentials, evidence_check, petcare, vaccinations
 from pawguard_api.errors import ApiError
 from pawguard_api.integrations.cose import SigningUnavailable
 
@@ -101,3 +102,13 @@ def correct(event_id: UUID, body: VaccinationCorrect, ctx: CurrentOrg) -> Issued
         raise ApiError("Corrected, but signing is not set up on this server.", code="signing_unavailable",
                        status_code=503)
     return IssuedOut(credential_id=cid)
+
+
+@router.get("/api/v1/vaccination-events/{event_id}/evidence-check", response_model=EvidenceCheckOut,
+            summary="AI-assisted check of a record's certificates")
+def check_evidence(event_id: UUID, ctx: CurrentOrg) -> EvidenceCheckOut:
+    """Permission: clinic staff. For each attached certificate: verifies a signed PawGuard QR if present, reads the
+    certificate (OCR / Gemini vision for sample clinics) and compares date, vaccine and batch with the record, and flags
+    a file already used for another record. Assists the vet — never verifies or rejects on its own."""
+    with ctx.tx() as db:
+        return EvidenceCheckOut(**evidence_check.check_event(db, ctx, event_id))

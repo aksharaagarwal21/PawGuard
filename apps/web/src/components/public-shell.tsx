@@ -76,16 +76,6 @@ export async function PublicHeader() {
   );
 }
 
-export async function DemoBanner() {
-  if (!serverEnv().demoMode) return null;
-  const t = await getTranslations("common");
-  return (
-    <div role="note" className="bg-lavender text-ink">
-      <p className="container-pg py-2 text-sm font-semibold">{t("demoBanner")}</p>
-    </div>
-  );
-}
-
 export async function TranslationNotice({ locale }: { locale: string }) {
   if (locale === "en") return null;
   const t = await getTranslations("common");
@@ -132,7 +122,6 @@ export async function PublicFooter() {
 export async function PublicPage({ locale, children }: { locale: string; children: React.ReactNode }) {
   return (
     <>
-      <DemoBanner />
       <TranslationNotice locale={locale} />
       <PublicHeader />
       <main id="main" tabIndex={-1} className="outline-none">

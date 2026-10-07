@@ -79,6 +79,18 @@ def summary(ctx: CurrentOrg) -> ProgrammeSummary:
                             areas=areas, totals=AreaSummary(area_id=None, area_code=None, area_name="All areas", **tot))
 
 
+def _status(last_verified: Any, next_due: Any) -> str:
+    """Vaccination status for map colouring (same 14-day rule as the pet status)."""
+    from datetime import date, timedelta
+
+    if last_verified is None:
+        return "no_verified_record"
+    if next_due is None:
+        return "verified"
+    today = date.today()
+    return "overdue" if next_due < today else "due_soon" if next_due <= today + timedelta(days=14) else "up_to_date"
+
+
 @router.get("/map/layers", summary="Map layers (GeoJSON)")
 def layers(ctx: CurrentOrg, days: Annotated[int, Query(ge=1, le=365)] = 90) -> dict[str, Any]:
     """Permission: ``animal.read``. Sighting points are exact only with ``animal.location.exact`` and otherwise
@@ -92,8 +104,12 @@ def layers(ctx: CurrentOrg, days: Annotated[int, Query(ge=1, le=365)] = 90) -> d
             where boundary is not null and (effective_to is null or effective_to > current_date)""")).all()
         sightings = db.execute(text(f"""
             select o.id, o.animal_id, a.reference_code, coalesce(o.observed_at::date, o.observed_on) as day,
-                   st_asgeojson({col}::geometry, 6)::json as geom
+                   st_asgeojson({col}::geometry, 6)::json as geom, a.nickname, a.species, a.ownership_category,
+                   v.administered_on as last_verified, v.next_review_on as next_due
             from app.animal_observations o left join app.animals a on a.id = o.animal_id
+            left join lateral (select e.administered_on, e.next_review_on from app.animal_vaccination_events e
+                               where e.animal_id = a.id and e.state = 'verified'
+                               order by e.administered_on desc nulls last limit 1) v on true
             where {col} is not null and o.created_at >= now() - make_interval(days => :d)
             order by o.created_at desc limit 2001"""), {"d": days}).all()  # noqa: S608
         tasks = db.execute(text("""
@@ -110,7 +126,11 @@ def layers(ctx: CurrentOrg, days: Annotated[int, Query(ge=1, le=365)] = 90) -> d
         "sightings": {"type": "FeatureCollection", "features": [
             {"type": "Feature", "id": str(r.id), "geometry": r.geom,
              "properties": {"animal_id": str(r.animal_id) if r.animal_id else None, "reference": r.reference_code,
-                            "day": r.day.isoformat() if r.day else None}} for r in sightings[:2000]]},
+                            "day": r.day.isoformat() if r.day else None, "name": r.nickname, "species": r.species,
+                            "ownership": r.ownership_category, "status": _status(r.last_verified, r.next_due),
+                            "last_verified": r.last_verified.isoformat() if r.last_verified else None,
+                            "next_due": r.next_due.isoformat() if r.next_due else None}}
+            for r in sightings[:2000]]},
         "tasks": {"type": "FeatureCollection", "features": [
             {"type": "Feature", "id": str(r.id), "geometry": r.geom,
              "properties": {"title": r.title, "state": r.state, "task_type": r.task_type}} for r in tasks]},

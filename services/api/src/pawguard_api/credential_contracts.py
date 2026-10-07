@@ -61,3 +61,31 @@ class DemoSamplesOut(Out):
     genuine: DemoSampleOut
     altered: DemoSampleOut
     cancelled: DemoSampleOut
+
+
+class SignedSummaryOut(Out):
+    pet_reference: str | None
+    pet_name: str | None
+    vaccine: str | None
+    given_on: str | None
+    next_due_on: str | None
+    clinic: str | None
+    vet: str | None
+
+
+class EvidenceCheckItemOut(Out):
+    kind: Literal["file", "signature", "reading", "date", "vaccine", "batch", "reuse"]
+    status: Literal["ok", "warn", "bad", "info", "unavailable"]
+    message: str
+    certificate: SignedSummaryOut | None = None
+
+
+class EvidenceFileOut(Out):
+    media_id: UUID
+    kind: Literal["photo", "pdf"]
+    checks: list[EvidenceCheckItemOut]
+
+
+class EvidenceCheckOut(Out):
+    summary: Literal["problems", "check", "partial", "consistent"]
+    files: list[EvidenceFileOut]

@@ -13,9 +13,9 @@ test.skip(({ isMobile }) => isMobile, "journey runs once on desktop");
 const run = Date.now().toString(36).toUpperCase();
 const CSV = [
   "source_row_id,nickname,species,sex,sterilisation_status,age_band,ownership_category,area_code,last_seen_date,coat_description",
-  `E2E-${run}-1,Imported ${run},dog,F,yes,adult,street,DEMO-A,2026-09-01,Tan with white socks`,
+  `E2E-${run}-1,Imported ${run},dog,F,yes,adult,street,W-A,2026-09-01,Tan with white socks`,
   `E2E-${run}-2,Second ${run},canine,M,intact,pup,stray,NOPE,2026-09-02,Brown`,
-  `E2E-${run}-3,,dog,?,maybe,old,community,DEMO-A,2099-01-01,White`,
+  `E2E-${run}-3,,dog,?,maybe,old,community,W-A,2099-01-01,White`,
 ].join("\n");
 
 async function as(browser: Browser, email: string): Promise<Page> {

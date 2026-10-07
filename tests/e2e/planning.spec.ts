@@ -19,21 +19,21 @@ test("coordinator plans, approves and publishes a field day; revised inputs give
   await signIn(page, DEMO.coordinator.email);
   await switchOrg(page, ORGS.riverside);
   await page.getByRole("navigation", { name: "App navigation" }).first().getByRole("link", { name: "Campaign planning" }).click();
-  await page.getByRole("link", { name: "Demo October vaccination round" }).click();
-  await expect(page.getByRole("heading", { name: "Demo October vaccination round" })).toBeVisible();
+  await page.getByRole("link", { name: "October vaccination round" }).click();
+  await expect(page.getByRole("heading", { name: "October vaccination round" })).toBeVisible();
   await expect(page.getByText(/Suggested 22: one street count on \d{4}-\d{2}-\d{2}/)).toBeVisible();
   await expect(page.getByText("they are not population sizes or vaccination coverage", { exact: false })).toBeVisible();
   await expectNoAxeViolations(page);
 
   // The coordinator leaves the market ward out; the plan must respect that
-  await page.getByLabel("Demo Ward F — Market").selectOption({ label: "Leave out" });
+  await page.getByLabel("Ward F — Market").selectOption({ label: "Leave out" });
   await page.getByRole("button", { name: "Make plan" }).click();
   await expect(page.getByText("Ready for review").first()).toBeVisible({ timeout: 60_000 });
   const main = page.getByRole("main");
   await expect(main.getByText("This is a proposal")).toBeVisible();
   await expect(main.getByText(/straight-line distance × 1\.3 at 15 km\/h/)).toBeVisible();
   await expect(main.getByText("Simple plan, for comparison")).toBeVisible();
-  await expect(main.getByText(/Demo Ward F — Market\s*:\s*You left it out\./)).toBeVisible();
+  await expect(main.getByText(/Ward F — Market\s*:\s*You left it out\./)).toBeVisible();
   await expectNoAxeViolations(page);
   await page.screenshot({ path: path.join(SHOTS, "planner-ready-1440.png"), fullPage: true });
 
@@ -58,12 +58,12 @@ test("coordinator plans, approves and publishes a field day; revised inputs give
   await vctx.close();
 
   // Revised input: only team 2 with 10 doses → a new version that explains what cannot be done
-  await page.getByLabel("Demo team 1").uncheck();
+  await page.getByLabel("Team 1").uncheck();
   await page.getByLabel("Doses").nth(1).fill("10");
   await page.getByRole("button", { name: "Make plan" }).click();
   await expect(page.getByRole("heading", { name: /Plan version \d+ for/ })).toBeVisible();
   await expect(page.getByText("Ready for review").first()).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText("It needs more doses than any team carries.").first()).toBeVisible();
-  await expect(page.getByText(/Demo Ward F — Market\s*:\s*You left it out\./)).toBeVisible(); // decision kept
+  await expect(page.getByText(/Ward F — Market\s*:\s*You left it out\./)).toBeVisible(); // decision kept
   await expect(page.getByRole("heading", { name: "Plan versions" })).toBeVisible();
 });

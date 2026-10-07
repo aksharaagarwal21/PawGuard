@@ -99,9 +99,9 @@ test("hackathon demo journey (recorded)", async ({ browser }) => {
   await page.getByRole("link", { name: "Record vaccination evidence" }).click();
   const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
   await page.getByLabel("Date", { exact: true }).fill(yesterday);
-  await page.getByLabel("Vaccine product").selectOption({ label: "DEMO Rabies Vaccine A (fictional)" });
-  await page.getByLabel("Lot / batch number").selectOption({ label: "DEMO-A-001" });
-  await page.getByLabel("Given by (name)").fill("Dr Fictional (demo)");
+  await page.getByLabel("Vaccine product").selectOption({ label: "Anti-rabies vaccine A" });
+  await page.getByLabel("Lot / batch number").selectOption({ label: "ARV-A-001" });
+  await page.getByLabel("Given by (name)").fill("Dr Meera Rao");
   await page.getByTestId("vacc-evidence-file-input").setInputFiles(path.join(FIXTURES, "synthetic-certificate.jpg"));
   await expect(page.getByText(/^(Ready|Checking the file…|Saved\. It will be checked shortly)/)).toBeVisible({ timeout: 30_000 });
   await page.waitForTimeout(PAUSE);

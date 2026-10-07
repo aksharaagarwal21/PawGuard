@@ -20,8 +20,8 @@ export async function BiteShell({ children }: { children: React.ReactNode }) {
         <div className="container-pg max-w-2xl space-y-5 py-5">{children}</div>
       </main>
       {serverEnv().demoMode ? (
-        <footer className="bg-lavender">
-          <p className="container-pg py-2 text-sm font-semibold">{t("demoBanner")}</p>
+        <footer className="border-t border-divider">
+          <p className="container-pg py-2 text-xs text-ink-2">{t("demoBanner")}</p>
         </footer>
       ) : null}
     </>

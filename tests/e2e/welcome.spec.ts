@@ -6,8 +6,8 @@ import { expectNoAxeViolations } from "./helpers";
 test("opening the demo shows instructions, then Let's start opens sign-in", async ({ page }) => {
   await page.goto("/");
   await page.waitForURL(/\/en\/welcome$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Welcome to the PawGuard 360 demo" })).toBeVisible();
-  await expect(page.getByText("Everything here is fictional")).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Welcome to PawGuard 360" })).toBeVisible();
+  await expect(page.getByText("Sample accounts, pets and clinics", { exact: true })).toBeVisible();
   await expect(page.getByText("Photo matching is a research preview", { exact: false })).toBeVisible();
   for (const file of ["/demo/sample-dog.jpg", "/demo/sample-certificate.jpg"]) {
     const res = await page.request.get(file);
@@ -18,5 +18,5 @@ test("opening the demo shows instructions, then Let's start opens sign-in", asyn
   await page.getByRole("link", { name: "Let's start" }).click();
   await page.waitForURL(/\/en\/sign-in$/);
   await expect(page.getByRole("button", { name: /^Sign in as Priya/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: "How this demo works" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "How to explore" })).toBeVisible();
 });

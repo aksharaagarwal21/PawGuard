@@ -36,10 +36,10 @@ class DemoAccount:
 
 
 ORGS = (
-    DemoOrg("riverside", "Demo — Riverside Animal Welfare Trust", "animal_welfare_ngo", "IN-TN"),
-    DemoOrg("hillview", "Demo — Hillview Municipal Programme", "municipal_programme", "IN-TN"),
-    DemoOrg("lotus", "Demo — Lotus Pet Clinic (fictional)", "veterinary_service", "IN-TN"),
-    DemoOrg("banyan", "Demo — Banyan Veterinary Centre (fictional)", "veterinary_service", "IN-TN"),
+    DemoOrg("riverside", "Riverside Animal Welfare Trust", "animal_welfare_ngo", "IN-TN"),
+    DemoOrg("hillview", "Hillview Municipal Programme", "municipal_programme", "IN-TN"),
+    DemoOrg("lotus", "Lotus Pet Clinic", "veterinary_service", "IN-TN"),
+    DemoOrg("banyan", "Banyan Veterinary Centre", "veterinary_service", "IN-TN"),
 )
 
 ACCOUNTS = (
@@ -62,7 +62,7 @@ ACCOUNTS = (
     DemoAccount("hill_admin", "admin.farhan@example.org", "Farhan", "Organisation administrator (Hillview)",
                 (("hillview", "org_admin"),)),
     # Pet vaccination reminders (fictional clinics)
-    DemoAccount("owner", "owner.neha@example.org", "Neha", "Pet owner — 3 demo pets at Lotus Pet Clinic",
+    DemoAccount("owner", "owner.neha@example.org", "Neha", "Pet owner — 3 pets at Lotus Pet Clinic",
                 (("lotus", "resident"),)),
     DemoAccount("clinic_vet", "vet.kiran@example.org", "Dr Kiran", "Clinic vet (Lotus Pet Clinic)",
                 (("lotus", "veterinary_reviewer"),), vet_approval_in=("lotus",)),

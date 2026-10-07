@@ -9,6 +9,7 @@ import { formatDateTime } from "@/lib/format";
 import { pageContext } from "@/lib/page-context";
 import { serverEnv } from "@/lib/server-env";
 
+import { STATUS_COLOURS } from "./area-map";
 import { LazyAreaMap } from "./map-loader";
 
 export default async function MapPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -62,9 +63,33 @@ export default async function MapPage({ params }: { params: Promise<{ locale: st
             tileUrl={env.PAWGUARD_MAP_TILE_URL || undefined}
             attribution={env.PAWGUARD_MAP_TILE_ATTRIBUTION}
             label={t("mapLabel")}
+            locale={locale}
+            labels={{
+              status_up_to_date: t("status.up_to_date"),
+              status_verified: t("status.verified"),
+              status_due_soon: t("status.due_soon"),
+              status_overdue: t("status.overdue"),
+              status_no_verified_record: t("status.no_verified_record"),
+              lastVerified: t("popup.lastVerified"),
+              nextDue: t("popup.nextDue"),
+              seen: t("popup.seen"),
+              openRecord: t("popup.openRecord"),
+              openTasks: t("popup.openTasks"),
+              species_dog: t("popup.dog"),
+              species_cat: t("popup.cat"),
+              task_unassigned: t("popup.taskUnassigned"),
+              task_assigned: t("popup.taskAssigned"),
+              task_in_progress: t("popup.taskInProgress"),
+              task_blocked: t("popup.taskBlocked"),
+            }}
           />
           <div className="flex flex-wrap gap-4 text-sm" aria-label={t("legend")}>
-            <span className="inline-flex items-center gap-2"><span aria-hidden className="inline-block size-3 rounded-full bg-primary ring-2 ring-white" />{t("legendSightings")}</span>
+            {(["up_to_date", "due_soon", "overdue", "no_verified_record"] as const).map((s) => (
+              <span key={s} className="inline-flex items-center gap-2">
+                <span aria-hidden className="inline-block size-3 rounded-full ring-2 ring-white" style={{ backgroundColor: STATUS_COLOURS[s] }} />
+                {t("legendSighting", { status: t(`status.${s}`) })}
+              </span>
+            ))}
             <span className="inline-flex items-center gap-2"><span aria-hidden className="inline-block size-4 rounded-full border-[3px] border-urgent" />{t("legendTasks")}</span>
             <span className="inline-flex items-center gap-2"><span aria-hidden className="inline-block h-3 w-5 border-2 border-primary bg-primary/10" />{t("legendAreas")}</span>
           </div>

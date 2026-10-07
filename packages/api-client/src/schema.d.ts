@@ -2439,6 +2439,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/vaccination-events/{event_id}/evidence-check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * AI-assisted check of a record's certificates
+         * @description Permission: clinic staff. For each attached certificate: verifies a signed PawGuard QR if present, reads the
+         *     certificate (OCR / Gemini vision for sample clinics) and compares date, vaccine and batch with the record, and flags
+         *     a file already used for another record. Assists the vet — never verifies or rejects on its own.
+         */
+        get: operations["certificates (signed)_check_evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/vaccination-events/{event_id}/reviews": {
         parameters: {
             query?: never;
@@ -3590,6 +3612,47 @@ export interface components {
         /** ErrorResponse */
         ErrorResponse: {
             error: components["schemas"]["ErrorBody"];
+        };
+        /** EvidenceCheckItemOut */
+        EvidenceCheckItemOut: {
+            certificate: components["schemas"]["SignedSummaryOut"] | null;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "file" | "signature" | "reading" | "date" | "vaccine" | "batch" | "reuse";
+            /** Message */
+            message: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "ok" | "warn" | "bad" | "info" | "unavailable";
+        };
+        /** EvidenceCheckOut */
+        EvidenceCheckOut: {
+            /** Files */
+            files: components["schemas"]["EvidenceFileOut"][];
+            /**
+             * Summary
+             * @enum {string}
+             */
+            summary: "problems" | "check" | "partial" | "consistent";
+        };
+        /** EvidenceFileOut */
+        EvidenceFileOut: {
+            /** Checks */
+            checks: components["schemas"]["EvidenceCheckItemOut"][];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "photo" | "pdf";
+            /**
+             * Media Id
+             * Format: uuid
+             */
+            media_id: string;
         };
         /** EvidenceOut */
         EvidenceOut: {
@@ -5212,6 +5275,23 @@ export interface components {
             format: "PG-TL1" | "PG-RL1";
             /** Version */
             version: number;
+        };
+        /** SignedSummaryOut */
+        SignedSummaryOut: {
+            /** Clinic */
+            clinic: string | null;
+            /** Given On */
+            given_on: string | null;
+            /** Next Due On */
+            next_due_on: string | null;
+            /** Pet Name */
+            pet_name: string | null;
+            /** Pet Reference */
+            pet_reference: string | null;
+            /** Vaccine */
+            vaccine: string | null;
+            /** Vet */
+            vet: string | null;
         };
         /** SignedUrlOut */
         SignedUrlOut: {
@@ -12858,6 +12938,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IssuedOut"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    "certificates (signed)_check_evidence": {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-pawguard-org"?: string | null;
+                authorization?: string | null;
+            };
+            path: {
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvidenceCheckOut"];
                 };
             };
             /** @description Unauthorized */

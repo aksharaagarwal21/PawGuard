@@ -78,6 +78,11 @@ def _read(db: Any, ctx: OrgContext, media: Any, s: Any) -> dict[str, Any]:
     from pawguard_api.integrations.storage import get_storage
 
     image = get_storage().download(key, MAX_BYTES)
+    return draft_from_image(db, ctx, media.id, image, s)
+
+
+def draft_from_image(db: Any, ctx: OrgContext, media_id: Any, image: bytes, s: Any) -> dict[str, Any]:
+    """Read one certificate image (a photo, or a PDF page rendered by the caller) into a stored draft."""
     demo = bool(db.execute(text("select is_demo from app.organisations where id = :o"), {"o": ctx.org_id}).scalar())
     try:
         result = ocr.extract(s, image, demo_org=demo)
@@ -98,7 +103,7 @@ def _read(db: Any, ctx: OrgContext, media: Any, s: Any) -> dict[str, Any]:
           product_id = excluded.product_id, product_text = excluded.product_text, lot_text = excluded.lot_text,
           confidence = excluded.confidence, warnings = excluded.warnings, created_at = now()
         returning *"""),
-        {"m": media.id, "o": ctx.org_id, "e": result.engine, "l": list(result.languages),
+        {"m": media_id, "o": ctx.org_id, "e": result.engine, "l": list(result.languages),
          "a": draft.administered_on, "n": draft.next_due_on, "pid": draft.product_id,
          "pt": draft.product_name or draft.vaccine_keyword, "lot": draft.lot_text, "c": result.confidence,
          "u": ctx.user_id, "w": warnings}).one()

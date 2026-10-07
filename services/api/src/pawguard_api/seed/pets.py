@@ -2,7 +2,7 @@
 
 Two fictional clinics, one pet owner with three pets (one up to date, one due soon, one overdue) and one clinic vet.
 Dates are relative to today so the three statuses hold whenever the demo is reset. Products carry a *demo* schedule
-template ("Demo template — confirm with your vet"); every seeded due date is entered as the vet's own date.
+template ("Standard schedule — confirm with your vet"); every seeded due date is entered as the vet's own date.
 The owner-uploaded certificate awaiting verification is created through the API by ``scripts/demo_prepare.py``.
 """
 
@@ -16,11 +16,11 @@ from sqlalchemy.engine import Connection
 from pawguard_api.domain.reminders import schedule_reminders
 from pawguard_api.seed.accounts import demo_id
 
-TEMPLATE_LABEL = "Demo template — confirm with your vet"
+TEMPLATE_LABEL = "Standard schedule — confirm with your vet"
 PRODUCTS = {  # key: (name, species, demo template interval in days)
-    "rabies": ("Rabies vaccine (demo product)", ["dog", "cat"], 365),
-    "dhppi": ("DHPPi combination (demo product)", ["dog"], 365),
-    "tricat": ("Feline tricat combination (demo product)", ["cat"], 365),
+    "rabies": ("Rabies vaccine", ["dog", "cat"], 365),
+    "dhppi": ("DHPPi combination", ["dog"], 365),
+    "tricat": ("Feline tricat combination", ["cat"], 365),
 }
 PETS = (  # key, name, species, sex, age in years, [(product, given days ago, next due in days)]
     ("bruno", "Bruno", "dog", "male", 3, [("rabies", 120, 245), ("dhppi", 120, 245)]),
@@ -45,7 +45,7 @@ def seed_pets(c: Connection, users: dict[str, UUID]) -> dict[str, int]:
         for key, (name, species, interval) in PRODUCTS.items():
             _ins(c, "vaccine_products", {
                 "id": demo_id("product", f"{clinic}:{key}"), "org_id": demo_id("org", clinic), "name": name,
-                "manufacturer": "Fictional manufacturer (demo)", "species": species, "form": "injection",
+                "manufacturer": None, "species": species, "form": "injection",
                 "review_state": "reviewed", "template_interval_days": interval, "template_label": TEMPLATE_LABEL,
                 "is_demo": True, "created_by": users[f"{clinic}_admin"]})
     for key, name, species, sex, years, shots in PETS:
@@ -66,8 +66,8 @@ def seed_pets(c: Connection, users: dict[str, UUID]) -> dict[str, int]:
             _ins(c, "animal_vaccination_events", {
                 "id": eid, "org_id": org_id, "animal_id": aid, "original_animal_id": aid, "administered_on": given,
                 "date_precision": "day", "product_id": demo_id("product", f"{org}:{product}"),
-                "administered_by_name": "Dr Kiran (demo)", "source_type": "clinic_record",
-                "source_reference": "Recorded at the clinic (demo)", "state": "verified",
+                "administered_by_name": "Dr Kiran", "source_type": "clinic_record",
+                "source_reference": "Recorded at the clinic", "state": "verified",
                 "next_review_on": today + timedelta(days=due_in), "next_review_source": "vet",
                 "submitted_by": vet, "submitted_at": at, "verified_by": vet, "verified_at": at, "is_demo": True,
                 "created_by": vet})

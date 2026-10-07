@@ -88,7 +88,7 @@ def test_compose_has_only_reminder_facts():
     m = notify.compose(info, s)
     assert m.subject == "Reminder: Coco's Rabies vaccination was due on 1 Oct 2026"
     assert "Please contact Lotus" in m.short and "/en/app/reminders" in m.text
-    assert "Demo — fictional" in m.text and "your vet decides" in m.text
+    assert "Sample data" in m.text and "your vet decides" in m.text
     m2 = notify.compose({**info, "due_on": "2026-10-17", "is_demo": False}, s)
     assert "is due on 17 Oct 2026" in m2.subject and "Demo" not in m2.text
 

@@ -29,7 +29,7 @@ test("coordinator and admin screens", async ({ page, isMobile }) => {
     await snap(page, `coord-${name}`, isMobile);
   }
   await page.goto("/en/app/campaigns");
-  await page.getByRole("link", { name: "Demo October vaccination round" }).click();
+  await page.getByRole("link", { name: "October vaccination round" }).click();
   await snap(page, "coord-planner", isMobile);
   await page.context().clearCookies();
   await signIn(page, DEMO.admin.email);

@@ -21,7 +21,7 @@
     "optional": "(optional)",
     "required": "(required)",
     "signOut": "Sign out",
-    "demoBanner": "Demo environment — all organisations, people and animals are fictional. Nothing here is a real record.",
+    "demoBanner": "Sample data — accounts, pets and clinics shown here are examples.",
     "translationDraftNotice": "This translation is a draft and has not yet been reviewed by a native speaker.",
     "untranslatedNotice": "This content is not yet available in your language. It is shown in English.",
     "reviewStatus": {
@@ -112,7 +112,7 @@
       "mistyLine": "Due in 10 days",
       "cocoLine": "5 days overdue",
       "nextStep": "Next step: Coco is overdue. Book a visit or mark it as done.",
-      "caption": "What you'll see after signing in (fictional pets)."
+      "caption": "What you'll see after signing in."
     },
     "howTitle": "How it works",
     "howIntro": "Four steps, from adding your pet to showing a verified card.",
@@ -162,7 +162,7 @@
       "vets": "Only vets can verify a vaccine.",
       "contact": "Your contact details never appear on the public card.",
       "reminds": "The app reminds you. It never decides treatment.",
-      "demo": "Demo data is clearly labelled."
+      "demo": "Sample data is clearly marked."
     },
     "mattersTitle": "Why it matters",
     "mattersIntro": "Vaccinating pets protects them — and the people around them. In the World Health Organization's words:",
@@ -175,7 +175,7 @@
     "mattersSourceLink": "WHO rabies fact sheet (updated 17 September 2026)",
     "mattersChecked": "checked 6 October 2026",
     "faqTitle": "Questions people ask",
-    "closing": "Takes about two minutes with the demo accounts."
+    "closing": "Takes about two minutes with the sample accounts."
   },
   "help": {
     "title": "Bitten or scratched by an animal?",
@@ -237,17 +237,17 @@
       "unavailable": "Sign-in is not available right now. Please try again shortly.",
       "rateLimited": "Too many attempts. Wait a few minutes and try again."
     },
-    "demoTitle": "Demo accounts",
-    "demoIntro": "Fictional accounts that exist only in this demo. One click signs you in.",
+    "demoTitle": "Sample accounts",
+    "demoIntro": "Ready-made accounts to explore PawGuard. One click signs you in.",
     "demoSignInAs": "Sign in as {name}",
     "expired": "Your session has ended. Please sign in again.",
     "signedOut": "You have signed out.",
-    "howDemoWorks": "How this demo works",
+    "howDemoWorks": "How to explore",
     "stepsTitle": "Signing in takes 3 steps",
     "steps": {
       "one": {
         "title": "Pick your account",
-        "body": "In this demo, choose one of the demo accounts below."
+        "body": "Choose one of the sample accounts below."
       },
       "two": {
         "title": "Land on your home page",
@@ -269,7 +269,7 @@
     "chooseOrganisation": "Choose an organisation",
     "online": "Online",
     "offline": "Offline",
-    "demoOrg": "Demo"
+    "demoOrg": "Sample data"
   },
   "today": {
     "greeting": "Hello, {name}",
@@ -653,7 +653,7 @@
     "notAuthorised": "Reviewing needs an approved veterinary authority in this organisation.",
     "staleRow": "Someone else reviewed or changed this record. The queue has been refreshed.",
     "nextDueLabel": "Next due date",
-    "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a demo schedule template, that date is used and labelled “Demo template — confirm with your vet”.",
+    "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a standard schedule, that date is used and labelled “Standard schedule — confirm with your vet”.",
     "nextDueFromCertificate": "Pre-filled from the certificate draft — check it."
   },
   "tasks": {
@@ -773,14 +773,35 @@
     },
     "registryNote": "Registry measures, not population coverage: animals that were never registered are not counted.",
     "generated": "Data as of {time} · {mode}",
-    "modeDemo": "demo data",
+    "modeDemo": "sample data",
     "modeLive": "live data",
     "export": "Download registry (CSV)",
     "truncated": "Only the 2,000 most recent sightings are shown.",
     "mapLabel": "Map of sightings and areas",
     "loading": "Loading map…",
-    "showList": "The table below lists the same information.",
-    "totals": "All areas"
+    "showList": "Tap a point or area for details. The table below lists the same information.",
+    "totals": "All areas",
+    "legendSighting": "Sighting — {status}",
+    "status": {
+      "up_to_date": "vaccination up to date",
+      "verified": "vaccination recorded",
+      "due_soon": "due soon",
+      "overdue": "overdue",
+      "no_verified_record": "no verified vaccination"
+    },
+    "popup": {
+      "lastVerified": "Last verified vaccination:",
+      "nextDue": "Next due:",
+      "seen": "Seen:",
+      "openRecord": "Open record →",
+      "openTasks": "Open tasks →",
+      "dog": "dog",
+      "cat": "cat",
+      "taskUnassigned": "Not assigned yet",
+      "taskAssigned": "Assigned",
+      "taskInProgress": "In progress",
+      "taskBlocked": "Blocked"
+    }
   },
   "capture": {
     "title": "Add a photo or sighting",
@@ -877,7 +898,7 @@
   },
   "identity": {
     "previewTitle": "Research preview — not validated",
-    "previewBody": "This demo organisation can try photo-based suggestions from a research model. It has only been tested on a research set of dog face photos, not on community dogs in the field. It is not offered for real records. Always compare the photos and details yourself.",
+    "previewBody": "This organisation can try photo-based suggestions from a research model. It has only been tested on a research set of dog face photos, not on community dogs in the field. It is not offered for real records. Always compare the photos and details yourself.",
     "step1": "1. Add a photo and choose the animal in it",
     "lookFor": "Look for possible matches",
     "chooseSubjectFirst": "Choose which animal in the photo you mean before searching.",
@@ -1143,10 +1164,10 @@
     "estimatesBody": "A street count is what one person saw on one day: it can miss animals and count some twice. Registry numbers include only registered animals. Only the latest count is used — counts are never added up. These numbers schedule time and doses; they are not population sizes or vaccination coverage."
   },
   "welcome": {
-    "title": "Welcome to the PawGuard 360 demo",
+    "title": "Welcome to PawGuard 360",
     "intro": "PawGuard helps pet owners keep vaccination records and get reminders before each due date, with every record verified by the clinic's vet. It also supports community rabies programmes.",
-    "fictionalTitle": "Everything here is fictional",
-    "fictionalBody": "This demo uses fictional accounts, pets and clinics. You sign in with one click on the next page — no password to type. Please don't upload photos of people or private places.",
+    "fictionalTitle": "Sample accounts, pets and clinics",
+    "fictionalBody": "Everything you'll see uses sample accounts, pets and clinics. You sign in with one click on the next page — no password to type. Please don't upload photos of people or private places.",
     "howTitle": "Community dog programmes: try it in four steps (about 3 minutes)",
     "steps": {
       "one": {
@@ -1159,7 +1180,7 @@
       },
       "three": {
         "title": "Submit vaccination evidence",
-        "body": "On the animal's page choose “Record vaccination evidence”: yesterday's date, product “DEMO Rabies Vaccine A (fictional)”, lot “DEMO-A-001”, any name, and the sample certificate. Then “Submit for review”."
+        "body": "On the animal's page choose “Record vaccination evidence”: yesterday's date, product “Anti-rabies vaccine A”, lot “ARV-A-001”, any name, and the sample certificate. Then “Submit for review”."
       },
       "four": {
         "title": "Verify as the vet",
@@ -1171,14 +1192,14 @@
     "sampleDog": "Sample dog photo (for “Add photo”)",
     "sampleDogCredit": "Photo: Flickr 3572256424 via the COCO 2017 dataset, CC BY 2.0.",
     "sampleCertificate": "Sample vaccination certificate (for the evidence step)",
-    "sampleCertificateNote": "A made-up certificate image created for this demo.",
+    "sampleCertificateNote": "A sample certificate image for trying the upload.",
     "limitsTitle": "Please keep in mind",
     "limits": {
       "matching": "Photo matching is a research preview: tested only on a set of pet-dog face photos, not on community dogs, and it does not pass our own accuracy bar. Suggestions are never automatic — a person decides.",
       "offline": "Offline mode covers tasks and sightings only; photos and vaccination evidence need a connection.",
       "language": "Tamil and Hindi are partial drafts; some screens appear in English.",
-      "reset": "Demo data may be reset at any time.",
-      "reminders": "Reminders appear in the app. Email, browser notifications and WhatsApp are opt-in; in the demo they go only to the team's test inbox and test WhatsApp number. Seeded due dates are fictional; the app only reminds and never decides treatment."
+      "reset": "Sample data may be reset at any time.",
+      "reminders": "Reminders appear in the app. Email, browser notifications and WhatsApp are opt-in. Due dates in the sample data are examples; the app only reminds and never decides treatment."
     },
     "start": "Let's start",
     "aboutLink": "About PawGuard",
@@ -1186,7 +1207,7 @@
     "petSteps": {
       "one": {
         "title": "Sign in as Neha (pet owner)",
-        "body": "Click “Let's start”, then “Sign in as Neha”. Three demo pets: Bruno is up to date, Misty is due soon, Coco is overdue."
+        "body": "Click “Let's start”, then “Sign in as Neha”. Three pets: Bruno is up to date, Misty is due soon, Coco is overdue."
       },
       "two": {
         "title": "Act on a reminder",
@@ -1197,7 +1218,7 @@
         "body": "Sign out, choose “Sign in as Dr Kiran”, open “Clinic”. Under “Awaiting verification” choose “Review” for Coco, then “Verify” with a next due date."
       },
       "four": {
-        "title": "Move the demo date",
+        "title": "Move the date forward",
         "body": "On the clinic dashboard choose “+7 days”: Misty moves to “Due this week”. Choose “Back to the real date” when done."
       },
       "five": {
@@ -1206,7 +1227,7 @@
       }
     },
     "beforeYouBegin": "Before you begin",
-    "beginIntro": "Pick how you'll use PawGuard. We'll show you which demo account to use and what to try first.",
+    "beginIntro": "Pick how you'll use PawGuard. We'll show you which sample account to use and what to try first.",
     "chooseTitle": "Choose how you'll use PawGuard",
     "chooseIntro": "You can switch any time. This only changes what we suggest you try first.",
     "selected": "Selected",
@@ -1225,7 +1246,7 @@
         "one": "See which pets are due this week or overdue.",
         "two": "Verify certificates that owners upload.",
         "three": "Record vaccines and set the next due date.",
-        "ready": "nothing — the demo clinic is already set up."
+        "ready": "nothing — the clinic is already set up."
       },
       "volunteer": {
         "title": "I volunteer with community dogs",
@@ -1235,7 +1256,7 @@
         "ready": "a dog photo (a sample is in the walkthrough below)."
       }
     },
-    "accountsTitle": "In this demo",
+    "accountsTitle": "Sample accounts",
     "colName": "Sign in as",
     "colRole": "Role",
     "colTry": "What to try first",
@@ -1273,7 +1294,7 @@
       "clinic": "Next: choose “Sign in as Dr Kiran”.",
       "volunteer": "Next: choose “Sign in as Priya”."
     },
-    "walkthroughTitle": "Full demo walkthrough and sample files (for presenters)"
+    "walkthroughTitle": "Full walkthrough and sample files (for presenters)"
   },
   "modelEvidence": {
     "title": "Model evidence: photo matching",
@@ -1282,7 +1303,7 @@
     "caveatLine": "Evaluated on DogFaceNet pet face photos; not yet validated on street dogs.",
     "caveatBody": "DogFaceNet is a public set of close-up face photos of pet dogs. Our field photos are full-body photos of community dogs, taken outdoors in very different conditions, so these numbers do not tell us how well matching works in the field.",
     "statusChip": "Research preview",
-    "status": "Offered only in demo organisations, always with a person deciding. Our release bar is not met, so real organisations cannot use it.",
+    "status": "Offered only as a labelled preview, always with a person deciding. Our release bar is not met, so it is not used for real records yet.",
     "whatTitle": "What was tested",
     "what": "{known} known dogs had {gallery} photos on record (2 each); {knownQ} other photos of them were searched. {unknown} more dogs were never put on record; their {unknownQ} photos should get no confident match. None of these dogs were used to build the model, and the settings were chosen beforehand on {valDogs} separate validation dogs.",
     "threshold": "Confidence threshold {tau} (similarity to the average of a dog's photos on record), chosen on the validation dogs to keep false matches for unknown dogs at or below 5 %.",
@@ -1322,7 +1343,7 @@
     "reproTitle": "Reproducibility",
     "reproModel": "Model {name} · {version} (frozen; the face detector was skipped because the photos are already face crops).",
     "reproSplit": "Split manifest sha256 {hash}… · seed {seed} · code commit {commit}",
-    "reproTiming": "On the demo laptop's CPU: {ms} ms per photo to compute a match signature; {search} ms per search."
+    "reproTiming": "On a laptop CPU: {ms} ms per photo to compute a match signature; {search} ms per search."
   },
   "pets": {
     "title": "My pets",
@@ -1334,7 +1355,7 @@
     "emptyTitle": "No pets yet",
     "emptyBody": "Add your pet to keep its vaccination records in one place and get reminders before each due date.",
     "listLabel": "Your pets",
-    "demoData": "Demo data",
+    "demoData": "Sample data",
     "species": {
       "dog": "Dog",
       "cat": "Cat"
@@ -1354,7 +1375,7 @@
     "dueIn": "{vaccine}: due on {date} (in {days, plural, one {# day} other {# days}})",
     "dueToday": "{vaccine}: due today, {date}",
     "wasDue": "{vaccine}: was due on {date} ({days, plural, one {# day} other {# days}} ago)",
-    "templateLabel": "Demo template — confirm with your vet",
+    "templateLabel": "Standard schedule — confirm with your vet",
     "dueFromVet": "Due date set by the vet.",
     "verification": {
       "verified_by_vet": "Verified by vet",
@@ -1364,7 +1385,7 @@
       "rejected": "Not accepted",
       "superseded": "Replaced by a corrected record"
     },
-    "demoDate": "Demo date: today is shown as {date} ({days, plural, one {# day} other {# days}} moved for the demonstration).",
+    "demoDate": "Preview date: today is shown as {date} ({days, plural, one {# day} other {# days}} ahead).",
     "speciesLabel": "Species",
     "dobLabel": "Date of birth",
     "clinicLabel": "Clinic",
@@ -1579,12 +1600,12 @@
     "channelsLink": "Choose how to get reminders"
   },
   "demoClock": {
-    "title": "Demo date (demo organisation only)",
+    "title": "Preview date",
     "body": "Move “today” forward to show how reminders and statuses change. Stored dates are not changed.",
     "current": "Today is shown as {date} ({days, plural, =0 {real date} one {+# day} other {+# days}}).",
     "advance": "+{days, plural, one {# day} other {# days}}",
     "reset": "Back to the real date",
-    "failed": "The demo date could not be changed."
+    "failed": "The preview date could not be changed."
   },
   "publicCard": {
     "title": "Vaccination card for {name}",
@@ -1620,7 +1641,7 @@
       "vaccine": "Vaccine",
       "date": "Date given",
       "nextDue": "Next due date",
-      "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a demo schedule template, that date is used and labelled “Demo template — confirm with your vet”.",
+      "nextDueHint": "Your date for the next dose. If left empty and the vaccine has a standard schedule, that date is used and labelled “Standard schedule — confirm with your vet”.",
       "lot": "Batch / lot",
       "save": "Save vaccination",
       "saving": "Saving…",
@@ -1628,20 +1649,20 @@
       "dateRequired": "Enter the date the vaccine was given.",
       "dateFuture": "The date cannot be in the future.",
       "dueAfter": "The next due date must be after the vaccination date.",
-      "templateOption": "{name} (demo template: {days} days)"
+      "templateOption": "{name} (standard schedule: {days} days)"
     },
     "todayAt": "Today at {clinic}",
-    "demoClinic": "Demo clinic",
+    "demoClinic": "Sample clinic",
     "filterLabel": "Filter the lists",
     "filteredBy": "Showing only: {name}.",
     "showAll": "Show everything",
-    "demoTools": "Demo tools",
-    "demoToolsIntro": "Only in demo organisations. Use these to show how reminders progress; real clinics never see this.",
+    "demoTools": "Presenter tools",
+    "demoToolsIntro": "For presentations with sample data: show how reminders progress over time. Real clinics never see this.",
     "verifyLink": "Verify a certificate (scan a PawGuard QR)"
   },
   "footer": {
-    "demoVersion": "Demo version — not for real medical use.",
-    "credit": "Made for a hackathon, October 2026. All pets, people and clinics in the demo are fictional."
+    "demoVersion": "Sample data — not for real medical use.",
+    "credit": "Made for a hackathon, October 2026."
   },
   "statusGuide": {
     "up_to_date": "Verified by a vet, and the next dose is more than 2 weeks away.",
@@ -1657,7 +1678,7 @@
     },
     "dueDate": {
       "q": "Who sets the due date?",
-      "a": "Your vet. When a vet verifies a vaccine, they enter the next due date. If they leave it empty, a clearly labelled demo template may fill it in — always confirm the date with your vet."
+      "a": "Your vet. When a vet verifies a vaccine, they enter the next due date. If they leave it empty, a clearly labelled standard schedule may fill it in — always confirm the date with your vet."
     },
     "lostCertificate": {
       "q": "What if I lost my paper certificate?",
@@ -1710,8 +1731,8 @@
         "body": "Vaccines given here are saved as verified, and the owner's reminders update at once."
       },
       "demo": {
-        "title": "Demo tools",
-        "body": "In the demo you can move the date forward to show how reminders progress."
+        "title": "Presenter tools",
+        "body": "Move the date forward to show how reminders progress."
       }
     }
   },
@@ -1774,8 +1795,8 @@
       "call": "Test call on its way — your phone should ring in a few seconds."
     },
     "testLimited": "You've sent several tests already. Try again in an hour.",
-    "demoTitle": "In this demo",
-    "demoBody": "Messages go to the team's test inbox and test WhatsApp number, never to the fictional demo accounts.",
+    "demoTitle": "Test recipients",
+    "demoBody": "Messages go to the team's test inbox and test WhatsApp number, never to the sample accounts.",
     "footer": "PawGuard only reminds you; your vet decides what your pet needs. Reminder messages contain your pet's name, the vaccine, the date and your clinic — nothing else.",
     "email": {
       "title": "Email",
@@ -1847,7 +1868,7 @@
       "test": "Test message",
       "none": "No messages yet.",
       "runNow": "Send due reminders now",
-      "runHint": "Demo only. Normally this happens every 10 minutes.",
+      "runHint": "Normally this happens every 10 minutes.",
       "queued": "{count, plural, =0 {Nothing new to send.} one {# message queued.} other {# messages queued.}}",
       "failed": "That didn't work. Try again.",
       "webhook": "WhatsApp webhook address (Meta dashboard → WhatsApp → Configuration; it changes when the public link restarts):",
@@ -1857,7 +1878,7 @@
         "1": "Answer: will book a visit",
         "2": "Answer: remind again in 3 days"
       },
-      "demoReminder": "Demo reminder (fictional pet)"
+      "demoReminder": "Practice reminder"
     },
     "verify": {
       "okTitle": "Email confirmed",
@@ -1874,22 +1895,22 @@
       "unavailable": "Phone calls aren't set up on this server (optional)."
     },
     "waDemo": {
-      "title": "WhatsApp demo (Twilio trial)",
+      "title": "WhatsApp (Twilio trial)",
       "ready": "Ready",
       "notReady": "Not set up yet",
       "missingIntro": "These server settings are still missing (values are never shown here):",
       "missingHint": "Add them to the server's private .env file, then restart the API, worker and dispatcher.",
-      "recipient": "Sends only to the demo number",
+      "recipient": "Sends only to the test number",
       "recipientNote": "(set on the server; it can't be changed here).",
       "previewLabel": "Message preview — generic Twilio trial template.",
       "previewExact": "This is the exact text Twilio reported for the configured template.",
       "previewSample": "Example of Twilio's fixed trial text; the exact text appears here after the first send.",
       "previewNote": "On a Twilio trial, WhatsApp only allows Twilio's pre-approved sample templates, so the message doesn't name the pet or clinic. Real reminders need your own approved template.",
       "sendTest": "Send test WhatsApp",
-      "schedule": "Schedule demo reminder in 2 minutes",
+      "schedule": "Schedule a practice reminder in 2 minutes",
       "sending": "Please wait…",
-      "left": "{count, plural, =0 {No demo sends left this hour} one {# demo send left this hour} other {# demo sends left this hour}}",
-      "closeTab": "Scheduled reminders are sent by the server — you can close this tab. The reminder is for a fictional pet; no records change.",
+      "left": "{count, plural, =0 {No practice sends left this hour} one {# practice send left this hour} other {# practice sends left this hour}}",
+      "closeTab": "Scheduled reminders are sent by the server — you can close this tab. The reminder uses a sample pet; no records change.",
       "queuedNow": "Queued — it is sent within about 15 seconds.",
       "scheduledFor": "Scheduled for {time} IST.",
       "cancelled": "Cancelled — it won't be sent.",
@@ -1900,7 +1921,7 @@
       "colStatus": "Delivery status",
       "colSid": "Twilio message ID",
       "kindTest": "Test message",
-      "kindReminder": "Demo reminder",
+      "kindReminder": "Practice reminder",
       "cancel": "Cancel",
       "updated": "Updated {time} IST",
       "callback": "Delivery updates come from Twilio to {url}",
@@ -2038,7 +2059,7 @@
       "threadIntro": "A private conversation with the owner. The pet is registered with {clinic}.",
       "isLost": "Still lost",
       "isFound": "Found — thank you!",
-      "demo": "Demo data",
+      "demo": "Sample data",
       "closed": "The owner has marked the pet found, so this conversation is closed.",
       "keepLink": "Keep this page's link to come back. Anyone with the link can read this conversation."
     }
@@ -2060,7 +2081,7 @@
     "cameraView": "Camera view for scanning",
     "pasteLabel": "Or paste the code text",
     "check": "Check",
-    "samplesLink": "Demo: sample certificates to try (genuine, altered, cancelled)",
+    "samplesLink": "Sample certificates to try (genuine, altered, cancelled)",
     "footerNote": "Verification confirms the record came from a registered clinic and wasn't changed. It does not confirm the pet's health.",
     "unreadableTitle": "Can't read the code",
     "unreadableBody": "This isn't a readable PawGuard certificate. Hold the camera steady with the whole QR code in view and good light, try a sharper photo, or paste the text that starts with PG1:.",
@@ -2084,19 +2105,19 @@
     "reference": "Reference",
     "photoAlt": "Photo of the pet on record",
     "matchAnimal": "Check that this matches the animal in front of you.",
-    "demoIssuer": "Demo data — a fictional clinic and pet.",
+    "demoIssuer": "Sample data.",
     "overdueTitle": "Next dose overdue",
     "overdueBody": "Genuine, but the next due date has passed.",
     "samples": {
-      "title": "Sample certificates (demo)",
-      "intro": "Fictional demo data. Open the verifier on a phone and scan these from the screen, or copy the text.",
+      "title": "Sample certificates",
+      "intro": "Open the verifier on a phone and scan these from the screen, or copy the text.",
       "unavailable": "The samples couldn't be loaded. Is the API running with signing set up?",
-      "missing": "Not available in this demo database.",
+      "missing": "Not available.",
       "showText": "Show the code text",
       "back": "Back to the verifier",
       "genuine": {
         "title": "Genuine",
-        "body": "Bruno's rabies certificate from the fictional Lotus Pet Clinic."
+        "body": "Bruno's rabies certificate from Lotus Pet Clinic."
       },
       "altered": {
         "title": "Altered",
@@ -2202,7 +2223,7 @@
       "expires": "This link works until {date}.",
       "notFoundTitle": "This link doesn't work",
       "notFoundBody": "It has expired or was turned off.",
-      "demo": "Demo data — fictional pet, clinic and report."
+      "demo": "Sample data."
     },
     "doctorLinks": {
       "title": "Link for your doctor",
@@ -2259,5 +2280,25 @@
       "saved": "Examination saved.",
       "failed": "That didn't work."
     }
+  },
+  "evidenceCheck": {
+    "title": "AI evidence check",
+    "rerun": "Check again",
+    "checking": "Checking the certificate: reading it, looking for a signed PawGuard QR and comparing it with the record…",
+    "failed": "The check could not run just now. You can still compare the certificate by eye.",
+    "noFiles": "No certificate is attached to this record.",
+    "file": "Certificate {n} ({kind})",
+    "kind": {
+      "photo": "photo",
+      "pdf": "PDF"
+    },
+    "summary": {
+      "problems": "Problems found — look closely before deciding.",
+      "check": "Some details differ or are unclear — please compare.",
+      "partial": "Partly checked — some checks could not run.",
+      "consistent": "No problems found by the automatic checks."
+    },
+    "signedDetail": "On the signed certificate: {pet} · {vaccine} · given {given} · {vet}",
+    "disclaimer": "Automatic checks assist you and can be wrong. You decide: compare the certificate with the record yourself."
   }
 }

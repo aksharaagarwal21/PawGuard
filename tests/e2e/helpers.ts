@@ -31,7 +31,7 @@ export async function expectNoAxeViolations(page: Page) {
 
 /** Deterministic demo organisation ids (seed/accounts.py). */
 export const ORGS = {
-  riverside: { id: "04e6d089-3750-505d-a6de-3813a6458fcb", label: "Demo — Riverside Animal Welfare Trust" },
+  riverside: { id: "04e6d089-3750-505d-a6de-3813a6458fcb", label: "Riverside Animal Welfare Trust" },
 } as const;
 
 /** Make `org` the active organisation for a multi-membership account and wait until the server reflects it. */

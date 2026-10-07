@@ -36,7 +36,7 @@ def _check(db: Any, ctx: OrgContext) -> None:
         raise Forbidden("Clinic staff only.", code="staff_only")
     is_demo = db.execute(text("select is_demo from app.organisations where id = :o"), {"o": ctx.org_id}).scalar()
     if not (is_demo and get_settings().demo_mode):
-        raise Forbidden("Only available in the demo organisation.", code="not_demo")
+        raise Forbidden("Only available for organisations with sample data.", code="not_demo")
 
 
 def missing_settings() -> list[str]:
@@ -107,7 +107,7 @@ def queue(db: Any, ctx: OrgContext, kind: Literal["test", "demo_reminder"]) -> d
         raise ApiError("One is already waiting to be sent — see the history below.", code="already_queued",
                        status_code=409)
     if _sent_last_hour(db, ctx) >= SENDS_PER_HOUR:
-        raise ApiError("The demo allows 5 WhatsApp sends an hour. Try again later.", code="rate_limited",
+        raise ApiError("Practice sends are limited to 5 an hour. Try again later.", code="rate_limited",
                        status_code=429)
     minutes = SCHEDULE_MINUTES if kind == "demo_reminder" else 0
     row = db.execute(text("""

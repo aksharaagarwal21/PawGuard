@@ -22,8 +22,8 @@ from pawguard_api.seed.accounts import demo_id
 DEMO_REPORTER_TOKENS = {"bruno": "pawguard-demo-reporter-link-bruno-0001",
                         "misty": "pawguard-demo-reporter-link-misty-0002"}
 CASES = (  # pet key, reference, days since bite, bitten, [(day, state)]
-    ("bruno", "BR-DEMO-0001", 4, "person", [(1, "normal"), (3, "normal")]),
-    ("misty", "BR-DEMO-0002", 3, "person", [(1, "normal"), (2, "unusual_behaviour")]),
+    ("bruno", "BR-7K2M-4QXA", 4, "person", [(1, "normal"), (3, "normal")]),
+    ("misty", "BR-9PRT-3HWD", 3, "person", [(1, "normal"), (2, "unusual_behaviour")]),
 )
 
 
@@ -47,14 +47,14 @@ def seed_bites(c: Connection, users: dict[str, UUID]) -> dict[str, int]:
                                         "is_demo": True})
         _ins(c, "bite_reports", {"id": report, "org_id": org, "animal_id": animal, "period_id": period,
                                  "reference": reference, "bite_date": bite_date, "bite_time": "18:30",
-                                 "bitten": bitten, "area": "Demo area (fictional)",
-                                 "note": "Demo data — fictional report.", "status": "under_observation",
+                                 "bitten": bitten, "area": "Near the market",
+                                 "note": None, "status": "under_observation",
                                  "client_hash": "demo", "is_demo": True})
         for day, state in checkins:
             _ins(c, "observation_checkins", {"id": demo_id("checkin", f"{key}:{day}"), "org_id": org,
                                              "period_id": period, "day_number": day,
                                              "checkin_date": bite_date + timedelta(days=day), "state": state,
-                                             "note": "Demo update", "source": "owner", "recorded_by": users["owner"]})
+                                             "note": None, "source": "owner", "recorded_by": users["owner"]})
         _ins(c, "share_links", {"id": demo_id("share_link", key), "org_id": org, "report_id": report,
                                 "purpose": "reporter", "token_hash": token_hash(DEMO_REPORTER_TOKENS[key]),
                                 "expires_at": datetime.now(ZoneInfo("UTC")) + timedelta(days=60)})

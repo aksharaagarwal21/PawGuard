@@ -29,6 +29,8 @@ dependencies = [
   "cbor2==6.1.5",
   "base45==0.4.4",
   "uharfbuzz==0.56.3",
+  "pypdfium2==5.14.0",
+  "opencv-python-headless==5.0.0.93",
 ]
 
 [project.scripts]
